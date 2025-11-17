@@ -7,7 +7,7 @@ package use_case.loyalty_score;
 public interface LoyaltyScoreInputBoundary {
 
     /**
-     * Executes the loyalty score use case.
+     * Executes the loyalty score use case
      * @param loyaltyScoreInputData the input data
      */
     void execute(LoyaltyScoreInputData loyaltyScoreInputData);
