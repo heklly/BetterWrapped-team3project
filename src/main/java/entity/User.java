@@ -1,30 +1,61 @@
 package entity;
 
 /**
- * A simple entity representing a user. Users have a username, userid, and datejoined
+ * A simple entity representing a user.
+ * Users have a username, password, userid, and date joined.
  */
 public class User {
 
     private final String username;
+    private String password;
     private final int userid;
     private final String date_created;
 
     /**
-     * Creates a new user with the given non-empty name and non-empty password.
-     * @param name the username
-     * @param userid the unique userid for each user
-     * @param date the date the user was created
+     * Constructor mainly used by login/signup examples:
+     * username + password.
+     * userid / date
      */
-    public User(String name, int userid, String date ) {
-        this.username = name;
+    public User(String username, String password) {
+        this(username, password, -1, "");
+    }
+
+    /**
+     * Constructor for when you also want userid & date.
+     */
+    public User(String username, String password, int userid, String date) {
+        this.username = username;
+        this.password = password;
         this.userid = userid;
         this.date_created = date;
+    }
+
+    /**
+     * keep original User Class
+     * set password as empty string.
+     */
+    public User(String name, int userid, String date) {
+        this(name, "", userid, date);
     }
 
     public String getName() {
         return this.username;
     }
-    public int getUserid() { return this.userid; }
-    public String getDate() { return this.date_created; }
 
+    public int getUserid() {
+        return this.userid;
+    }
+
+    public String getDate() {
+        return this.date_created;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String newPassword) {
+        this.password = newPassword;
+    }
 }
+
