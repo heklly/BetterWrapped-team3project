@@ -6,7 +6,7 @@ package entity;
 public class User {
 
     private final String username;
-    private final int userid;
+    private final String userid;
     private final String date_created;
 
     /**
@@ -15,7 +15,7 @@ public class User {
      * @param userid the unique userid for each user
      * @param date the date the user was created
      */
-    public User(String name, int userid, String date ) {
+    public User(String name, String userid, String date ) {
         this.username = name;
         this.userid = userid;
         this.date_created = date;
@@ -24,7 +24,10 @@ public class User {
     public String getName() {
         return this.username;
     }
-    public int getUserid() { return this.userid; }
+    public String getUserid() { return this.userid; }
     public String getDate() { return this.date_created; }
+
+    // dummy method so code compiles...
+    public String getPassword() {return "password";}
 
 }
