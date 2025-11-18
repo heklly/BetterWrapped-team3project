@@ -7,12 +7,12 @@ import java.util.List;
 /**
  * The input data for the Check Shared Song Use Case.
  */
-public class CheckSharedSongInputData {
+public class SharedSongInputData {
 
     private final Group group;
     private final User user;
 
-    public CheckSharedSongInputData(Group group, User user) {
+    public SharedSongInputData(User user, Group group) {
         this.group = group;
         this.user = user;
     }
