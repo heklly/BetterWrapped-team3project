@@ -47,7 +47,7 @@ public class SharedSongInteractor implements SharedSongInputBoundary {
         try {
             final CurrentlyPlaying response = request.execute();
 
-            // check to make sure something is playing
+            // check to make sure something is playing, i.e. playing type and id are not null
             if (!response.getIs_playing()) {
                 sharedSongPresenter.prepareFailureView("Try playing a song");
                 return;
@@ -62,43 +62,40 @@ public class SharedSongInteractor implements SharedSongInputBoundary {
             String trackId = response.getItem().getId();
 
             // go into group and check if song saved
-            final List<User> group = inputData.getListOfMembers();
-            final Map<String, String> usernameToShared = new HashMap<String, String>();
+            final Map<String, String> usernameToShared = new HashMap<>();
+            boolean shared = mapBuilder(inputData.getListOfMembers(), usernameToShared, trackId);
 
-            // tracking if at least one person shares your song
-            boolean noneShare = false;
-            for (final User u : group) {
-                boolean saved = checkUserSavedTrack(u, trackId);
-                if (u == user)
-                    continue;
-                else if (saved) {
-                    usernameToShared.put(u.getName(), "Yes");
-                    noneShare = true;
-                }
-                // user has not saved song
-                else {
-                    usernameToShared.put(u.getName(), "No");
-                }
-            }
             // if no users in group have saved songs or none share your song then fail
-            if (noneShare) {
-                sharedSongPresenter.prepareFailureView("No one shares your song :(");
-            } else {
+            if (shared) {
                 final SharedSongOutputData sharedSongOutputData = new SharedSongOutputData(usernameToShared);
                 sharedSongPresenter.prepareSuccessView(sharedSongOutputData);
+            } else {
+                sharedSongPresenter.prepareFailureView("No one shares your song :(");
+
             }
         } catch (IOException | SpotifyWebApiException | ParseException e) {
-            throw new RuntimeException(e);
+            System.out.println("Error: " + e.getMessage());
         }
     }
 
-    private boolean checkUserSavedTrack(User user, String trackId) {
-        try {
-            final CheckUsersSavedTracksRequest request = spotifyApi.checkUserSavedTracks(new String[]{trackId}).build();
-            final Boolean[] response = request.execute();
-            return response[0];
-        } catch (IOException | SpotifyWebApiException | ParseException e) {
-            throw new RuntimeException(e);
-        }
+    private boolean checkUserSavedTrack(User user, String trackId) throws IOException, SpotifyWebApiException, ParseException {
+        final CheckUsersSavedTracksRequest request = spotifyApi.checkUserSavedTracks(new String[]{trackId}).build();
+        final Boolean[] response = request.execute();
+        return response[0];
+    }
+
+    private boolean mapBuilder(List<User> group, Map<String, String> usernameToShared, String trackId)
+            throws IOException, SpotifyWebApiException, ParseException {
+        // tracking if at least one person shares your song
+        boolean shared = false;
+        for (final User u : group) {
+            if (checkUserSavedTrack(u, trackId)) {
+                usernameToShared.put(u.getName(), "Yes");
+                shared = true;
+            }
+            else {
+                usernameToShared.put(u.getName(), "No");
+            }
+        } return shared;
     }
 }
