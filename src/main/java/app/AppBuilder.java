@@ -63,30 +63,35 @@ public class AppBuilder {
         cardPanel.setLayout(cardLayout);
     }
 
-    public AppBuilder addSignupView() {
+    public AppBuilder addViewModels() {
         signupViewModel = new SignupViewModel();
+        loginViewModel = new LoginViewModel();
+        loggedInViewModel = new LoggedInViewModel();
+        spotifyAuthViewModel = new SpotifyAuthViewModel();
+        return this;
+    }
+
+    public AppBuilder addSignupView() {
         signupView = new SignupView(signupViewModel);
         cardPanel.add(signupView, signupView.getViewName());
         return this;
     }
 
     public AppBuilder addLoginView() {
-        loginViewModel = new LoginViewModel();
         loginView = new LoginView(loginViewModel, viewManagerModel, signupViewModel);
         cardPanel.add(loginView, loginView.getViewName());
         return this;
     }
 
     public AppBuilder addLoggedInView() {
-        loggedInViewModel = new LoggedInViewModel();
         loggedInView = new LoggedInView(loggedInViewModel, viewManagerModel, spotifyAuthViewModel);
         cardPanel.add(loggedInView, loggedInView.getViewName());
         return this;
     }
 
     public AppBuilder addSpotifyAuthView() {
-        spotifyAuthViewModel = new SpotifyAuthViewModel();
-        spotifyAuthView = new SpotifyAuthView(spotifyAuthViewModel);
+        spotifyAuthView = new SpotifyAuthView(spotifyAuthViewModel, loggedInViewModel);  // Pass loggedInViewModel
+        spotifyAuthView.setViewManagerModel(viewManagerModel);
         cardPanel.add(spotifyAuthView, spotifyAuthView.getViewName());
         return this;
     }
@@ -138,22 +143,12 @@ public class AppBuilder {
     }
 
     public AppBuilder addSpotifyAuthUseCase() {
-        String clientId = System.getenv("SPOTIFY_CLIENT_ID");
-        String clientSecret = System.getenv("SPOTIFY_CLIENT_SECRET");
-        String redirectUri = "http://127.0.0.1:8080/callback";
-
-        if (clientId == null || clientSecret == null) {
-            System.err.println("Warning: Spotify credentials not found in environment variables");
-            clientId = "your_spotify_client_id_here";
-            clientSecret = "your_spotify_client_secret_here";
-        }
-
+        // PKCE doesn't need client secret!
         data_access.SpotifyDataAccessObject spotifyDAO = new data_access.SpotifyDataAccessObject();
 
         final SpotifyAuthOutputBoundary spotifyAuthOutputBoundary =
                 new SpotifyAuthPresenter(viewManagerModel, spotifyAuthViewModel, loggedInViewModel);
 
-        // NEW: Set the LoggedInView reference in the presenter
         if (spotifyAuthOutputBoundary instanceof SpotifyAuthPresenter) {
             ((SpotifyAuthPresenter) spotifyAuthOutputBoundary).setLoggedInView(loggedInView);
         }

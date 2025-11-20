@@ -27,10 +27,19 @@ public class SpotifyAuthPresenter implements SpotifyAuthOutputBoundary {
 
     @Override
     public void prepareSuccessView(SpotifyAuthOutputData response) {
-        // Update logged in state with Spotify authentication info
+        // Get current state (preserves existing username!)
         LoggedInState loggedInState = loggedInViewModel.getState();
+
+        // If username is somehow empty, set it from response
+        if (loggedInState.getUsername() == null || loggedInState.getUsername().isEmpty()) {
+            loggedInState.setUsername(response.getUsername());
+        }
+
+        // Add Spotify authentication info
         loggedInState.setSpotifyAuthenticated(true);
         loggedInState.setSpotifyUserId(response.getSpotifyUserId());
+
+        // Update the view model
         loggedInViewModel.setState(loggedInState);
         loggedInViewModel.firePropertyChange();
 

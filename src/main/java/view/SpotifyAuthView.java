@@ -3,6 +3,8 @@ package view;
 import interface_adapter.spotify_auth.SpotifyAuthController;
 import interface_adapter.spotify_auth.SpotifyAuthState;
 import interface_adapter.spotify_auth.SpotifyAuthViewModel;
+import interface_adapter.logged_in.LoggedInViewModel;
+import interface_adapter.ViewManagerModel;
 import util.CallbackServer;
 
 import javax.swing.*;
@@ -15,13 +17,16 @@ import java.beans.PropertyChangeListener;
 public class SpotifyAuthView extends JPanel implements ActionListener, PropertyChangeListener {
     public static final String viewName = "spotify auth";
     private final SpotifyAuthViewModel spotifyAuthViewModel;
+    private final LoggedInViewModel loggedInViewModel;
+    private ViewManagerModel viewManagerModel;  // NEW
     private final JButton connectSpotifyButton;
     private final JLabel statusLabel;
     private SpotifyAuthController spotifyAuthController;
     private String currentUsername;
 
-    public SpotifyAuthView(SpotifyAuthViewModel spotifyAuthViewModel) {
+    public SpotifyAuthView(SpotifyAuthViewModel spotifyAuthViewModel, LoggedInViewModel loggedInViewModel) {
         this.spotifyAuthViewModel = spotifyAuthViewModel;
+        this.loggedInViewModel = loggedInViewModel;
         this.spotifyAuthViewModel.addPropertyChangeListener(this);
 
         JLabel title = new JLabel("Connect Spotify Account");
@@ -41,7 +46,7 @@ public class SpotifyAuthView extends JPanel implements ActionListener, PropertyC
         JPanel buttonPanel = new JPanel();
         connectSpotifyButton = new JButton("Connect to Spotify");
         connectSpotifyButton.setFont(new Font("Arial", Font.BOLD, 14));
-        connectSpotifyButton.setBackground(new Color(29, 185, 84)); // Spotify green
+        connectSpotifyButton.setBackground(new Color(29, 185, 84));
         connectSpotifyButton.setForeground(Color.WHITE);
         connectSpotifyButton.setFocusPainted(false);
         buttonPanel.add(connectSpotifyButton);
@@ -64,17 +69,36 @@ public class SpotifyAuthView extends JPanel implements ActionListener, PropertyC
         this.add(Box.createVerticalGlue());
     }
 
+    // NEW METHOD
+    public void setViewManagerModel(ViewManagerModel viewManagerModel) {
+        this.viewManagerModel = viewManagerModel;
+        // Listen for when this view becomes active
+        if (viewManagerModel != null) {
+            viewManagerModel.addPropertyChangeListener(evt -> {
+                if ("state".equals(evt.getPropertyName()) &&
+                        viewName.equals(evt.getNewValue())) {
+                    // This view just became active - reset it
+                    resetView();
+                }
+            });
+        }
+    }
+
+    // NEW METHOD
+    private void resetView() {
+        connectSpotifyButton.setEnabled(true);
+        statusLabel.setText(" ");
+        statusLabel.setForeground(Color.BLUE);
+    }
+
     private void connectToSpotify() {
         connectSpotifyButton.setEnabled(false);
         statusLabel.setText("Opening browser...");
 
-        // Run in background thread to not block UI
         new Thread(() -> {
             try {
-                // Start the callback server
                 CallbackServer server = new CallbackServer();
 
-                // Get the authorization URL and open browser
                 SwingUtilities.invokeLater(() -> {
                     String authUrl = spotifyAuthController.getAuthorizationUrl();
                     if (authUrl != null) {
@@ -99,10 +123,8 @@ public class SpotifyAuthView extends JPanel implements ActionListener, PropertyC
                     }
                 });
 
-                // Wait for the callback (with 120 second timeout)
                 String code = server.startAndWaitForCode(120);
 
-                // Exchange the code for tokens
                 SwingUtilities.invokeLater(() -> {
                     statusLabel.setText("Completing authorization...");
                     spotifyAuthController.execute(code, getCurrentUsername());
@@ -131,7 +153,12 @@ public class SpotifyAuthView extends JPanel implements ActionListener, PropertyC
     }
 
     private String getCurrentUsername() {
-        // TODO: Get the actual logged-in username
+        if (loggedInViewModel != null && loggedInViewModel.getState() != null) {
+            String username = loggedInViewModel.getState().getUsername();
+            if (username != null && !username.isEmpty()) {
+                return username;
+            }
+        }
         return currentUsername != null ? currentUsername : "user";
     }
 

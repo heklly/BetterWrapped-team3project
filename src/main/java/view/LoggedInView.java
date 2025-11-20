@@ -123,8 +123,8 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
                 final LoggedInState currentState = loggedInViewModel.getState();
                 if (changePasswordController != null) {
                     changePasswordController.execute(
-                            currentState.getPassword(),
-                            currentState.getUsername()
+                            currentState.getUsername(),
+                            currentState.getPassword()
                     );
                 }
             }
@@ -281,8 +281,6 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
                 connectSpotifyButton.setText("Spotify Connected");
                 showLoyaltyScoresButton.setEnabled(true);  // NEW: Enable loyalty button
 
-                // TODO: Store the SpotifyUser object properly
-                // For now, we'll need to pass it somehow
             } else {
                 spotifyStatusLabel.setText("Not Connected");
                 spotifyStatusLabel.setForeground(Color.RED);
