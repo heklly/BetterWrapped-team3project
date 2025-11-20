@@ -25,6 +25,6 @@ public class LoyaltyScoreOutputData {
     /**
      * Where name is the name of artist; as specified from spotify's api.
      */
-    public int getScore(String name) {return loyalty_scores.get(name);}
+    public int getScore(String name) { return loyalty_scores.getOrDefault(name, 0);}
 
 }

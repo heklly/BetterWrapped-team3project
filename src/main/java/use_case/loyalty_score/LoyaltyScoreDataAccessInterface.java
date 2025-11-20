@@ -14,7 +14,7 @@ public interface LoyaltyScoreDataAccessInterface {
      * @return A map where the key is the name of object, integer is
      * saved loyalty_score
      */
-    Map<String, Integer> getTopItemsDate(String userid, String date);
+    Map<String, Integer> getLoyaltyDate(String userid, String date);
 
     /**
      * @return Whether the artist exists in that date's saved loyalty scores
