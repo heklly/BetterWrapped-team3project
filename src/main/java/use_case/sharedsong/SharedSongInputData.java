@@ -16,7 +16,7 @@ public class SharedSongInputData {
         this.group = group;
         this.user = user;
     }
-    public List<User> getListOfMembers() {return group.getMembers();}
+    public List<User> getListOfMembers() {return group.getUsers();}
     public User getUser() {return user;}
 }
 
