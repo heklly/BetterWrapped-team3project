@@ -1,14 +1,18 @@
 package use_case.daily_mix;
 
 /**
- * The output boundary for the Daily Mix Use Case.
+ * Output Boundary for the Daily Mix Use Case.
+ *
+ * The presenter receives a DailyMixOutputData object containing the generated
+ * Playlist entity and an optional message for display. Any unexpected issues
+ * (e.g., empty library) should trigger the fail view instead.
  */
 public interface DailyMixOutputBoundary {
 
     /**
      * Prepares the success view for the Daily Mix Use Case.
      *
-     * @param outputData the output data
+     * @param outputData the output data containing the generated Playlist
      */
     void prepareSuccessView(DailyMixOutputData outputData);
 
@@ -19,3 +23,4 @@ public interface DailyMixOutputBoundary {
      */
     void prepareFailView(String errorMessage);
 }
+

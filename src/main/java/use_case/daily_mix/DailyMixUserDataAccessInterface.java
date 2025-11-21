@@ -1,5 +1,7 @@
 package use_case.daily_mix;
 
+import entity.Playlist;
+
 import java.util.List;
 import java.util.Map;
 
@@ -9,28 +11,36 @@ import java.util.Map;
 public interface DailyMixUserDataAccessInterface {
 
     /**
-     * Returns the user's library and play frequencies.
+     * Returns the user's library with preference weights for each track.
      *
-     * @param username the username
-     * @return a Map from track id to play count
+     * The concrete implementation may derive these weights from listening history,
+     * top tracks, or any other available data source (e.g., Spotify Web API),
+     * but the use case only relies on the relative weights.
+     *
+     * @param userId the unique id of the user
+     * @return a Map from track identifier to a non-negative weight
      */
-    Map<String, Integer> getLibraryWithFrequencies(String username);
+    Map<String, Integer> getLibraryWithFrequencies(int userId);
 
     /**
      * Creates (or replaces) the "Daily Mix" playlist for this user.
+     * The implementation is responsible for constructing and persisting
+     * the Playlist entity (including its creation date), and returning it.
      *
-     * @param username     the username
+     * @param userId       the unique id of the user
      * @param playlistName the playlist name (e.g., "Daily Mix")
      * @param trackIds     the ordered list of track ids for the playlist
+     * @return the created/updated Playlist entity
      */
-    void saveDailyMixPlaylist(String username, String playlistName, List<String> trackIds);
+    Playlist saveDailyMixPlaylist(int userId, String playlistName, List<String> trackIds);
 
     /**
-     * Returns the track ids from the previous Daily Mix, if any.
+     * Returns the previous Daily Mix playlist for this user, if any.
      * Used for simple anti-repetition / cooldown logic.
      *
-     * @param username the username
-     * @return list of track ids in the previous Daily Mix, or empty list if none
+     * @param userId the unique id of the user
+     * @return the previous Daily Mix playlist, or null if none
      */
-    List<String> getPreviousDailyMix(String username);
+    Playlist getPreviousDailyMix(int userId);
 }
+

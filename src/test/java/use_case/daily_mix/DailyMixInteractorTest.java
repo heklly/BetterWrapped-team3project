@@ -1,5 +1,6 @@
 package use_case.daily_mix;
 
+import entity.Playlist;
 import org.junit.jupiter.api.Test;
 
 import java.util.*;
@@ -9,46 +10,44 @@ import static org.junit.jupiter.api.Assertions.*;
 class DailyMixInteractorTest {
 
     /**
-     * Simple in-memory implementation of DailyMixUserDataAccessInterface
-     * used only for tests.
+     * Simple in-memory implementation of DailyMixUserDataAccessInterface used for tests.
      */
     private static class InMemoryDailyMixDataAccessObject
             implements DailyMixUserDataAccessInterface {
 
         Map<String, Integer> library = new HashMap<>();
-        List<String> previousDailyMix = new ArrayList<>();
-
-        String savedUsername;
-        String savedPlaylistName;
-        List<String> savedPlaylistTracks = new ArrayList<>();
+        Playlist previousPlaylist = null;
+        Playlist savedPlaylist = null;
 
         @Override
-        public Map<String, Integer> getLibraryWithFrequencies(String username) {
+        public Map<String, Integer> getLibraryWithFrequencies(int userId) {
             return library;
         }
 
         @Override
-        public void saveDailyMixPlaylist(String username,
-                                         String playlistName,
-                                         List<String> trackIds) {
-            this.savedUsername = username;
-            this.savedPlaylistName = playlistName;
-            this.savedPlaylistTracks = new ArrayList<>(trackIds);
+        public Playlist saveDailyMixPlaylist(int userId, String playlistName, List<String> trackIds) {
+            Playlist p = new Playlist(playlistName, "2025-01-01");
+            for (String id : trackIds) {
+                p.addSong(id);
+            }
+            this.savedPlaylist = p;
+            this.previousPlaylist = p; // so next time cooldown works
+            return p;
         }
 
         @Override
-        public List<String> getPreviousDailyMix(String username) {
-            return previousDailyMix;
+        public Playlist getPreviousDailyMix(int userId) {
+            return previousPlaylist;
         }
     }
 
     @Test
     void successGeneratesTenSongs() {
-        DailyMixInputData inputData = new DailyMixInputData("Paul");
+        DailyMixInputData inputData = new DailyMixInputData(1);
         InMemoryDailyMixDataAccessObject userRepository =
                 new InMemoryDailyMixDataAccessObject();
 
-        // more than 10 songs
+        // prepare library with >10 songs
         for (int i = 1; i <= 15; i++) {
             userRepository.library.put("track-" + i, i); // play count = i
         }
@@ -56,44 +55,36 @@ class DailyMixInteractorTest {
         DailyMixOutputBoundary successPresenter = new DailyMixOutputBoundary() {
             @Override
             public void prepareSuccessView(DailyMixOutputData outputData) {
-                assertEquals("Daily Mix", outputData.getPlaylistName());
+                Playlist playlist = outputData.getPlaylist();
 
-                // generate 10 songs
-                assertEquals(10, outputData.getTrackIds().size());
-
-                // with no repeat
-                assertEquals(10,
-                        new HashSet<>(outputData.getTrackIds()).size());
-
-                // output message
+                assertEquals("Daily Mix", playlist.getName());
+                assertEquals(10, playlist.getSongs().size());
+                assertEquals(10, new HashSet<>(playlist.getSongs()).size());
                 assertEquals("", outputData.getMessage());
             }
 
             @Override
             public void prepareFailView(String errorMessage) {
-                fail("Use case failure is unexpected.");
+                fail("Unexpected fail.");
             }
         };
 
-        // Set Seed
         DailyMixInputBoundary interactor =
                 new DailyMixInteractor(userRepository, successPresenter, new Random(42));
 
         interactor.execute(inputData);
 
-        // check playlist being saved
-        assertEquals("Paul", userRepository.savedUsername);
-        assertEquals("Daily Mix", userRepository.savedPlaylistName);
-        assertEquals(10, userRepository.savedPlaylistTracks.size());
+        assertNotNull(userRepository.savedPlaylist);
+        assertEquals(10, userRepository.savedPlaylist.getSongs().size());
     }
 
     @Test
     void successLibraryLessThanTenSongsUsesAll() {
-        DailyMixInputData inputData = new DailyMixInputData("Paul");
+        DailyMixInputData inputData = new DailyMixInputData(1);
         InMemoryDailyMixDataAccessObject userRepository =
                 new InMemoryDailyMixDataAccessObject();
 
-        // 7 songs in total
+        // only 7 songs
         for (int i = 1; i <= 7; i++) {
             userRepository.library.put("track-" + i, 5);
         }
@@ -101,10 +92,9 @@ class DailyMixInteractorTest {
         DailyMixOutputBoundary successPresenter = new DailyMixOutputBoundary() {
             @Override
             public void prepareSuccessView(DailyMixOutputData outputData) {
-                // take all
-                assertEquals(7, outputData.getTrackIds().size());
+                Playlist playlist = outputData.getPlaylist();
 
-                // output message
+                assertEquals(7, playlist.getSongs().size());
                 assertEquals(
                         "Your library has fewer than 10 songs; using all available songs.",
                         outputData.getMessage()
@@ -113,7 +103,7 @@ class DailyMixInteractorTest {
 
             @Override
             public void prepareFailView(String errorMessage) {
-                fail("Use case failure is unexpected.");
+                fail("Unexpected fail.");
             }
         };
 
@@ -122,28 +112,24 @@ class DailyMixInteractorTest {
 
         interactor.execute(inputData);
 
-        assertEquals(7, userRepository.savedPlaylistTracks.size());
+        assertEquals(7, userRepository.savedPlaylist.getSongs().size());
     }
 
     @Test
     void failureWhenLibraryIsEmpty() {
-        DailyMixInputData inputData = new DailyMixInputData("Paul");
+        DailyMixInputData inputData = new DailyMixInputData(1);
         InMemoryDailyMixDataAccessObject userRepository =
                 new InMemoryDailyMixDataAccessObject();
-        // library set as empty
 
         DailyMixOutputBoundary failurePresenter = new DailyMixOutputBoundary() {
             @Override
             public void prepareSuccessView(DailyMixOutputData outputData) {
-                fail("Use case success is unexpected.");
+                fail("Unexpected success.");
             }
 
             @Override
             public void prepareFailView(String errorMessage) {
-                assertEquals(
-                        "User \"Paul\" has no songs in their library.",
-                        errorMessage
-                );
+                assertEquals("User with id 1 has no songs in their library.", errorMessage);
             }
         };
 
@@ -152,9 +138,9 @@ class DailyMixInteractorTest {
 
         interactor.execute(inputData);
 
-        // no playlist saved
-        assertNull(userRepository.savedPlaylistName);
-        assertTrue(userRepository.savedPlaylistTracks.isEmpty());
+        assertNull(userRepository.savedPlaylist);
     }
 }
+
+
 

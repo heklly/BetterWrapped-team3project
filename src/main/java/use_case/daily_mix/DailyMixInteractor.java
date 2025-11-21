@@ -1,5 +1,7 @@
 package use_case.daily_mix;
 
+import entity.Playlist;
+
 import java.util.*;
 
 /**
@@ -30,21 +32,24 @@ public class DailyMixInteractor implements DailyMixInputBoundary {
 
     @Override
     public void execute(DailyMixInputData inputData) {
-        String username = inputData.getUsername();
+        int userId = inputData.getUserId();
 
-        Map<String, Integer> library = userDataAccess.getLibraryWithFrequencies(username);
+        Map<String, Integer> library = userDataAccess.getLibraryWithFrequencies(userId);
 
         if (library == null || library.isEmpty()) {
             dailyMixPresenter.prepareFailView(
-                    "User \"" + username + "\" has no songs in their library.");
+                    "User with id " + userId + " has no songs in their library.");
             return;
         }
 
         List<String> allTracks = new ArrayList<>(library.keySet());
 
         // previous mix for simple "cooldown"
-        List<String> previousMix = userDataAccess.getPreviousDailyMix(username);
-        Set<String> previousSet = new HashSet<>(previousMix);
+        Playlist previousMixPlaylist = userDataAccess.getPreviousDailyMix(userId);
+        Set<String> previousSet = new HashSet<>();
+        if (previousMixPlaylist != null) {
+            previousSet.addAll(previousMixPlaylist.getSongs());
+        }
 
         // candidates that are not in the previous mix
         List<String> candidates = new ArrayList<>();
@@ -54,7 +59,7 @@ public class DailyMixInteractor implements DailyMixInputBoundary {
             }
         }
 
-        // less than 10 songs if cooldown，use all
+        // If cooldown filtering leaves fewer than 10 songs, fall back to using all tracks.
         if (candidates.size() < TARGET_SIZE) {
             candidates = allTracks;
         }
@@ -67,11 +72,11 @@ public class DailyMixInteractor implements DailyMixInputBoundary {
             message = "Your library has fewer than 10 songs; using all available songs.";
         }
 
-        // save / replace playlist
-        userDataAccess.saveDailyMixPlaylist(username, PLAYLIST_NAME, chosen);
+        // Save / replace playlist and get the Playlist entity that was created
+        Playlist playlist = userDataAccess.saveDailyMixPlaylist(userId, PLAYLIST_NAME, chosen);
 
         DailyMixOutputData outputData =
-                new DailyMixOutputData(PLAYLIST_NAME, chosen, message);
+                new DailyMixOutputData(playlist, message);
 
         dailyMixPresenter.prepareSuccessView(outputData);
     }
@@ -121,4 +126,5 @@ public class DailyMixInteractor implements DailyMixInputBoundary {
         return result;
     }
 }
+
 

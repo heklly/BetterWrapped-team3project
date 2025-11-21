@@ -1,32 +1,30 @@
 package use_case.daily_mix;
 
-import java.util.List;
+import entity.Playlist;
 
 /**
  * Output Data for the Daily Mix Use Case.
+ *
+ * The output includes the Playlist entity that was generated,
+ * and an optional message for the presenter (e.g., small library warning).
  */
 public class DailyMixOutputData {
 
-    private final String playlistName;
-    private final List<String> trackIds;
-    private final String message; // can be empty if no special message
+    private final Playlist playlist;
+    private final String message;
 
-    public DailyMixOutputData(String playlistName, List<String> trackIds, String message) {
-        this.playlistName = playlistName;
-        this.trackIds = trackIds;
+    public DailyMixOutputData(Playlist playlist, String message) {
+        this.playlist = playlist;
         this.message = message;
     }
 
-    public String getPlaylistName() {
-        return playlistName;
-    }
-
-    public List<String> getTrackIds() {
-        return trackIds;
+    public Playlist getPlaylist() {
+        return playlist;
     }
 
     public String getMessage() {
         return message;
     }
 }
+
 

@@ -2,7 +2,7 @@ package entity;
 
 /**
  * A simple entity representing a user.
- * Users have a username, password, userid, and date joined.
+ * Users have a username, password (for authentication), a userid, and a date of creation.
  */
 public class User {
 
@@ -12,30 +12,41 @@ public class User {
     private final String date_created;
 
     /**
-     * Constructor mainly used by login/signup examples:
-     * username + password.
-     * userid / date
+     * Constructor for user creation during login/signup processes.
+     * In this case, userid and date may not yet be assigned.
+     *
+     * @param name     the username
+     * @param password the user's password
      */
-    public User(String username, String password) {
-        this(username, password, -1, "");
+    public User(String name, String password) {
+        this(name, password, -1, "");
     }
 
     /**
-     * Constructor for when you also want userid & date.
-     */
-    public User(String username, String password, int userid, String date) {
-        this.username = username;
-        this.password = password;
-        this.userid = userid;
-        this.date_created = date;
-    }
-
-    /**
-     * keep original User Class
-     * set password as empty string.
+     * Constructor used when userid and date are known,
+     * while the password is not relevant for this creation path.
+     *
+     * @param name   the username
+     * @param userid the unique user ID
+     * @param date   the account creation date
      */
     public User(String name, int userid, String date) {
         this(name, "", userid, date);
+    }
+
+    /**
+     * Full constructor specifying all fields.
+     *
+     * @param name     the username
+     * @param password the user’s password
+     * @param userid   the unique user ID
+     * @param date     the account creation date
+     */
+    public User(String name, String password, int userid, String date) {
+        this.username = name;
+        this.password = password;
+        this.userid = userid;
+        this.date_created = date;
     }
 
     public String getName() {
@@ -50,12 +61,18 @@ public class User {
         return this.date_created;
     }
 
+    //The following are to ensure that existing DAO/use cases compile successfully:
+
+    /** Password getter for login-related use cases. */
     public String getPassword() {
-        return password;
+        return this.password;
     }
 
+    /** Password setter for change-password use case. */
     public void setPassword(String newPassword) {
         this.password = newPassword;
     }
 }
+
+
 
