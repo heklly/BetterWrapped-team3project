@@ -21,7 +21,8 @@ public class LoyaltyScoreInteractor implements LoyaltyScoreInputBoundary {
 
     @Override
     public void execute(LoyaltyScoreInputData loyaltyScoreInputData) {
-        spotifyGateway.getTopArtists("id");
+
+        //TODO: Finish
 
     }
 

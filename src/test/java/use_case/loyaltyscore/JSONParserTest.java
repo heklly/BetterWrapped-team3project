@@ -1,5 +1,6 @@
 package use_case.loyaltyscore;
-import data_access.TopObjectsJSONParser;
+import data_access.JSONParsers;
+import data_access.JSONParsers;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
@@ -8,7 +9,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class TopObjectsJSONParserTest {
+public class JSONParserTest {
 
     @Test
     void testGetTopObjects() {
@@ -31,8 +32,7 @@ public class TopObjectsJSONParserTest {
 
         System.out.println(response.toString(2));
 
-        TopObjectsJSONParser parser = new TopObjectsJSONParser();
-        List<String> topObjects = parser.getTopObjects(response);
+        List<String> topObjects = JSONParsers.getTopObjects(response);
 
         // Assertions
         assertEquals(2, topObjects.size());

@@ -1,9 +1,9 @@
 package use_case.loyaltyscore;
 
-import data_access.TopObjectsJSONParser;
+import data_access.JSONParsers;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import data_access.TopObjectsJSONParser;
+
 import org.junit.jupiter.api.Test;
 
 
@@ -35,9 +35,9 @@ public class LoyaltyScoreInteractorTest {
 
         System.out.println(response.toString(2));
 
-        TopObjectsJSONParser parser = new TopObjectsJSONParser();
-        List<String> topObjects = parser.getTopObjects(response);
+        List<String> topObjects = JSONParsers.getTopObjects(response);
 
+        // TODO: Finish
 
 
     }

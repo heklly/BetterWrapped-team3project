@@ -15,7 +15,7 @@ public class JSONParsers {
 
     // JSON parsers not strictly necessary w/ michelthelin's API. Left in just in case.
 
-    public static List<String> getTopObjectsParser(JSONObject responseJSON) {
+    public static List<String> getTopObjects(JSONObject responseJSON) {
         JSONArray items = responseJSON.getJSONArray("items");
         List<String> topObjects = new ArrayList<>();
 
@@ -27,7 +27,7 @@ public class JSONParsers {
         return topObjects;
     }
 
-    public static List<String> getRecentlyPlayedParser(JSONObject responseJSON) {
+    public static List<String> getRecentlyPlayed(JSONObject responseJSON) {
         JSONArray items = responseJSON.getJSONArray("items");
         List<String> recentlyPlayed = new ArrayList<>();
         for (int i = 0; i < items.length(); i++) {
