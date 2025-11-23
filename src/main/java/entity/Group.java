@@ -8,30 +8,57 @@ import java.util.List;
  */
 public class Group {
 
+    public static final int MAX_MEMBERS = 7;
     private String group_name;
     private final List<User> users;
     private final List<Playlist> group_playlists;
     private final String date_created;
+    private final User owner;
 
 
     /**
      * Creates a new group given these parameters:
+     *
      * @param group_name the group's name
-     * @param date the date the group was created
+     * @param owner      the user who created the group
      */
-    public Group(String group_name, String date ) {
+    public Group(String group_name, User owner ) {
+        this.owner = owner;
         this.group_name = group_name;
         this.date_created = date;
         this.users = new ArrayList<User>();
         this.group_playlists = new ArrayList<Playlist>();
     }
+    public User getOwner() {
+        return owner;
+    }
 
-    public String getName() {
+    public String getGroup_name() {
         return this.group_name;
     }
     public String getDate() { return this.date_created; }
-    public void addUser(User user) { this.users.add(user); }
+    public void addUser(User user) {
+        if (user == null) {
+            throw new IllegalArgumentException("User does not exist.");
+        }
+        if (users.size() >= MAX_MEMBERS) {
+            throw new IllegalStateException("Cannot have more than 7 members in group");}
+                    this.users.add(user);
+    }
+    public void removeUser (User user) {
+        this.users.remove(user);
+    }
+
     public void addPlaylist(Playlist playlist) { this.group_playlists.add(playlist); }
-    public void changeName(String group_name) { this.group_name = group_name; }
-    public List<User> getUsers() { return this.users; }
+
+    public void changeName(String group_name) {
+        if (group_name == null || group_name.isBlank()){
+            throw new IllegalArgumentException("Group name cannot be empty.");
+        } this.group_name = group_name;
+    }
+
+    public List <User> getUsers() {
+        return this.users;
+    }
+
 }
