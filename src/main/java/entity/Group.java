@@ -33,5 +33,5 @@ public class Group {
     public void addUser(User user) { this.users.add(user); }
     public void addPlaylist(Playlist playlist) { this.group_playlists.add(playlist); }
     public void changeName(String group_name) { this.group_name = group_name; }
-    public List<User> getUsers() { return new ArrayList<User>(this.users); }
+    public List<User> getUsers() { return this.users; }
 }
