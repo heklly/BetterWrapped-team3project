@@ -1,11 +1,11 @@
 package entity;
 
 /**
- * Factory for creating CommonUser objects.
+ * Dummy kept in so code compiles...
  */
 public class UserFactory {
 
     public User create(String name, String password) {
-        return new User(name, password);
+        return new User(name, "id", "hi");
     }
 }

@@ -21,6 +21,7 @@
             <artifactId>okhttp</artifactId>
             <version>4.12.0</version>
         </dependency>
+             
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
@@ -28,11 +29,11 @@
             <scope>test</scope>
         </dependency>
 
-        <dependency>
-            <groupId>se.michaelthelin.spotify</groupId>
-            <artifactId>spotify-web-api-java</artifactId>
-            <version>9.4.0</version>
-        </dependency>
+         <dependency>
+           <groupId>se.michaelthelin.spotify</groupId>
+           <artifactId>spotify-web-api-java</artifactId>
+           <version>9.4.0</version>
+         </dependency>
 
     </dependencies>
     <build>
