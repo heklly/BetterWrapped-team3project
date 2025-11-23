@@ -1,6 +1,6 @@
 package view;
 
-import interface_adapter.bw_viewmodel.NoGroupViewModel;
+import interface_adapter.NoGroupViewModel;
 
 import javax.swing.*;
 import java.beans.PropertyChangeListener;
@@ -15,6 +15,7 @@ public class NoGroupView extends JPanel implements ActionListener, PropertyChang
     public NoGroupView(NoGroupViewModel noGroupViewModel) {
         this.noGroupViewModel = noGroupViewModel;
         this.noGroupViewModel.addPropertyChangeListener(this);
+
 
 
     }

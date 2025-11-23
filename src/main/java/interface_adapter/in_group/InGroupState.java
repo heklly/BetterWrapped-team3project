@@ -9,7 +9,7 @@ public class InGroupState {
     private String ownerName = "";
     private List<String> groupUsers = new ArrayList<>();
 
-    public InGroupState()
+    public InGroupState() {};
 
     public String getUsername() { return username; }
 

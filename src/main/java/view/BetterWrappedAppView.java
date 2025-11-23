@@ -12,10 +12,10 @@ import java.awt.event.KeyEvent;
  */
 public class BetterWrappedAppView {
 
-    private final String viewName;
-    private final String groupViewName;
-    private final String youViewName;
-    private final String profileViewName;
+//    private final String viewName;
+//    private final String groupViewName;
+//    private final String youViewName;
+//    private final String profileViewName;
 
     private final BetterWrappedAppViewModel betterWrappedAppViewModel;
 

@@ -1,8 +1,4 @@
 package interface_adapter.create_group;
-import entity.User;
-import entity.User;
-
-import java.util.List;
 
 
 /**

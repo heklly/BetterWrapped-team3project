@@ -5,7 +5,9 @@ import interface_adapter.in_group.InGroupViewModel;
 import interface_adapter.sharedsong.SharedSongController;
 
 import javax.swing.*;
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 /**
@@ -59,6 +61,20 @@ public class InGroupView extends JPanel implements ActionListener, PropertyChang
             this.add(new JLabel(u));
         }
         this.add(buttons);
+    }
+
+    /**
+     * React to a button click that results in evt.
+     * @param evt the ActionEvent to react to
+     */
+    public void actionPerformed(ActionEvent evt) {
+        // TODO: execute the leave group use case through the Controller
+        System.out.println("Click " + evt.getActionCommand());
+    }
+
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+        //TODO implemennt group state change
     }
 
     public String getGroupViewName() {

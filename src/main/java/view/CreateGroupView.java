@@ -5,6 +5,7 @@ import interface_adapter.create_group.CreateGroupViewModel;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 public class CreateGroupView extends JPanel implements ActionListener, PropertyChangeListener {
@@ -38,6 +39,7 @@ public class CreateGroupView extends JPanel implements ActionListener, PropertyC
 
         createGroup.addActionListener(
                 new ActionListener() {
+                    //TODO: fix
                     public void actionPerformed(ActionEvent evt) {
                         if  (evt.getSource().equals(createGroup)) {
                             final GroupState currentState = createGroupViewModel.getState();
@@ -53,5 +55,21 @@ public class CreateGroupView extends JPanel implements ActionListener, PropertyC
         this.add(groupUsers);
         this.add(usersErrorField);
         this.add(createGroup);
+    }
+    /**
+     * React to a button click that results in evt.
+     * @param evt the ActionEvent to react to
+     */
+    public void actionPerformed(ActionEvent evt) {
+        // TODO: execute use case through the Controller
+        System.out.println("Click " + evt.getActionCommand());
+    }
+
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+        if (evt.getPropertyName().equals("state")) {
+
+        }
+        else if (evt.getPropertyName().equals("username")) {}
     }
 }
