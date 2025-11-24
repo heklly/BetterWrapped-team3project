@@ -1,7 +1,7 @@
 package use_case.create_group;
 
 import entity.Group;
-import entity.User;
+import entity.SpotifyUser;
 
 import java.util.List;
 
@@ -16,9 +16,9 @@ public abstract class CreateGroupInteractor implements CreateGroupInputBoundary 
 
         Group group = new Group(inputData.getGroup_name(), inputData.getOwner());
 
-        List<User> initialMembers = inputData.getInitialMembers();
+        List<SpotifyUser> initialMembers = inputData.getInitialMembers();
         if (initialMembers != null) {
-            for (User user : initialMembers) {
+            for (SpotifyUser user : initialMembers) {
                 group.addUser(user);
             }
         }

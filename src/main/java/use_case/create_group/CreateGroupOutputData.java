@@ -1,6 +1,6 @@
 package use_case.create_group;
 
-import entity.User;
+import entity.SpotifyUser;
 
 import java.util.List;
 
@@ -11,8 +11,8 @@ public class CreateGroupOutputData {
 
     private final String group_name;
     private boolean success;
-    private final User owner;
-    private final List<User> users;
+    private final SpotifyUser owner;
+    private final List<SpotifyUser> users;
 
 
     /**
@@ -21,7 +21,7 @@ public class CreateGroupOutputData {
      * @param group_name name of newly created group
      */
 
-    public CreateGroupOutputData(String group_name, User owner, List<User> users) {
+    public CreateGroupOutputData(String group_name, SpotifyUser owner, List<SpotifyUser> users) {
         this.group_name = group_name;
         this.success = success;
         this.owner = owner;
@@ -35,8 +35,8 @@ public class CreateGroupOutputData {
     public boolean isSuccess() {
         return success;
     }
-    public User getOwner() { return owner; }
+    public SpotifyUser getOwner() { return owner; }
 
-    public List<User> getUsers() { return users; }
+    public List<SpotifyUser> getUsers() { return users; }
 }
 
