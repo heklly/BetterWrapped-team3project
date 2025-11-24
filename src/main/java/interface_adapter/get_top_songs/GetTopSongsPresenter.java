@@ -1,18 +1,14 @@
 package interface_adapter.get_top_songs;
 
-import interface_adapter.ViewManagerModel;
 import use_case.get_top_songs.GetTopSongsOutputData;
 import use_case.get_top_songs.GetTopSongsOutputBoundary;
 
 public class GetTopSongsPresenter implements GetTopSongsOutputBoundary {
 
     private final GetTopSongsViewModel GetTopSongsViewModel;
-    private final ViewManagerModel viewManagerModel;
 
-    public GetTopSongsPresenter(ViewManagerModel viewManagerModel,
-                                GetTopSongsViewModel GetTopSongsViewModel) {
+    public GetTopSongsPresenter(GetTopSongsViewModel GetTopSongsViewModel) {
         this.GetTopSongsViewModel = GetTopSongsViewModel;
-        this.viewManagerModel = viewManagerModel;
     }
 
     @Override

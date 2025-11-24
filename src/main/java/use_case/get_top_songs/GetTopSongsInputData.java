@@ -1,7 +1,6 @@
 package use_case.get_top_songs;
 
 import entity.SpotifyUser;
-import static use_case.get_top_songs.TopItem.tracks;
 
 public class GetTopSongsInputData {
     private final TopItem topItem;
