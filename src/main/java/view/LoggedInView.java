@@ -3,7 +3,6 @@ package view;
 import data_access.SpotifyDataAccessObject;
 import entity.ArtistLoyaltyScore;
 import entity.SpotifyUser;
-import interface_adapter.logged_in.ChangePasswordController;
 import interface_adapter.logged_in.LoggedInState;
 import interface_adapter.logged_in.LoggedInViewModel;
 import interface_adapter.logout.LogoutController;
@@ -30,7 +29,6 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
     private final ViewManagerModel viewManagerModel;
     private final SpotifyAuthViewModel spotifyAuthViewModel;
     private final JLabel passwordErrorField = new JLabel();
-    private ChangePasswordController changePasswordController = null;
     private LogoutController logoutController;
     private SpotifyDataAccessObject spotifyDAO;  // NEW
     private SpotifyUser currentSpotifyUser;  // NEW
@@ -141,18 +139,7 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
             }
         });
 
-        // Change password button listener
-        changePassword.addActionListener(evt -> {
-            if (evt.getSource().equals(changePassword)) {
-                final LoggedInState currentState = loggedInViewModel.getState();
-                if (changePasswordController != null) {
-                    changePasswordController.execute(
-                            currentState.getUsername(),
-                            currentState.getPassword()
-                    );
-                }
-            }
-        });
+
 
         // Connect Spotify button listener
         connectSpotifyButton.addActionListener(evt -> {
@@ -392,9 +379,6 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
         return viewName;
     }
 
-    public void setChangePasswordController(ChangePasswordController changePasswordController) {
-        this.changePasswordController = changePasswordController;
-    }
 
     public void setLogoutController(LogoutController logoutController) {
         this.logoutController = logoutController;
