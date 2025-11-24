@@ -1,5 +1,6 @@
 package use_case.get_top_songs;
 
 public interface GetTopSongsOutputBoundary {
-    void present(GetTopSongsOutputData output);
+    void prepareSuccessView(GetTopSongsOutputData  outputData);
+    void prepareFailureView(String errorMessage);
 }
