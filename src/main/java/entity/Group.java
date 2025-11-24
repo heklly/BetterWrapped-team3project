@@ -12,7 +12,6 @@ public class Group {
     private String group_name;
     private final List<User> users;
     private final List<Playlist> group_playlists;
-    private final String date_created;
     private final User owner;
 
 
@@ -25,7 +24,6 @@ public class Group {
     public Group(String group_name, User owner ) {
         this.owner = owner;
         this.group_name = group_name;
-        this.date_created = date;
         this.users = new ArrayList<User>();
         this.group_playlists = new ArrayList<Playlist>();
     }
@@ -36,7 +34,6 @@ public class Group {
     public String getGroup_name() {
         return this.group_name;
     }
-    public String getDate() { return this.date_created; }
     public void addUser(User user) {
         if (user == null) {
             throw new IllegalArgumentException("User does not exist.");
