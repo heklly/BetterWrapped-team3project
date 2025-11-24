@@ -2,7 +2,6 @@ package use_case.create_group;
 
 import entity.Group;
 import entity.SpotifyUser;
-import entity.User;
 
 import java.util.List;
 
