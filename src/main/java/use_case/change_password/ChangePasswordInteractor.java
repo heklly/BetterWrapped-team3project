@@ -28,6 +28,9 @@ public class ChangePasswordInteractor implements ChangePasswordInputBoundary {
             final User user = userFactory.create(changePasswordInputData.getUsername(),
                     changePasswordInputData.getPassword());
 
+            System.out.println("DEBUG: Changing password for user: " + user.getName());
+            System.out.println("DEBUG: New password: " + user.getPassword());
+
             userDataAccessObject.changePassword(user);
 
             final ChangePasswordOutputData changePasswordOutputData = new ChangePasswordOutputData(user.getName());

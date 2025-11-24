@@ -30,9 +30,4 @@ public abstract class CreateGroupInteractor implements CreateGroupInputBoundary 
                 group.getUsers()
         );
     }
-
-    @Override
-    public CreateGroupOutputData execute() {
-        return null;
-    }
 }

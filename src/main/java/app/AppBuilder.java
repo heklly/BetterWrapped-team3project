@@ -14,6 +14,9 @@ import interface_adapter.logout.LogoutPresenter;
 import interface_adapter.signup.SignupController;
 import interface_adapter.signup.SignupPresenter;
 import interface_adapter.signup.SignupViewModel;
+import interface_adapter.spotify_auth.SpotifyAuthController;
+import interface_adapter.spotify_auth.SpotifyAuthPresenter;
+import interface_adapter.spotify_auth.SpotifyAuthViewModel;
 import use_case.change_password.ChangePasswordInputBoundary;
 import use_case.change_password.ChangePasswordInteractor;
 import use_case.change_password.ChangePasswordOutputBoundary;
@@ -26,9 +29,13 @@ import use_case.logout.LogoutOutputBoundary;
 import use_case.signup.SignupInputBoundary;
 import use_case.signup.SignupInteractor;
 import use_case.signup.SignupOutputBoundary;
+import use_case.spotify_auth.SpotifyAuthInputBoundary;
+import use_case.spotify_auth.SpotifyAuthInteractor;
+import use_case.spotify_auth.SpotifyAuthOutputBoundary;
 import view.LoggedInView;
 import view.LoginView;
 import view.SignupView;
+import view.SpotifyAuthView;
 import view.ViewManager;
 
 import javax.swing.*;
@@ -41,14 +48,7 @@ public class AppBuilder {
     final ViewManagerModel viewManagerModel = new ViewManagerModel();
     ViewManager viewManager = new ViewManager(cardPanel, cardLayout, viewManagerModel);
 
-    // set which data access implementation to use, can be any
-    // of the classes from the data_access package
-
-    // DAO version using local file storage
     final FileUserDataAccessObject userDataAccessObject = new FileUserDataAccessObject("users.csv", userFactory);
-
-    // DAO version using a shared external database
-    // final DBUserDataAccessObject userDataAccessObject = new DBUserDataAccessObject(userFactory);
 
     private SignupView signupView;
     private SignupViewModel signupViewModel;
@@ -56,29 +56,43 @@ public class AppBuilder {
     private LoggedInViewModel loggedInViewModel;
     private LoggedInView loggedInView;
     private LoginView loginView;
+    private SpotifyAuthView spotifyAuthView;
+    private SpotifyAuthViewModel spotifyAuthViewModel;
 
     public AppBuilder() {
         cardPanel.setLayout(cardLayout);
     }
 
-    public AppBuilder addSignupView() {
+    public AppBuilder addViewModels() {
         signupViewModel = new SignupViewModel();
+        loginViewModel = new LoginViewModel();
+        loggedInViewModel = new LoggedInViewModel();
+        spotifyAuthViewModel = new SpotifyAuthViewModel();
+        return this;
+    }
+
+    public AppBuilder addSignupView() {
         signupView = new SignupView(signupViewModel);
         cardPanel.add(signupView, signupView.getViewName());
         return this;
     }
 
     public AppBuilder addLoginView() {
-        loginViewModel = new LoginViewModel();
-        loginView = new LoginView(loginViewModel);
+        loginView = new LoginView(loginViewModel, viewManagerModel, signupViewModel);
         cardPanel.add(loginView, loginView.getViewName());
         return this;
     }
 
     public AppBuilder addLoggedInView() {
-        loggedInViewModel = new LoggedInViewModel();
-        loggedInView = new LoggedInView(loggedInViewModel);
+        loggedInView = new LoggedInView(loggedInViewModel, viewManagerModel, spotifyAuthViewModel);
         cardPanel.add(loggedInView, loggedInView.getViewName());
+        return this;
+    }
+
+    public AppBuilder addSpotifyAuthView() {
+        spotifyAuthView = new SpotifyAuthView(spotifyAuthViewModel, loggedInViewModel);  // Pass loggedInViewModel
+        spotifyAuthView.setViewManagerModel(viewManagerModel);
+        cardPanel.add(spotifyAuthView, spotifyAuthView.getViewName());
         return this;
     }
 
@@ -116,10 +130,6 @@ public class AppBuilder {
         return this;
     }
 
-    /**
-     * Adds the Logout Use Case to the application.
-     * @return this builder
-     */
     public AppBuilder addLogoutUseCase() {
         final LogoutOutputBoundary logoutOutputBoundary = new LogoutPresenter(viewManagerModel,
                 loggedInViewModel, loginViewModel);
@@ -132,17 +142,35 @@ public class AppBuilder {
         return this;
     }
 
+    public AppBuilder addSpotifyAuthUseCase() {
+        // PKCE doesn't need client secret!
+        data_access.SpotifyDataAccessObject spotifyDAO = new data_access.SpotifyDataAccessObject();
+
+        final SpotifyAuthOutputBoundary spotifyAuthOutputBoundary =
+                new SpotifyAuthPresenter(viewManagerModel, spotifyAuthViewModel, loggedInViewModel);
+
+        if (spotifyAuthOutputBoundary instanceof SpotifyAuthPresenter) {
+            ((SpotifyAuthPresenter) spotifyAuthOutputBoundary).setLoggedInView(loggedInView);
+        }
+
+        final SpotifyAuthInputBoundary spotifyAuthInteractor =
+                new SpotifyAuthInteractor(spotifyDAO, spotifyAuthOutputBoundary);
+
+        SpotifyAuthController controller = new SpotifyAuthController(spotifyAuthInteractor);
+        spotifyAuthView.setSpotifyAuthController(controller);
+
+        return this;
+    }
+
     public JFrame build() {
-        final JFrame application = new JFrame("User Login Example");
+        final JFrame application = new JFrame("Better Wrapped - Spotify Analysis");
         application.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
         application.add(cardPanel);
 
-        viewManagerModel.setState(signupView.getViewName());
+        viewManagerModel.setState(loginView.getViewName());
         viewManagerModel.firePropertyChange();
 
         return application;
     }
-
-
 }

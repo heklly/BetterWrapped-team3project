@@ -7,10 +7,10 @@ import use_case.change_password.ChangePasswordInputData;
  * Controller for the Change Password Use Case.
  */
 public class ChangePasswordController {
-    private final ChangePasswordInputBoundary userChangePasswordUseCaseInteractor;
+    private final ChangePasswordInputBoundary changePasswordInteractor;
 
-    public ChangePasswordController(ChangePasswordInputBoundary userChangePasswordUseCaseInteractor) {
-        this.userChangePasswordUseCaseInteractor = userChangePasswordUseCaseInteractor;
+    public ChangePasswordController(ChangePasswordInputBoundary changePasswordInteractor) {
+        this.changePasswordInteractor = changePasswordInteractor;
     }
 
     /**
@@ -18,9 +18,8 @@ public class ChangePasswordController {
      * @param password the new password
      * @param username the user whose password to change
      */
-    public void execute(String password, String username) {
+    public void execute(String username, String password) {
         final ChangePasswordInputData changePasswordInputData = new ChangePasswordInputData(username, password);
-
-        userChangePasswordUseCaseInteractor.execute(changePasswordInputData);
+        changePasswordInteractor.execute(changePasswordInputData);
     }
 }
