@@ -9,6 +9,9 @@ import interface_adapter.logged_in.LoggedInViewModel;
 import interface_adapter.logout.LogoutController;
 import interface_adapter.ViewManagerModel;
 import interface_adapter.spotify_auth.SpotifyAuthViewModel;
+import interface_adapter.daily_mix.DailyMixViewModel;
+import interface_adapter.daily_mix.DailyMixState;
+import interface_adapter.daily_mix.DailyMixController;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -42,12 +45,21 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
     private final JTextField passwordInputField = new JTextField(15);
     private final JButton changePassword;
 
+    private final DailyMixViewModel dailyMixViewModel;
+    private DailyMixController dailyMixController;   // NEW
+    private final JButton generateDailyMixButton;    // NEW
+    private final JTextArea dailyMixArea;            // NEW
+
+
     public LoggedInView(LoggedInViewModel loggedInViewModel, ViewManagerModel viewManagerModel,
-                        SpotifyAuthViewModel spotifyAuthViewModel) {
+                        SpotifyAuthViewModel spotifyAuthViewModel, DailyMixViewModel dailyMixViewModel) {
         this.loggedInViewModel = loggedInViewModel;
         this.viewManagerModel = viewManagerModel;
         this.spotifyAuthViewModel = spotifyAuthViewModel;
+        this.dailyMixViewModel = dailyMixViewModel;
+
         this.loggedInViewModel.addPropertyChangeListener(this);
+        this.dailyMixViewModel.addPropertyChangeListener(this);  // 监听 DailyMix
         this.spotifyDAO = new SpotifyDataAccessObject();  // NEW
 
         final JLabel title = new JLabel("Better Wrapped - Dashboard");
@@ -81,6 +93,18 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
         showLoyaltyScoresButton = new JButton("Show Artist Loyalty");  // NEW
         showLoyaltyScoresButton.setEnabled(false);  // Disabled until Spotify connected
         buttons.add(showLoyaltyScoresButton);  // NEW
+
+        // Daily Mix text
+        dailyMixArea = new JTextArea(10, 40);
+        dailyMixArea.setEditable(false);
+        dailyMixArea.setFont(new Font("Monospaced", Font.PLAIN, 12));
+        JScrollPane dailyMixScroll = new JScrollPane(dailyMixArea);
+
+        // Daily Mix button
+        generateDailyMixButton = new JButton("Generate Daily Mix");
+        generateDailyMixButton.setEnabled(false);  // 先禁用，连上 Spotify 后再启用
+        buttons.add(generateDailyMixButton);
+
 
         // Log out button listener
         logOut.addActionListener(evt -> {
@@ -145,6 +169,22 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
             }
         });
 
+        // NEW: Generate Daily Mix button listener
+        generateDailyMixButton.addActionListener(evt -> {
+            if (evt.getSource().equals(generateDailyMixButton)) {
+                if (dailyMixController == null || currentSpotifyUser == null) {
+                    JOptionPane.showMessageDialog(this,
+                            "Please connect your Spotify account first.",
+                            "No Spotify User",
+                            JOptionPane.WARNING_MESSAGE);
+                } else {
+                    // generate 20 songs
+                    dailyMixController.execute(currentSpotifyUser, 20);
+                }
+            }
+        });
+
+
         // Add all components to view
         this.add(title);
         this.add(usernameInfo);
@@ -153,6 +193,9 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
         this.add(passwordInfo);
         this.add(passwordErrorField);
         this.add(buttons);
+        this.add(Box.createVerticalStrut(10));
+        this.add(new JLabel("Your Daily Mix:"));
+        this.add(dailyMixScroll);
     }
 
     // REPLACE the showArtistLoyaltyScores() method with this corrected version
@@ -269,37 +312,81 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        if (evt.getPropertyName().equals("state")) {
-            final LoggedInState state = (LoggedInState) evt.getNewValue();
-            username.setText(state.getUsername());
+        // get newValue for 2 following branches.
+        Object newValue = evt.getNewValue();
 
-            // Update Spotify status display
-            if (state.isSpotifyAuthenticated()) {
-                spotifyStatusLabel.setText("Connected ✓");
-                spotifyStatusLabel.setForeground(Color.GREEN);
-                connectSpotifyButton.setEnabled(false);
-                connectSpotifyButton.setText("Spotify Connected");
-                showLoyaltyScoresButton.setEnabled(true);  // NEW: Enable loyalty button
+        // --------------------------
+        // 1. LoggedInState update
+        // --------------------------
+        if (newValue instanceof LoggedInState) {
+            LoggedInState state = (LoggedInState) newValue;
 
-            } else {
-                spotifyStatusLabel.setText("Not Connected");
-                spotifyStatusLabel.setForeground(Color.RED);
-                connectSpotifyButton.setEnabled(true);
-                connectSpotifyButton.setText("Connect Spotify");
-                showLoyaltyScoresButton.setEnabled(false);  // NEW: Disable loyalty button
+            if (evt.getPropertyName().equals("state")) {
+                username.setText(state.getUsername());
+
+                // Update Spotify status display
+                if (state.isSpotifyAuthenticated()) {
+                    spotifyStatusLabel.setText("Connected ✓");
+                    spotifyStatusLabel.setForeground(Color.GREEN);
+                    connectSpotifyButton.setEnabled(false);
+                    connectSpotifyButton.setText("Spotify Connected");
+                    showLoyaltyScoresButton.setEnabled(true);   // Enable loyalty button
+                    generateDailyMixButton.setEnabled(true);    // Enable Daily Mix
+                } else {
+                    spotifyStatusLabel.setText("Not Connected");
+                    spotifyStatusLabel.setForeground(Color.RED);
+                    connectSpotifyButton.setEnabled(true);
+                    connectSpotifyButton.setText("Connect Spotify");
+                    showLoyaltyScoresButton.setEnabled(false);  // Disable loyalty button
+                    generateDailyMixButton.setEnabled(false);   // Disable Daily Mix
+                }
+            }
+            else if (evt.getPropertyName().equals("password")) {
+                if (state.getPasswordError() == null) {
+                    JOptionPane.showMessageDialog(this,
+                            "Password updated for " + state.getUsername());
+                    passwordInputField.setText("");
+                } else {
+                    JOptionPane.showMessageDialog(this, state.getPasswordError());
+                }
             }
         }
-        else if (evt.getPropertyName().equals("password")) {
-            final LoggedInState state = (LoggedInState) evt.getNewValue();
-            if (state.getPasswordError() == null) {
-                JOptionPane.showMessageDialog(this, "Password updated for " + state.getUsername());
-                passwordInputField.setText("");
+
+        // --------------------------
+        // 2. DailyMixState update
+        // --------------------------
+        else if (newValue instanceof DailyMixState) {
+            DailyMixState mixState = (DailyMixState) newValue;
+
+            if (mixState.getError() != null) {
+                JOptionPane.showMessageDialog(this,
+                        mixState.getError(),
+                        "Daily Mix Error",
+                        JOptionPane.ERROR_MESSAGE);
+                return;
             }
-            else {
-                JOptionPane.showMessageDialog(this, state.getPasswordError());
+
+            StringBuilder sb = new StringBuilder();
+            if (mixState.getTracks() == null || mixState.getTracks().isEmpty()) {
+                sb.append("No tracks found. Try saving some songs or playing music on Spotify!");
+            } else {
+                int index = 1;
+                for (String line : mixState.getTracks()) {
+                    sb.append(index).append(". ").append(line).append("\n");
+                    index++;
+                }
             }
+
+            dailyMixArea.setText(sb.toString());
+            dailyMixArea.setCaretPosition(0);
         }
     }
+
+
+    public void setDailyMixController(DailyMixController dailyMixController) {
+        this.dailyMixController = dailyMixController;
+    }
+
 
     public String getViewName() {
         return viewName;
