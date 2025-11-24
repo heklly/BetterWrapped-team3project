@@ -13,7 +13,7 @@ public class GetTopSongsInteractor implements GetTopSongInputBoundary{
     @Override
     public void execute(GetTopSongsInputData input) {
         try{
-            GetTopSongsOutputData outputData = dataAccess.fetchSpotifyResult(input.getActionType());
+            GetTopSongsOutputData outputData = dataAccess.fetchSpotifyResult(input);
             presenter.prepareSuccessView(outputData);
         } catch (Exception e){
             presenter.prepareFailureView("Failed to fetch spotify result"

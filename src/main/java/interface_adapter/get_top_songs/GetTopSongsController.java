@@ -1,8 +1,7 @@
 package interface_adapter.get_top_songs;
 
-import use_case.get_top_songs.ActionType;
-import use_case.get_top_songs.GetTopSongInputBoundary;
-import use_case.get_top_songs.GetTopSongsInputData;
+import entity.SpotifyUser;
+import use_case.get_top_songs.*;
 
 public class GetTopSongsController {
     private final GetTopSongInputBoundary GetTopSongSongsUseCaseInteractor;
@@ -11,9 +10,12 @@ public class GetTopSongsController {
         this.GetTopSongSongsUseCaseInteractor = GetTopSongSongsUseCaseInteractor;
     }
 
-    public void onButtonClicked(String actionName){
-        ActionType actionType = ActionType.valueOf(actionName);
-        GetTopSongsInputData getTopSongsInputData = new GetTopSongsInputData(actionType);
-        GetTopSongSongsUseCaseInteractor.execute(getTopSongsInputData);
+    public void execute(SpotifyUser spotifyUser, TopItem topItem, TimeType timeType){
+        GetTopSongsInputData inputData = new GetTopSongsInputDataBuilder()
+                .setTopItem(topItem)
+                .setTimeType(timeType)
+                .setSpotifyUser(spotifyUser)
+                .createGetTopSongsInputData();
+        GetTopSongSongsUseCaseInteractor.execute(inputData);
     }
 }

@@ -1,13 +1,26 @@
 package use_case.get_top_songs;
 
-public class GetTopSongsInputData {
-    private final ActionType actionType;
+import entity.SpotifyUser;
+import static use_case.get_top_songs.TopItem.tracks;
 
-    public GetTopSongsInputData(ActionType actionType) {
-        this.actionType = actionType;
+public class GetTopSongsInputData {
+    private final TopItem topItem;
+    private final TimeType timeType;
+    private final SpotifyUser spotifyUser;
+
+    public GetTopSongsInputData(TopItem topItem, TimeType timeType, SpotifyUser spotifyUser) {
+        this.timeType = timeType;
+        this.topItem = topItem;
+        this.spotifyUser = spotifyUser;
     }
 
-    public ActionType getActionType() {
-        return actionType;
+    public TopItem getTopItem() {
+        return this.topItem;
+    }
+    public TimeType getTimeType() {
+        return this.timeType;
+    }
+    public SpotifyUser getSpotifyUser() {
+        return this.spotifyUser;
     }
 }

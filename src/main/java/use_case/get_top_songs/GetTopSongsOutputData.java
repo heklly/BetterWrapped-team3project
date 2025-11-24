@@ -1,14 +1,16 @@
 package use_case.get_top_songs;
 
-public class GetTopSongsOutputData {
-    private final String resultType;
-    private final Object payload;
+import java.util.List;
 
-    public GetTopSongsOutputData(String resultType, Object payload) {
-        this.resultType = resultType;
-        this.payload = payload;
+public class GetTopSongsOutputData {
+
+    private final List<String> topItems;
+
+    public GetTopSongsOutputData(List<String> topItems) {
+        this.topItems = topItems;
     }
 
-    public String getResultType() {return resultType;}
-    public Object getPayload() {return payload;}
+    public List<String> getTopItems() {
+        return topItems;
+    }
 }

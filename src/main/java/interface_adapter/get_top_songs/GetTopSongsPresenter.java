@@ -1,10 +1,8 @@
 package interface_adapter.get_top_songs;
 
 import interface_adapter.ViewManagerModel;
-import use_case.get_top_songs.ActionType;
 import use_case.get_top_songs.GetTopSongsOutputData;
 import use_case.get_top_songs.GetTopSongsOutputBoundary;
-import view.ViewManager;
 
 public class GetTopSongsPresenter implements GetTopSongsOutputBoundary {
 
@@ -20,16 +18,20 @@ public class GetTopSongsPresenter implements GetTopSongsOutputBoundary {
     @Override
     public void prepareSuccessView(GetTopSongsOutputData response) {
         final GetTopSongsState getTopSongsState = GetTopSongsViewModel.getState();
-        getTopSongsState.setResultType(response.getResultType());
+        getTopSongsState.setSuccess(true);
+        getTopSongsState.setTopItems(response.getTopItems());
+
+        GetTopSongsViewModel.setState(getTopSongsState);
         GetTopSongsViewModel.firePropertyChange();
 
-        viewManagerModel.setState(GetTopSongsViewModel.getViewName());
-        viewManagerModel.firePropertyChange();
     }
 
     public void prepareFailureView(String errorMessage) {
         final GetTopSongsState getTopSongsState = GetTopSongsViewModel.getState();
-        getTopSongsState.setResultType(errorMessage);
+        getTopSongsState.setSuccess(false);
+        getTopSongsState.setTopItems(null);
+
+        GetTopSongsViewModel.setState(getTopSongsState);
         GetTopSongsViewModel.firePropertyChange();
     }
 }

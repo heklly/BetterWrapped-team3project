@@ -1,12 +1,22 @@
 package interface_adapter.get_top_songs;
 
+import java.util.*;
+
 public class GetTopSongsState {
-    private String resultType = "";
-    private Object payload = null;
+    private List<String> topItems = new ArrayList<>();
+    private boolean success = false;
 
-    public void setResultType(String resultType) {this.resultType = resultType;}
-    public void setPayload(Object payload) {this.payload = payload;}
+    public List<String> getTopItems() {
+        return topItems;
+    }
+    public boolean getSuccess() {
+        return success;
+    }
 
-    public String getResultType() {return resultType;}
-    public Object getPayload() {return payload;}
+    public void setSuccess(boolean success) {
+        this.success = success;
+    }
+    public void setTopItems(List<String> topItems) {
+        this.topItems = topItems;
+    }
 }
