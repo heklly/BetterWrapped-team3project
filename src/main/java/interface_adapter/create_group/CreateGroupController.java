@@ -1,4 +1,5 @@
 package interface_adapter.create_group;
+import entity.SpotifyUser;
 import entity.User;
 import use_case.create_group.CreateGroupInputBoundary;
 import use_case.create_group.CreateGroupInputData;
@@ -28,7 +29,7 @@ public class CreateGroupController {
      * @param owner the user creating the group
      * @param initialMembers  list of initial members
      */
-    public void create(String group_name, User owner, List<User> initialMembers) {
+    public void create(String group_name, SpotifyUser owner, List<SpotifyUser> initialMembers) {
         CreateGroupInputData inputData = new CreateGroupInputData(group_name, owner, initialMembers);
         createGroupUseCase.execute(inputData);
 
