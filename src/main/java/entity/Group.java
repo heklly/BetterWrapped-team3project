@@ -57,7 +57,7 @@ public class Group {
         } this.group_name = group_name;
     }
 
-    public List <SpotifyUser> getUsers() {
+    public List<SpotifyUser> getUsers() {
         return this.users;
     }
 
