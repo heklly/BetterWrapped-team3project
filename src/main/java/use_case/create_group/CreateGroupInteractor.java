@@ -9,10 +9,10 @@ import java.util.List;
  * Interactor for the Create Group use case.
  * Implements the input boundary.
  */
-public abstract class CreateGroupInteractor implements use_case.create_group.CreateGroupInputBoundary {
+public abstract class CreateGroupInteractor implements CreateGroupInputBoundary {
 
     @Override
-    public use_case.create_group.CreateGroupOutputData execute(use_case.create_group.CreateGroupInputData inputData) {
+    public CreateGroupOutputData execute(CreateGroupInputData inputData) {
 
         Group group = new Group(inputData.getGroup_name(), inputData.getOwner());
 
@@ -24,14 +24,10 @@ public abstract class CreateGroupInteractor implements use_case.create_group.Cre
         }
 
         // Return output data
-        return new use_case.create_group.CreateGroupOutputData(
+        return new CreateGroupOutputData(
                 group.getGroup_name(),
                 group.getOwner(),
                 group.getUsers()
         );
-    }
-
-    public use_case.create_group.CreateGroupOutputData execute() {
-        return null;
     }
 }
