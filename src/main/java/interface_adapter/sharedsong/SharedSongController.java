@@ -1,7 +1,7 @@
 package interface_adapter.sharedsong;
 
 import entity.Group;
-import entity.User;
+import entity.SpotifyUser;
 import use_case.sharedsong.SharedSongInputBoundary;
 import use_case.sharedsong.SharedSongInputData;
 
@@ -23,7 +23,7 @@ public class SharedSongController {
      * @param group the group the user is in
      */
 
-    public void execute(User user, Group group) {
+    public void execute(SpotifyUser user, Group group) {
         final SharedSongInputData inputData = new SharedSongInputData(user,group);
         sharedSongUseCaseInteractor.execute(inputData);
     }

@@ -1,5 +1,6 @@
 package use_case.sharedsong;
 
+import entity.SpotifyUser;
 import entity.User;
 import org.apache.hc.core5.http.ParseException;
 import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
@@ -22,25 +23,10 @@ public class SharedSongInteractor implements SharedSongInputBoundary {
         this.sharedSongPresenter = sharedSongPresenter;
     }
 
-    private CurrentlyPlaying getCurrentlyPlaying(User user) {
-        // make api request
-        GetUsersCurrentlyPlayingTrackRequest request = spotifyApi
-                .getUsersCurrentlyPlayingTrack()
-//                    .additionalTypes("track")
-                .build();
-        try {
-            final CurrentlyPlaying response = request.execute();
-            return response;
-
-        } catch (IOException | SpotifyWebApiException | ParseException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     public void execute(SharedSongInputData inputData) {
-        final User user = inputData.getUser();
+        final SpotifyUser user = inputData.getUser();
 
-        final GetUsersCurrentlyPlayingTrackRequest request = spotifyApi
+        final GetUsersCurrentlyPlayingTrackRequest request = getSpotifyApiForUser(user)
                 .getUsersCurrentlyPlayingTrack()
 //                    .additionalTypes("track")
                 .build();
@@ -79,7 +65,7 @@ public class SharedSongInteractor implements SharedSongInputBoundary {
     }
 
     private boolean checkUserSavedTrack(User user, String trackId) throws IOException, SpotifyWebApiException, ParseException {
-        final CheckUsersSavedTracksRequest request = spotifyApi.checkUserSavedTracks(new String[]{trackId}).build();
+        final CheckUsersSavedTracksRequest request = getSpotifyApiForUser(user).checkUserSavedTracks(new String[]{trackId}).build();
         final Boolean[] response = request.execute();
         return response[0];
     }
