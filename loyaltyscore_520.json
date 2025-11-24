@@ -1,0 +1,12 @@
+{"loyalty_scores": [
+    {
+        "date": "231123",
+        "score": 85,
+        "artist_name": "Artist1"
+    },
+    {
+        "date": "231123",
+        "score": 90,
+        "artist_name": "Artist1"
+    }
+]}
