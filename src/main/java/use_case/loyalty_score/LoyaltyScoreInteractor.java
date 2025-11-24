@@ -1,29 +1,60 @@
 package use_case.loyalty_score;
 
+import java.time.*;
+import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import data_access.SpotifyDataAccessObject;
+import entity.ArtistLoyaltyScore;
 import interface_adapter.loyalty_score.SpotifyGateway;
 
 public class LoyaltyScoreInteractor implements LoyaltyScoreInputBoundary {
 
-    private final LoyaltyScoringService scoringService;
     private final LoyaltyScoreDataAccessInterface loyaltyDataAccessObject;
     private final LoyaltyScoreOutputBoundary loyaltyPresenter;
-    private final SpotifyGatewayInterface spotifyGateway;
+    private final SpotifyDataAccessObject spotifyDAO;
 
-    public LoyaltyScoreInteractor(LoyaltyScoringService scoringService,
-                                  LoyaltyScoreDataAccessInterface loyaltyScoreDataAccessInterface,
+    public LoyaltyScoreInteractor(LoyaltyScoreDataAccessInterface loyaltyScoreDataAccessInterface,
                                   LoyaltyScoreOutputBoundary loyaltyScoreOutputBoundary,
-                                  SpotifyGatewayInterface spotifyGateway) {
-        this.scoringService = scoringService;
+                                  SpotifyDataAccessObject spotifyDAO) {
         this.loyaltyDataAccessObject = loyaltyScoreDataAccessInterface;
         this.loyaltyPresenter = loyaltyScoreOutputBoundary;
-        this.spotifyGateway = spotifyGateway;
+        this.spotifyDAO = spotifyDAO;
+
     }
 
     @Override
     public void execute(LoyaltyScoreInputData loyaltyScoreInputData) {
 
-        //TODO: Finish
+        final String userid = loyaltyScoreInputData.getCurrentUser().getUserid();
+        final String chosen_artist = loyaltyScoreInputData.getArtist_name();
 
+        // update loyalty scores for current visit
+        update_loyalty_scores(loyaltyScoreInputData);
+
+        // user chooses a specific artist to view loyalty scores for; so
+        final Map<String, Integer> loyalty_scores = loyaltyDataAccessObject.getLoyaltyArtist(userid, chosen_artist);
+
+        // output data is loyalty scores
+        final LoyaltyScoreOutputData outputData = new LoyaltyScoreOutputData(loyalty_scores);
+
+        //
+        loyaltyPresenter.prepareView(outputData);
     }
 
+    private void update_loyalty_scores(LoyaltyScoreInputData loyaltyScoreInputData) {
+        String currentDate = LocalDate.now().toString();
+        String userid = loyaltyScoreInputData.getCurrentUser().getUserid();
+
+        List<ArtistLoyaltyScore> loyaltyScores = spotifyDAO.getArtistLoyaltyScores(loyaltyScoreInputData.getSpotifyUser());
+
+        // get loyalty scores for today and save them
+        for  (ArtistLoyaltyScore loyaltyScore : loyaltyScores) {
+            String artist_name = loyaltyScore.getArtistName();
+            int loyalty = loyaltyScore.getLoyaltyScore();
+            loyaltyDataAccessObject.saveLoyalty(userid, currentDate, artist_name, loyalty);
+        }
+    }
 }

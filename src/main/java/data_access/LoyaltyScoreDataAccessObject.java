@@ -11,11 +11,10 @@ import java.util.Map;
 /**
  * Implementation of LoyaltyScoreDataAccessInterface
  * The file is formatted as: loyaltyscore_userid
- *
  * {
  *   "loyalty_scores": [
  *     {
- *       "date": "231123",
+ *       "date": "2023-11-23",
  *       "artist_name": "Artist1",
  *       "score": 85
  * }
@@ -23,10 +22,6 @@ import java.util.Map;
 
 public class LoyaltyScoreDataAccessObject implements LoyaltyScoreDataAccessInterface {
 
-    // Helper method to get the file for a specific user
-    private File getUserFile(String userid) {
-        return new File("loyaltyscore_" + userid + ".json");
-    }
 
     @Override
     public Map<String, Integer> getLoyaltyDate(String userid, String date) {
@@ -101,6 +96,35 @@ public class LoyaltyScoreDataAccessObject implements LoyaltyScoreDataAccessInter
 
         // Write the updated data back to the file
         writeUserFile(userid, rootNode, loyaltyScoresArray);
+    }
+
+    @Override
+    public Map<String, Integer> getLoyaltyArtist(String userid, String artist_name) {
+        Map<String, Integer> loyaltyScores = new HashMap<>();
+        JSONObject rootNode = readUserFile(userid);
+        if (rootNode == null) {
+            return loyaltyScores;  // Early return if the file doesn't exist
+        }
+
+        JSONArray loyaltyScoresArray = rootNode.optJSONArray("loyalty_scores");
+        if (loyaltyScoresArray == null) {
+            return loyaltyScores;  // Early return if the loyalty_scores array doesn't exist
+        }
+
+        loyaltyScoresArray.forEach(entry -> {
+            JSONObject loyaltyScore = (JSONObject) entry;
+            if (loyaltyScore.getString("artist_name").equals(artist_name)) {
+                String date = loyaltyScore.getString("date");
+                int score = loyaltyScore.getInt("score");
+                loyaltyScores.put(date, score);
+            }
+        });
+        return loyaltyScores;
+    }
+
+    // Helper method to get the file for a specific user
+    private File getUserFile(String userid) {
+        return new File("loyaltyscore_" + userid + ".json");
     }
 
     // Helper method to read the user's file and return a JSONObject

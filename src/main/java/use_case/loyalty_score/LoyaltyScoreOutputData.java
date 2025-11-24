@@ -1,5 +1,7 @@
 package use_case.loyalty_score;
 
+import entity.User;
+
 import java.util.Map;
 
 /**
@@ -7,24 +9,15 @@ import java.util.Map;
  */
 
 public class LoyaltyScoreOutputData {
-    private final String userid;
-    private final String date;
+    // key of String is date.
     private final Map<String, Integer> loyalty_scores;
 
 
-    public LoyaltyScoreOutputData(String userid, String date, Map<String, Integer> loyalty_scores)
+    public LoyaltyScoreOutputData(Map<String, Integer> loyalty_scores)
     {
-        this.date = date;
-        this.userid = userid;
         this.loyalty_scores = loyalty_scores;
     }
 
-    public String getUserid() {return userid; }
-    public String getDate() {return this.date; }
-
-    /**
-     * Where name is the name of artist; as specified from spotify's api.
-     */
-    public int getScore(String name) { return loyalty_scores.getOrDefault(name, 0);}
+    public Map<String, Integer> getScores() { return loyalty_scores; }
 
 }

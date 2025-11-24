@@ -1,27 +1,35 @@
 package use_case.loyalty_score;
 
+import entity.SpotifyUser;
+import entity.User;
 import org.json.JSONArray;
 
 /**
  * The Input Data for the Login Use Case.
- * Userid is for the userid for which the loyalty score is calculated
- * Date is for the date of calculation;
+ * artist_name is the artist of interest.
  */
 public class LoyaltyScoreInputData {
 
-    private final String userid;
-    private final String date;
+    private final User currentUser;
+    private final SpotifyUser spotifyUser;
+    private final String artist_name;
     private JSONArray loyalty_scores;
 
 
-    public LoyaltyScoreInputData(String userid , String date) {
-        this.userid = userid;
-        this.date = date;
+    public LoyaltyScoreInputData(User currentUser, SpotifyUser currentSpotifyUser, String artistName) {
+        this.currentUser = currentUser;
+        this.spotifyUser = currentSpotifyUser;
+        this.artist_name = artistName;
     }
 
-    String getUserid() { return this.userid;}
-    String getDate() {
-        return this.date;
+    public User getCurrentUser() {
+        return currentUser;
+    }
+    public SpotifyUser getSpotifyUser() {
+        return spotifyUser;
     }
 
+    public String getArtist_name() {
+        return artist_name;
+    }
 }

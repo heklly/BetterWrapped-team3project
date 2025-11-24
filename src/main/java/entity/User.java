@@ -13,7 +13,7 @@ public class User {
      * Creates a new user with the given non-empty name and non-empty password.
      * @param name the username
      * @param userid the unique userid for each user
-     * @param date the date the user was created
+     * @param date the date the user was created, formatted yyyy-mm-dd
      */
     public User(String name, String userid, String date ) {
         this.username = name;
