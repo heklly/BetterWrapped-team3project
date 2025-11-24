@@ -27,7 +27,6 @@ public interface GroupDataAccessInterface {
 
     /**
      * Updates existing Group entity in storage.
-     *
      * Used to update group members in join_group use case
      * @param group the updated Group Entity to save
      */
