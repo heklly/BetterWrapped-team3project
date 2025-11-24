@@ -1,7 +1,6 @@
 package use_case.loyalty_score;
 
 import entity.SpotifyUser;
-import entity.User;
 import org.json.JSONArray;
 
 /**
@@ -10,21 +9,16 @@ import org.json.JSONArray;
  */
 public class LoyaltyScoreInputData {
 
-    private final User currentUser;
     private final SpotifyUser spotifyUser;
     private final String artist_name;
     private JSONArray loyalty_scores;
 
 
-    public LoyaltyScoreInputData(User currentUser, SpotifyUser currentSpotifyUser, String artistName) {
-        this.currentUser = currentUser;
+    public LoyaltyScoreInputData(SpotifyUser currentSpotifyUser, String artistName) {
         this.spotifyUser = currentSpotifyUser;
         this.artist_name = artistName;
     }
 
-    public User getCurrentUser() {
-        return currentUser;
-    }
     public SpotifyUser getSpotifyUser() {
         return spotifyUser;
     }

@@ -1,14 +1,11 @@
 package use_case.loyalty_score;
 
 import java.time.*;
-import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import data_access.SpotifyDataAccessObject;
 import entity.ArtistLoyaltyScore;
-import interface_adapter.loyalty_score.SpotifyGateway;
 
 public class LoyaltyScoreInteractor implements LoyaltyScoreInputBoundary {
 
@@ -28,7 +25,7 @@ public class LoyaltyScoreInteractor implements LoyaltyScoreInputBoundary {
     @Override
     public void execute(LoyaltyScoreInputData loyaltyScoreInputData) {
 
-        final String userid = loyaltyScoreInputData.getCurrentUser().getUserid();
+        final String userid = loyaltyScoreInputData.getSpotifyUser().getSpotifyUserId();
         final String chosen_artist = loyaltyScoreInputData.getArtist_name();
 
         // update loyalty scores for current visit
@@ -46,7 +43,7 @@ public class LoyaltyScoreInteractor implements LoyaltyScoreInputBoundary {
 
     private void update_loyalty_scores(LoyaltyScoreInputData loyaltyScoreInputData) {
         String currentDate = LocalDate.now().toString();
-        String userid = loyaltyScoreInputData.getCurrentUser().getUserid();
+        String userid = loyaltyScoreInputData.getSpotifyUser().getSpotifyUserId();
 
         List<ArtistLoyaltyScore> loyaltyScores = spotifyDAO.getArtistLoyaltyScores(loyaltyScoreInputData.getSpotifyUser());
 

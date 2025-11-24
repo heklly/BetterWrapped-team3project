@@ -1,8 +1,6 @@
 package interface_adapter.loyalty_score;
 
 import entity.SpotifyUser;
-import entity.User;
-import use_case.logout.LogoutInputBoundary;
 import use_case.loyalty_score.LoyaltyScoreInputBoundary;
 import use_case.loyalty_score.LoyaltyScoreInputData;
 
@@ -17,8 +15,8 @@ public class LoyaltyController {
     /**
      * Executes the Logout Use Case.
      */
-    public void execute(User user, SpotifyUser spotifyUser, String artistName) {
-        LoyaltyScoreInputData inputData = new LoyaltyScoreInputData(user, spotifyUser, artistName);
+    public void execute(SpotifyUser spotifyUser, String artistName) {
+        LoyaltyScoreInputData inputData = new LoyaltyScoreInputData(spotifyUser, artistName);
         loyaltyScoreInteractor.execute(inputData);
     }
 }

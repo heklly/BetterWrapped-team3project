@@ -10,10 +10,10 @@ public class Group {
 
     public static final int MAX_MEMBERS = 7;
     private String group_name;
-    private final List<User> users;
+    private final List<SpotifyUser> users;
     private final List<Playlist> group_playlists;
     private final String date_created;
-    private final User owner;
+    private final SpotifyUser owner;
 
 
     /**
@@ -22,14 +22,14 @@ public class Group {
      * @param group_name the group's name
      * @param owner      the user who created the group
      */
-    public Group(String group_name, User owner ) {
+    public Group(String group_name, SpotifyUser owner ) {
         this.owner = owner;
         this.group_name = group_name;
         this.date_created = "20241212";
-        this.users = new ArrayList<User>();
+        this.users = new ArrayList<SpotifyUser>();
         this.group_playlists = new ArrayList<Playlist>();
     }
-    public User getOwner() {
+    public SpotifyUser getOwner() {
         return owner;
     }
 
@@ -37,7 +37,7 @@ public class Group {
         return this.group_name;
     }
     public String getDate() { return this.date_created; }
-    public void addUser(User user) {
+    public void addUser(SpotifyUser user) {
         if (user == null) {
             throw new IllegalArgumentException("User does not exist.");
         }
@@ -45,7 +45,7 @@ public class Group {
             throw new IllegalStateException("Cannot have more than 7 members in group");}
                     this.users.add(user);
     }
-    public void removeUser (User user) {
+    public void removeUser (SpotifyUser user) {
         this.users.remove(user);
     }
 
@@ -57,7 +57,7 @@ public class Group {
         } this.group_name = group_name;
     }
 
-    public List <User> getUsers() {
+    public List<SpotifyUser> getUsers() {
         return this.users;
     }
 

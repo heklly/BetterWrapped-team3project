@@ -1,7 +1,5 @@
 package use_case.loyalty_score;
 
-import entity.User;
-
 import java.util.Map;
 
 /**
