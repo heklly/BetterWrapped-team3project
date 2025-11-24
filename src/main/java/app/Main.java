@@ -29,6 +29,7 @@ public class Main {
                 .addChangePasswordUseCase()
                 .addLogoutUseCase()
                 .addSpotifyAuthUseCase()
+                .addDailyMixUseCase()
                 .build();
         application.pack();
         application.setLocationRelativeTo(null);
