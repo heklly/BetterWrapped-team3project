@@ -42,6 +42,8 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
     private final JTextField passwordInputField = new JTextField(15);
     private final JButton changePassword;
 
+    private final JButton groupAnalyticsButton = new JButton("Group analytics");
+
     public LoggedInView(LoggedInViewModel loggedInViewModel, ViewManagerModel viewManagerModel,
                         SpotifyAuthViewModel spotifyAuthViewModel) {
         this.loggedInViewModel = loggedInViewModel;
@@ -81,6 +83,8 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
         showLoyaltyScoresButton = new JButton("Show Artist Loyalty");  // NEW
         showLoyaltyScoresButton.setEnabled(false);  // Disabled until Spotify connected
         buttons.add(showLoyaltyScoresButton);  // NEW
+
+        buttons.add(groupAnalyticsButton);
 
         // Log out button listener
         logOut.addActionListener(evt -> {
@@ -143,6 +147,11 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
             if (evt.getSource().equals(showLoyaltyScoresButton) && currentSpotifyUser != null) {
                 showArtistLoyaltyScores();
             }
+        });
+
+        groupAnalyticsButton.addActionListener(e -> {
+            viewManagerModel.setState("group analytics");
+            viewManagerModel.firePropertyChange();
         });
 
         // Add all components to view
