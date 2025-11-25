@@ -37,4 +37,10 @@ public interface LoyaltyScoreDataAccessInterface {
      */
 
     Map<String, Integer> getLoyaltyArtist(String userid, String artist_name);
+
+
+    /**
+     * @return all previous calculated dates
+     */
+    List<String> getDates(String userid);
 }

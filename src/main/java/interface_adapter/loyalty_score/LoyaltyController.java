@@ -13,7 +13,7 @@ public class LoyaltyController {
     }
 
     /**
-     * Executes the Logout Use Case.
+     * Executes the LoyaltyScore use case.
      */
     public void execute(SpotifyUser spotifyUser, String artistName) {
         LoyaltyScoreInputData inputData = new LoyaltyScoreInputData(spotifyUser, artistName);

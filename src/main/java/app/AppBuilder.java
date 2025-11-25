@@ -1,8 +1,6 @@
 package app;
 
-import data_access.FileUserDataAccessObject;
 import data_access.SpotifyDataAccessObject;
-import entity.UserFactory;
 import interface_adapter.ViewManagerModel;
 import interface_adapter.logged_in.LoggedInViewModel;
 import interface_adapter.login.LoginPresenter;
@@ -13,9 +11,6 @@ import interface_adapter.spotify_auth.SpotifyAuthViewModel;
 import interface_adapter.daily_mix.DailyMixViewModel;
 import interface_adapter.daily_mix.DailyMixController;
 import interface_adapter.daily_mix.DailyMixPresenter;
-import use_case.change_password.ChangePasswordInputBoundary;
-import use_case.change_password.ChangePasswordInteractor;
-import use_case.change_password.ChangePasswordOutputBoundary;
 import use_case.login.LoginInputBoundary;
 import use_case.login.LoginInteractor;
 import use_case.login.LoginOutputBoundary;
