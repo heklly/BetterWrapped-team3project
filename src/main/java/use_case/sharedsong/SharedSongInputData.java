@@ -2,8 +2,6 @@ package use_case.sharedsong;
 
 import entity.Group;
 import entity.SpotifyUser;
-import se.michaelthelin.spotify.model_objects.specification.User;
-
 import java.util.List;
 
 /**
@@ -18,7 +16,7 @@ public class SharedSongInputData {
         this.group = group;
         this.user = user;
     }
-    public List<User> getListOfMembers() {return group.getUsers();}
+    public List<SpotifyUser> getListOfMembers() {return group.getUsers();}
     public SpotifyUser getUser() {return user;}
 }
 

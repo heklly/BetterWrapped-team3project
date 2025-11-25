@@ -1,13 +1,7 @@
 package app;
 
-import data_access.FileUserDataAccessObject;
 import data_access.SpotifyDataAccessObject;
-import data_access.TopItemDataAccessObject;
-import entity.UserFactory;
 import interface_adapter.ViewManagerModel;
-import interface_adapter.get_topItems.GetTopItemsController;
-import interface_adapter.get_topItems.GetTopItemsPresenter;
-import interface_adapter.get_topItems.GetTopItemsViewModel;
 import interface_adapter.logged_in.LoggedInViewModel;
 import interface_adapter.login.LoginPresenter;
 import interface_adapter.login.LoginViewModel;
@@ -17,12 +11,6 @@ import interface_adapter.spotify_auth.SpotifyAuthViewModel;
 import interface_adapter.daily_mix.DailyMixViewModel;
 import interface_adapter.daily_mix.DailyMixController;
 import interface_adapter.daily_mix.DailyMixPresenter;
-import use_case.change_password.ChangePasswordInputBoundary;
-import use_case.change_password.ChangePasswordInteractor;
-import use_case.change_password.ChangePasswordOutputBoundary;
-import use_case.get_topItems.GetTopItemsInputBoundary;
-import use_case.get_topItems.GetTopItemsInteractor;
-import use_case.get_topItems.GetTopItemsOutputBoundary;
 import use_case.login.LoginInputBoundary;
 import use_case.login.LoginInteractor;
 import use_case.login.LoginOutputBoundary;
@@ -55,7 +43,6 @@ public class AppBuilder {
     private SpotifyAuthView spotifyAuthView;
     private SpotifyAuthViewModel spotifyAuthViewModel;
     private DailyMixViewModel dailyMixViewModel;
-    private GetTopItemsViewModel getTopItemsViewModel;
 
     public AppBuilder() {
         cardPanel.setLayout(cardLayout);
@@ -76,11 +63,7 @@ public class AppBuilder {
     }
 
     public AppBuilder addLoggedInView() {
-        loggedInView = new LoggedInView(loggedInViewModel,
-                viewManagerModel,
-                spotifyAuthViewModel,
-                dailyMixViewModel,
-                getTopItemsViewModel);
+        loggedInView = new LoggedInView(loggedInViewModel, viewManagerModel, spotifyAuthViewModel,dailyMixViewModel);
         cardPanel.add(loggedInView, loggedInView.getViewName());
         return this;
     }
@@ -151,20 +134,6 @@ public class AppBuilder {
 
         DailyMixController dailyMixController = new DailyMixController(dailyMixInteractor);
         loggedInView.setDailyMixController(dailyMixController);
-
-        return this;
-    }
-
-    public AppBuilder addGetTopItemsUseCase() {
-        // use new GetTopItemPresenter and Interactor
-        final GetTopItemsOutputBoundary getTopItemsOutputBoundary =
-                new GetTopItemsPresenter(getTopItemsViewModel);
-
-        final GetTopItemsInputBoundary getTopItemsInteractor =
-                new GetTopItemsInteractor(getTopItemsOutputBoundary, new TopItemDataAccessObject());
-
-        GetTopItemsController getTopItemsController = new GetTopItemsController(getTopItemsInteractor);
-        loggedInView.setGetTopItemsController(getTopItemsController);
 
         return this;
     }
