@@ -1,6 +1,7 @@
 package use_case.create_group;
 
 import entity.User;
+import entity.SpotifyUser;
 
 import java.util.List;
 
@@ -15,6 +16,11 @@ public class CreateGroupInputData {
 
 
     public CreateGroupInputData(String group_name, User owner, List<User> initialMembers) {
+    private final SpotifyUser owner;
+    private final List<SpotifyUser> initialMembers;
+
+
+    public CreateGroupInputData(String group_name, SpotifyUser owner, List<SpotifyUser> initialMembers) {
         if (group_name == null || group_name.isBlank()) {
             throw new IllegalArgumentException("Group name is invalid.");
         }
@@ -29,8 +35,8 @@ public class CreateGroupInputData {
 
     public String getGroup_name() { return group_name; }
 
-    public User getOwner() { return owner; }
+    public SpotifyUser getOwner() { return owner; }
 
-    public List<User> getInitialMembers() { return initialMembers; }
+    public List<SpotifyUser> getInitialMembers() { return initialMembers; }
 }
 
