@@ -10,6 +10,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -46,7 +49,7 @@ public class LoyaltyScoreView extends JPanel implements ActionListener, Property
 
         // Create table with loyalty score data
         loyaltyScoreTable = new JTable();
-        updateTableData(loyaltyState.getLoyaltyScores()); // Set initial table data
+        updateTableData(); // Set initial table data
 
         // Add the table to a JScrollPane for better visibility
         JScrollPane scrollPane = new JScrollPane(loyaltyScoreTable);
@@ -63,22 +66,25 @@ public class LoyaltyScoreView extends JPanel implements ActionListener, Property
     }
 
     // Update the table data with loyalty scores
-    private void updateTableData(Map<String, Integer> scores) {
-        // Define column names for the table
-        String[] columnNames = {"Date", "Score"};
+    private void updateTableData() {
+        Map<String, Integer> scores = loyaltyState.getLoyaltyScores();
+        ArrayList<String> dates = loyaltyState.getDates();
 
-        // Create a 2D array to hold the data for the table
-        Object[][] data = new Object[scores.size()][2];
+        dates.sort(Comparator.reverseOrder());
+        String[] columnNames = {"Previous visit dates", "Loyalty Score"};
 
-        // Populate the table data with the scores
-        int i = 0;
-        for (Map.Entry<String, Integer> entry : scores.entrySet()) {
-            data[i][0] = entry.getKey(); // Date (yyyy-mm-dd)
-            data[i][1] = entry.getValue(); // Score
-            i++;
+        Object[][] data = new Object[dates.size()][2];
+
+        for (int i = 0; i < dates.size(); i++) {
+            String date = dates.get(i);
+            data[i][0] = date;
+
+            if (scores.containsKey(date)) {
+                data[i][1] = scores.get(date);
+            } else {
+                data[i][1] = ":( No loyalty score available for this date";
+            }
         }
-
-        // Set the table model with the data and column names
         DefaultTableModel model = new DefaultTableModel(data, columnNames);
         loyaltyScoreTable.setModel(model);
     }
@@ -98,7 +104,8 @@ public class LoyaltyScoreView extends JPanel implements ActionListener, Property
         // Update the table with the latest loyalty scores when the state changes
         if (evt.getPropertyName().equals("loyaltyScores")) {
             // Update the table data when loyalty scores are updated
-            updateTableData((Map<String, Integer>) evt.getNewValue());
+            updateTableData();
+            evt.getNewValue();
         }
 
         // If the current artist changes, update the artist label
