@@ -46,7 +46,8 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
     private final DailyMixViewModel dailyMixViewModel;
     private DailyMixController dailyMixController;   // NEW
     private final JButton generateDailyMixButton;    // NEW
-    private final JTextArea dailyMixArea;            // NEW
+    private final JTextArea dailyMixArea;   // NEW
+    private final JPanel dailyMixPanel;   // NEW
 
 
     public LoggedInView(LoggedInViewModel loggedInViewModel, ViewManagerModel viewManagerModel,
@@ -98,9 +99,16 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
         dailyMixArea.setFont(new Font("Monospaced", Font.PLAIN, 12));
         JScrollPane dailyMixScroll = new JScrollPane(dailyMixArea);
 
+        // Daily-Mix panel
+        dailyMixPanel = new JPanel();
+        dailyMixPanel.setLayout(new BoxLayout(dailyMixPanel, BoxLayout.Y_AXIS));
+        dailyMixPanel.add(new JLabel("Your Daily Mix:"));
+        dailyMixPanel.add(dailyMixScroll);
+        dailyMixPanel.setVisible(false);
+
         // Daily Mix button
         generateDailyMixButton = new JButton("Generate Daily Mix");
-        generateDailyMixButton.setEnabled(false);  // 先禁用，连上 Spotify 后再启用
+        generateDailyMixButton.setEnabled(false);  // enable after connected with Spotify
         buttons.add(generateDailyMixButton);
 
 
@@ -181,8 +189,7 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
         this.add(passwordErrorField);
         this.add(buttons);
         this.add(Box.createVerticalStrut(10));
-        this.add(new JLabel("Your Daily Mix:"));
-        this.add(dailyMixScroll);
+        this.add(dailyMixPanel);   // add Daily Mix panel
     }
 
     // REPLACE the showArtistLoyaltyScores() method with this corrected version
@@ -319,6 +326,7 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
                     connectSpotifyButton.setText("Spotify Connected");
                     showLoyaltyScoresButton.setEnabled(true);   // Enable loyalty button
                     generateDailyMixButton.setEnabled(true);    // Enable Daily Mix
+                    dailyMixPanel.setVisible(true);
                 } else {
                     spotifyStatusLabel.setText("Not Connected");
                     spotifyStatusLabel.setForeground(Color.RED);
@@ -326,6 +334,7 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
                     connectSpotifyButton.setText("Connect Spotify");
                     showLoyaltyScoresButton.setEnabled(false);  // Disable loyalty button
                     generateDailyMixButton.setEnabled(false);   // Disable Daily Mix
+                    dailyMixPanel.setVisible(false);
                 }
             }
             else if (evt.getPropertyName().equals("password")) {
