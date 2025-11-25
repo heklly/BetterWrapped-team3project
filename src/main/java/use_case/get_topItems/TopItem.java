@@ -1,4 +1,4 @@
-package use_case.get_top_songs;
+package use_case.get_topItems;
 
 public enum TopItem {
     tracks, artists

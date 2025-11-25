@@ -1,12 +1,12 @@
-package use_case.get_top_songs;
+package use_case.get_topItems;
 
 import java.util.List;
 
-public class GetTopSongsOutputData {
+public class GetTopItemsOutputData {
 
     private final List<String> topItems;
 
-    public GetTopSongsOutputData(List<String> topItems) {
+    public GetTopItemsOutputData(List<String> topItems) {
         this.topItems = topItems;
     }
 

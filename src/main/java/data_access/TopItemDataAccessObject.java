@@ -1,24 +1,23 @@
 package data_access;
 
-import data_access.SpotifyDataAccessObject;
 // import entity.TopItem;
 import se.michaelthelin.spotify.model_objects.specification.*;
 import se.michaelthelin.spotify.requests.data.personalization.simplified.GetUsersTopArtistsRequest;
 import se.michaelthelin.spotify.requests.data.personalization.simplified.GetUsersTopTracksRequest;
-import use_case.get_top_songs.TopItem;
+import use_case.get_topItems.TopItem;
 import se.michaelthelin.spotify.SpotifyApi;
-import use_case.get_top_songs.GetTopSongsInputData;
-import use_case.get_top_songs.GetTopSongsOutputData;
-import use_case.get_top_songs.GetTopSongsUserDataAccessInterface;
+import use_case.get_topItems.GetTopItemsInputData;
+import use_case.get_topItems.GetTopItemsOutputData;
+import use_case.get_topItems.GetTopItemsUserDataAccessInterface;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class TopItemDataAccessObject
         extends SpotifyDataAccessObject
-        implements GetTopSongsUserDataAccessInterface{
+        implements GetTopItemsUserDataAccessInterface {
     @Override
-    public GetTopSongsOutputData fetchSpotifyResult(GetTopSongsInputData inputData) throws Exception {
+    public GetTopItemsOutputData fetchSpotifyResult(GetTopItemsInputData inputData) throws Exception {
 
         List<String> topItems;
         try {
@@ -54,8 +53,9 @@ public class TopItemDataAccessObject
             }
 
         } catch (Exception e) {
+            e.printStackTrace();
             throw new Exception(e.getMessage());
         }
-        return new GetTopSongsOutputData(topItems);
+        return new GetTopItemsOutputData(topItems);
     }
 }

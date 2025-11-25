@@ -1,14 +1,14 @@
-package use_case.get_top_songs;
+package use_case.get_topItems;
 
 import entity.SpotifyUser;
 
-public class GetTopSongsInputData {
+public class GetTopItemsInputData {
     private final TopItem topItem;
-    private final TimeType timeType;
+    private final TimeRange timeRange;
     private final SpotifyUser spotifyUser;
 
-    public GetTopSongsInputData(TopItem topItem, TimeType timeType, SpotifyUser spotifyUser) {
-        this.timeType = timeType;
+    public GetTopItemsInputData(TopItem topItem, TimeRange timeRange, SpotifyUser spotifyUser) {
+        this.timeRange = timeRange;
         this.topItem = topItem;
         this.spotifyUser = spotifyUser;
     }
@@ -16,8 +16,8 @@ public class GetTopSongsInputData {
     public TopItem getTopItem() {
         return this.topItem;
     }
-    public TimeType getTimeType() {
-        return this.timeType;
+    public TimeRange getTimeType() {
+        return this.timeRange;
     }
     public SpotifyUser getSpotifyUser() {
         return this.spotifyUser;
