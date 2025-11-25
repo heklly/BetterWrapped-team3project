@@ -2,7 +2,8 @@ package use_case.sharedsong;
 
 import entity.Group;
 import entity.SpotifyUser;
-import entity.User;
+import se.michaelthelin.spotify.model_objects.specification.User;
+
 import java.util.List;
 
 /**
