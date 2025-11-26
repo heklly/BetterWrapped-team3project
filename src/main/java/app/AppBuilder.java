@@ -33,13 +33,6 @@ import view.LoggedInView;
 import view.LoginView;
 import view.SpotifyAuthView;
 import view.ViewManager;
-import interface_adapter.group_analytics.GroupAnalyticsController;
-import interface_adapter.group_analytics.GroupAnalyticsPresenter;
-import use_case.group_analytics.GroupAnalyticsInteractor;
-import use_case.group_analytics.GroupAnalyticsInputBoundary;
-import use_case.group_analytics.GroupAnalyticsOutputBoundary;
-import view.group_analytics.GroupAnalyticsView;
-import interface_adapter.group_analytics.GroupAnalyticsViewModel;
 
 import javax.swing.*;
 import java.awt.*;
@@ -56,8 +49,8 @@ public class AppBuilder {
     private LoginView loginView;
     private SpotifyAuthView spotifyAuthView;
     private SpotifyAuthViewModel spotifyAuthViewModel;
-    private GroupAnalyticsViewModel groupAnalyticsViewModel;
-    private GroupAnalyticsView groupAnalyticsView;
+    private DailyMixViewModel dailyMixViewModel;
+    private GetTopItemsViewModel getTopItemsViewModel;
 
     public AppBuilder() {
         cardPanel.setLayout(cardLayout);
@@ -67,14 +60,6 @@ public class AppBuilder {
         loginViewModel = new LoginViewModel();
         loggedInViewModel = new LoggedInViewModel();
         spotifyAuthViewModel = new SpotifyAuthViewModel();
-        groupAnalyticsViewModel = new GroupAnalyticsViewModel();
-        return this;
-    }
-
-
-    public AppBuilder addSignupView() {
-        signupView = new SignupView(signupViewModel);
-        cardPanel.add(signupView, signupView.getViewName());
         dailyMixViewModel = new DailyMixViewModel();
         getTopItemsViewModel = new GetTopItemsViewModel();
         return this;
@@ -132,12 +117,6 @@ public class AppBuilder {
         return this;
     }
 
-    public AppBuilder addGroupAnalyticsView() {
-        groupAnalyticsView = new GroupAnalyticsView(groupAnalyticsViewModel, viewManagerModel);
-        cardPanel.add(groupAnalyticsView, groupAnalyticsView.getViewName());
-        return this;
-    }
-
     public AppBuilder addSpotifyAuthUseCase() {
         // PKCE doesn't need client secret!
         data_access.SpotifyDataAccessObject spotifyDAO = new data_access.SpotifyDataAccessObject();
@@ -158,22 +137,6 @@ public class AppBuilder {
         return this;
     }
 
-    public AppBuilder addGroupAnalyticsUseCase() {
-        // presenter
-        final GroupAnalyticsViewModel vm = groupAnalyticsViewModel;
-        final GroupAnalyticsOutputBoundary outputBoundary =
-                new GroupAnalyticsPresenter(vm);
-
-        // interactor
-        final GroupAnalyticsInputBoundary interactor =
-                new GroupAnalyticsInteractor(outputBoundary);
-
-        // controller
-        GroupAnalyticsController controller =
-                new GroupAnalyticsController(interactor);
-
-        // wire into view
-        groupAnalyticsView.setGroupAnalyticsController(controller);
     public AppBuilder addDailyMixUseCase() {
         // use new DailyMixPresenter and Interactor
         final DailyMixOutputBoundary dailyMixOutputBoundary =

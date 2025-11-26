@@ -15,10 +15,6 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.SecureRandom;
 import java.util.*;
-import se.michaelthelin.spotify.model_objects.specification.Artist;
-import se.michaelthelin.spotify.model_objects.specification.Paging;
-import java.util.HashSet;
-import java.util.Set;
 
 public class SpotifyDataAccessObject {
     private final SpotifyApi spotifyApi;
@@ -303,37 +299,6 @@ public class SpotifyDataAccessObject {
         }
     }
 
-    public Set<String> getUserTopGenres(SpotifyUser user) {
-        try {
-            SpotifyApi userApi = getSpotifyApiForUser(user);
-
-            // Get user's top artists (50, medium term)
-            Paging<Artist> topArtists = userApi.getUsersTopArtists()
-                    .limit(50)
-                    .time_range("medium_term")
-                    .build()
-                    .execute();
-
-            Set<String> genres = new HashSet<>();
-
-            for (Artist artist : topArtists.getItems()) {
-                String[] artistGenres = artist.getGenres();
-                if (artistGenres != null) {
-                    for (String g : artistGenres) {
-                        if (g != null && !g.isBlank()) {
-                            genres.add(g.toLowerCase());
-                        }
-                    }
-                }
-            }
-
-            return genres;
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException("Failed to fetch top genres: " + e.getMessage(), e);
-        }
-    }
     // NEW: Generate a Daily Mix of tracks based on user's saved and recently played tracks
     public List<String> generateDailyMix(SpotifyUser user, int mixSize) {
         try {
