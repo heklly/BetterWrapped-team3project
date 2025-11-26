@@ -9,6 +9,7 @@ public class LeaveGroupInteractor implements LeaveGroupInputBoundary {
 
     private final LeaveGroupDataAccessInterface leaveGroupDAO;
     private final LeaveGroupOutputBoundary groupPresenter;
+
     public LeaveGroupInteractor(LeaveGroupDataAccessInterface leaveGroupDAO, LeaveGroupOutputBoundary presenter) {
         this.leaveGroupDAO = leaveGroupDAO;
         this.groupPresenter = presenter;
@@ -24,7 +25,7 @@ public class LeaveGroupInteractor implements LeaveGroupInputBoundary {
         final String groupName = inputData.getGroupName();
 
         //TODO: go into storage for group to users and remove use from group
-        final leaveGroupDAO.removeUserFromGroup(user, groupName);
+        leaveGroupDAO.removeUserFromGroup(user, groupName);
         inputData.getGroup().removeUser(user);
         final LeaveGroupOutputData outputData = new LeaveGroupOutputData(groupName);
         groupPresenter.present(outputData);
