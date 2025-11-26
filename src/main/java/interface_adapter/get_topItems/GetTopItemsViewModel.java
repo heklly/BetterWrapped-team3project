@@ -8,7 +8,7 @@ import interface_adapter.ViewModel;
 public class GetTopItemsViewModel extends ViewModel<GetTopItemsState> {
 
     public GetTopItemsViewModel() {
-        super("topsongs");
+        super("top Items");
         setState(new GetTopItemsState());
     }
 }

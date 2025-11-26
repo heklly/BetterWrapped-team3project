@@ -1,11 +1,7 @@
 package use_case.getTopItems;
 
 import data_access.TopItemDataAccessObject;
-import interface_adapter.get_topItems.GetTopItemsPresenter;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
-import org.junit.jupiter.api.TestInstance.Lifecycle;
 import entity.SpotifyUser;
 import use_case.get_topItems.*;
 
@@ -17,7 +13,7 @@ import java.util.List;
  * Tests for GetTopItemsInteractor
  */
 
-public class getTopItemInteractorTest {
+public class GetTopItemsInteractorTest {
 
     /**
      * Fake TopItemDataAccessObject that returns a fixed GetTopItemsOutput (success path)
