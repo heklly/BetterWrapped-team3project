@@ -149,8 +149,9 @@ public class LoyaltyScoreView extends JPanel implements ActionListener, Property
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == backButton) {
-            // Notify the ViewManagerModel to switch to the previous view
             viewManagerModel.setState(previousView);
+            // for debug
+            System.out.println("back button pressed!");
         }
     }
 
