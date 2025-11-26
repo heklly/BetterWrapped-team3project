@@ -1,5 +1,6 @@
 package interface_adapter.sharedsong;
 
+import data_access.SpotifyDataAccessObject;
 import entity.Group;
 import entity.SpotifyUser;
 import use_case.sharedsong.SharedSongInputBoundary;
@@ -21,10 +22,11 @@ public class SharedSongController {
      * Executes the Shared Song Use Case.
      * @param user the user checking if their song is shared
      * @param group the group the user is in
+     * @param spotifyDataAccessObject the spotify DAO
      */
 
-    public void execute(SpotifyUser user, Group group) {
+    public void execute(SpotifyUser user, Group group, SpotifyDataAccessObject spotifyDataAccessObject) {
         final SharedSongInputData inputData = new SharedSongInputData(user,group);
-        sharedSongUseCaseInteractor.execute(inputData);
+        sharedSongUseCaseInteractor.execute(inputData, spotifyDataAccessObject);
     }
 }

@@ -1,5 +1,5 @@
 package interface_adapter.create_group;
-import entity.User;
+
 import entity.SpotifyUser;
 import use_case.create_group.CreateGroupInputBoundary;
 import use_case.create_group.CreateGroupInputData;

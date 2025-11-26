@@ -1,6 +1,5 @@
 package use_case.create_group;
 
-import entity.User;
 import entity.SpotifyUser;
 
 import java.util.List;
@@ -11,11 +10,6 @@ import java.util.List;
 public class CreateGroupInputData {
 
     private final String group_name;
-    private final User owner;
-    private final List<User> initialMembers;
-
-
-    public CreateGroupInputData(String group_name, User owner, List<User> initialMembers) {
     private final SpotifyUser owner;
     private final List<SpotifyUser> initialMembers;
 

@@ -1,7 +1,7 @@
 package use_case.sharedsong;
 
+import data_access.SpotifyDataAccessObject;
 import entity.SpotifyUser;
-import entity.User;
 import org.apache.hc.core5.http.ParseException;
 import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
 import se.michaelthelin.spotify.model_objects.miscellaneous.CurrentlyPlaying;
@@ -18,19 +18,24 @@ import java.util.Map;
  */
 public class SharedSongInteractor implements SharedSongInputBoundary {
     private final SharedSongOutputBoundary sharedSongPresenter;
+    private final SpotifyDataAccessObject spotifyDataAccessObject;
 
-    public SharedSongInteractor(SharedSongOutputBoundary sharedSongPresenter) {
+    public SharedSongInteractor(SharedSongOutputBoundary sharedSongPresenter,
+                                SpotifyDataAccessObject spotifyDAO) {
         this.sharedSongPresenter = sharedSongPresenter;
+        this.spotifyDataAccessObject = spotifyDAO;
+
     }
 
-    public void execute(SharedSongInputData inputData) {
+    public void execute(SharedSongInputData inputData,
+                        SpotifyDataAccessObject spotifyDataAccessObject) {
         final SpotifyUser user = inputData.getUser();
-
-        final GetUsersCurrentlyPlayingTrackRequest request = getSpotifyApiForUser(user)
+        final GetUsersCurrentlyPlayingTrackRequest request = spotifyDataAccessObject
+                .getSpotifyApiForUser(user)
                 .getUsersCurrentlyPlayingTrack()
-//                    .additionalTypes("track")
                 .build();
         try {
+
             final CurrentlyPlaying response = request.execute();
 
             // check to make sure something is playing, i.e. playing type and id are not null
@@ -48,40 +53,37 @@ public class SharedSongInteractor implements SharedSongInputBoundary {
             String trackId = response.getItem().getId();
 
             // go into group and check if song saved
-            final Map<String, String> usernameToShared = new HashMap<>();
-            boolean shared = mapBuilder(inputData.getListOfMembers(), usernameToShared, trackId);
+            final Map<String, String> usernameToShared = mapBuilder(inputData.getListOfMembers(), trackId);
 
             // if no users in group have saved songs or none share your song then fail
-            if (shared) {
-                final SharedSongOutputData sharedSongOutputData = new SharedSongOutputData(usernameToShared);
-                sharedSongPresenter.prepareSuccessView(sharedSongOutputData);
-            } else {
-                sharedSongPresenter.prepareFailureView("No one shares your song :(");
+            final SharedSongOutputData sharedSongOutputData = new SharedSongOutputData(usernameToShared);
+            sharedSongPresenter.prepareSuccessView(sharedSongOutputData);
 
-            }
         } catch (IOException | SpotifyWebApiException | ParseException e) {
             System.out.println("Error: " + e.getMessage());
         }
     }
 
-    private boolean checkUserSavedTrack(User user, String trackId) throws IOException, SpotifyWebApiException, ParseException {
-        final CheckUsersSavedTracksRequest request = getSpotifyApiForUser(user).checkUserSavedTracks(new String[]{trackId}).build();
+    private boolean checkUserSavedTrack(SpotifyUser user, String trackId) throws IOException, SpotifyWebApiException, ParseException {
+        final CheckUsersSavedTracksRequest request = spotifyDataAccessObject
+                .getSpotifyApiForUser(user)
+                .checkUsersSavedTracks(new String[]{trackId})
+                .build();
         final Boolean[] response = request.execute();
         return response[0];
     }
 
-    private boolean mapBuilder(List<User> group, Map<String, String> usernameToShared, String trackId)
+    private Map<String, String> mapBuilder(List<SpotifyUser> group, String trackId)
             throws IOException, SpotifyWebApiException, ParseException {
-        // tracking if at least one person shares your song
-        boolean shared = false;
-        for (final User u : group) {
+        final Map<String, String> usernameToShared = new HashMap<>();
+
+        for (final SpotifyUser u : group) {
             if (checkUserSavedTrack(u, trackId)) {
-                usernameToShared.put(u.getName(), "Yes");
-                shared = true;
+                usernameToShared.put(u.getUsername(), "Yes");
             }
             else {
-                usernameToShared.put(u.getName(), "No");
+                usernameToShared.put(u.getUsername(), "No");
             }
-        } return shared;
+        } return usernameToShared;
     }
 }
