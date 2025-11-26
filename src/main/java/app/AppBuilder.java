@@ -1,40 +1,36 @@
 package app;
 
-import data_access.FileUserDataAccessObject;
-import entity.UserFactory;
+import data_access.SpotifyDataAccessObject;
+import data_access.TopItemDataAccessObject;
 import interface_adapter.ViewManagerModel;
-import interface_adapter.logged_in.ChangePasswordController;
-import interface_adapter.logged_in.ChangePasswordPresenter;
+import interface_adapter.get_topItems.GetTopItemsController;
+import interface_adapter.get_topItems.GetTopItemsPresenter;
+import interface_adapter.get_topItems.GetTopItemsViewModel;
 import interface_adapter.logged_in.LoggedInViewModel;
-import interface_adapter.login.LoginController;
 import interface_adapter.login.LoginPresenter;
 import interface_adapter.login.LoginViewModel;
-import interface_adapter.logout.LogoutController;
-import interface_adapter.logout.LogoutPresenter;
-import interface_adapter.signup.SignupController;
-import interface_adapter.signup.SignupPresenter;
-import interface_adapter.signup.SignupViewModel;
 import interface_adapter.spotify_auth.SpotifyAuthController;
 import interface_adapter.spotify_auth.SpotifyAuthPresenter;
 import interface_adapter.spotify_auth.SpotifyAuthViewModel;
-import use_case.change_password.ChangePasswordInputBoundary;
-import use_case.change_password.ChangePasswordInteractor;
-import use_case.change_password.ChangePasswordOutputBoundary;
+import interface_adapter.daily_mix.DailyMixViewModel;
+import interface_adapter.daily_mix.DailyMixController;
+import interface_adapter.daily_mix.DailyMixPresenter;
+import use_case.get_topItems.GetTopItemsInputBoundary;
+import use_case.get_topItems.GetTopItemsInteractor;
+import use_case.get_topItems.GetTopItemsOutputBoundary;
 import use_case.login.LoginInputBoundary;
 import use_case.login.LoginInteractor;
 import use_case.login.LoginOutputBoundary;
-import use_case.logout.LogoutInputBoundary;
-import use_case.logout.LogoutInteractor;
-import use_case.logout.LogoutOutputBoundary;
-import use_case.signup.SignupInputBoundary;
-import use_case.signup.SignupInteractor;
-import use_case.signup.SignupOutputBoundary;
 import use_case.spotify_auth.SpotifyAuthInputBoundary;
 import use_case.spotify_auth.SpotifyAuthInteractor;
 import use_case.spotify_auth.SpotifyAuthOutputBoundary;
+import use_case.daily_mix.DailyMixInputBoundary;
+import use_case.daily_mix.DailyMixInputData;
+import use_case.daily_mix.DailyMixInteractor;
+import use_case.daily_mix.DailyMixOutputBoundary;
+import use_case.daily_mix.DailyMixOutputData;
 import view.LoggedInView;
 import view.LoginView;
-import view.SignupView;
 import view.SpotifyAuthView;
 import view.ViewManager;
 import interface_adapter.group_analytics.GroupAnalyticsController;
@@ -51,14 +47,9 @@ import java.awt.*;
 public class AppBuilder {
     private final JPanel cardPanel = new JPanel();
     private final CardLayout cardLayout = new CardLayout();
-    final UserFactory userFactory = new UserFactory();
     final ViewManagerModel viewManagerModel = new ViewManagerModel();
     ViewManager viewManager = new ViewManager(cardPanel, cardLayout, viewManagerModel);
 
-    final FileUserDataAccessObject userDataAccessObject = new FileUserDataAccessObject("users.csv", userFactory);
-
-    private SignupView signupView;
-    private SignupViewModel signupViewModel;
     private LoginViewModel loginViewModel;
     private LoggedInViewModel loggedInViewModel;
     private LoggedInView loggedInView;
@@ -73,7 +64,6 @@ public class AppBuilder {
     }
 
     public AppBuilder addViewModels() {
-        signupViewModel = new SignupViewModel();
         loginViewModel = new LoginViewModel();
         loggedInViewModel = new LoggedInViewModel();
         spotifyAuthViewModel = new SpotifyAuthViewModel();
@@ -85,17 +75,23 @@ public class AppBuilder {
     public AppBuilder addSignupView() {
         signupView = new SignupView(signupViewModel);
         cardPanel.add(signupView, signupView.getViewName());
+        dailyMixViewModel = new DailyMixViewModel();
+        getTopItemsViewModel = new GetTopItemsViewModel();
         return this;
     }
 
     public AppBuilder addLoginView() {
-        loginView = new LoginView(loginViewModel, viewManagerModel, signupViewModel);
+        loginView = new LoginView(loginViewModel, viewManagerModel);
         cardPanel.add(loginView, loginView.getViewName());
         return this;
     }
 
     public AppBuilder addLoggedInView() {
-        loggedInView = new LoggedInView(loggedInViewModel, viewManagerModel, spotifyAuthViewModel);
+        loggedInView = new LoggedInView(loggedInViewModel,
+                viewManagerModel,
+                spotifyAuthViewModel,
+                dailyMixViewModel,
+                getTopItemsViewModel);
         cardPanel.add(loggedInView, loggedInView.getViewName());
         return this;
     }
@@ -108,48 +104,31 @@ public class AppBuilder {
     }
 
     public AppBuilder addSignupUseCase() {
-        final SignupOutputBoundary signupOutputBoundary = new SignupPresenter(viewManagerModel,
-                signupViewModel, loginViewModel);
-        final SignupInputBoundary userSignupInteractor = new SignupInteractor(
-                userDataAccessObject, signupOutputBoundary, userFactory);
-
-        SignupController controller = new SignupController(userSignupInteractor);
-        signupView.setSignupController(controller);
+        // emptied; do not need
         return this;
     }
 
     public AppBuilder addLoginUseCase() {
         final LoginOutputBoundary loginOutputBoundary = new LoginPresenter(viewManagerModel,
                 loggedInViewModel, loginViewModel);
-        final LoginInputBoundary loginInteractor = new LoginInteractor(
-                userDataAccessObject, loginOutputBoundary);
+        // final LoginInputBoundary loginInteractor = new LoginInteractor(
+        //        userDataAccessObject, loginOutputBoundary);
+        // TODO: add back in LoginInputBoundary loginInteractor variable
 
-        LoginController loginController = new LoginController(loginInteractor);
-        loginView.setLoginController(loginController);
+
+        // LoginController loginController = new LoginController(loginInteractor);
+        // TODO: Add back in LoginController
+        // loginView.setLoginController(loginController);
         return this;
     }
 
     public AppBuilder addChangePasswordUseCase() {
-        final ChangePasswordOutputBoundary changePasswordOutputBoundary = new ChangePasswordPresenter(viewManagerModel,
-                loggedInViewModel);
-
-        final ChangePasswordInputBoundary changePasswordInteractor =
-                new ChangePasswordInteractor(userDataAccessObject, changePasswordOutputBoundary, userFactory);
-
-        ChangePasswordController changePasswordController = new ChangePasswordController(changePasswordInteractor);
-        loggedInView.setChangePasswordController(changePasswordController);
+        // emptied, do not need.
         return this;
     }
 
     public AppBuilder addLogoutUseCase() {
-        final LogoutOutputBoundary logoutOutputBoundary = new LogoutPresenter(viewManagerModel,
-                loggedInViewModel, loginViewModel);
-
-        final LogoutInputBoundary logoutInteractor =
-                new LogoutInteractor(userDataAccessObject, logoutOutputBoundary);
-
-        final LogoutController logoutController = new LogoutController(logoutInteractor);
-        loggedInView.setLogoutController(logoutController);
+        // emptied; not necessary.
         return this;
     }
 
@@ -195,6 +174,30 @@ public class AppBuilder {
 
         // wire into view
         groupAnalyticsView.setGroupAnalyticsController(controller);
+    public AppBuilder addDailyMixUseCase() {
+        // use new DailyMixPresenter and Interactor
+        final DailyMixOutputBoundary dailyMixOutputBoundary =
+                new DailyMixPresenter(dailyMixViewModel);
+
+        final DailyMixInputBoundary dailyMixInteractor =
+                new DailyMixInteractor(new SpotifyDataAccessObject(), dailyMixOutputBoundary);
+
+        DailyMixController dailyMixController = new DailyMixController(dailyMixInteractor);
+        loggedInView.setDailyMixController(dailyMixController);
+
+        return this;
+    }
+
+    public AppBuilder addGetTopItemsUseCase() {
+
+        final GetTopItemsOutputBoundary getTopItemsOutputBoundary =
+                new GetTopItemsPresenter(getTopItemsViewModel);
+
+        final GetTopItemsInputBoundary getTopItemsInteractor =
+                new GetTopItemsInteractor(getTopItemsOutputBoundary, new TopItemDataAccessObject());
+
+        GetTopItemsController getTopItemsController = new GetTopItemsController(getTopItemsInteractor);
+        loggedInView.setGetTopItemsController(getTopItemsController);
 
         return this;
     }

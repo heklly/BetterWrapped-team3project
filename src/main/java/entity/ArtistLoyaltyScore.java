@@ -6,7 +6,7 @@ public class ArtistLoyaltyScore {
     private final int savedTracks;
     private final int savedAlbums;
     private final boolean inRecentlyPlayed;
-    private final double loyaltyScore;
+    private final int loyaltyScore;
 
     public ArtistLoyaltyScore(String artistName, String artistId, int savedTracks,
                               int savedAlbums, boolean inRecentlyPlayed) {
@@ -18,12 +18,12 @@ public class ArtistLoyaltyScore {
         this.loyaltyScore = calculateLoyaltyScore();
     }
 
-    private double calculateLoyaltyScore() {
+    private int calculateLoyaltyScore() {
         // Loyalty score formula:
         // - Each saved track: 10 points
         // - Each saved album: 50 points
         // - In recently played: 100 points bonus
-        double score = (savedTracks * 10) + (savedAlbums * 50);
+        int score = (savedTracks * 10) + (savedAlbums * 50);
         if (inRecentlyPlayed) {
             score += 100;
         }
@@ -50,7 +50,7 @@ public class ArtistLoyaltyScore {
         return inRecentlyPlayed;
     }
 
-    public double getLoyaltyScore() {
+    public int getLoyaltyScore() {
         return loyaltyScore;
     }
 
