@@ -30,6 +30,7 @@ public class Main {
                 .addLogoutUseCase()
                 .addSpotifyAuthUseCase()
                 .addDailyMixUseCase()
+                .addGetTopItemsUseCase()
                 .build();
         application.pack();
         application.setLocationRelativeTo(null);
