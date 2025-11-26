@@ -3,6 +3,7 @@ package view;
 import data_access.SpotifyDataAccessObject;
 import entity.ArtistLoyaltyScore;
 import entity.SpotifyUser;
+
 import interface_adapter.logged_in.LoggedInState;
 import interface_adapter.logged_in.LoggedInViewModel;
 import interface_adapter.logout.LogoutController;
@@ -11,6 +12,11 @@ import interface_adapter.spotify_auth.SpotifyAuthViewModel;
 import interface_adapter.daily_mix.DailyMixViewModel;
 import interface_adapter.daily_mix.DailyMixState;
 import interface_adapter.daily_mix.DailyMixController;
+import interface_adapter.get_topItems.GetTopItemsViewModel;
+import interface_adapter.get_topItems.GetTopItemsController;
+import interface_adapter.get_topItems.GetTopItemsState;
+import use_case.get_topItems.TimeRange;
+import use_case.get_topItems.TopItem;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -48,16 +54,31 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
     private final JButton generateDailyMixButton;    // NEW
     private final JTextArea dailyMixArea;            // NEW
 
+    private final GetTopItemsViewModel getTopItemsViewModel;
+    private GetTopItemsController getTopItemsController;
+    private final JButton artistsButton;
+    private final JButton tracksButton;
+    private final JButton short_termButton;
+    private final JButton medium_termButton;
+    private final JButton long_termButton;
+    private final JButton getTopItemButton;
+    private final JTextArea TopItemsArea;
 
-    public LoggedInView(LoggedInViewModel loggedInViewModel, ViewManagerModel viewManagerModel,
-                        SpotifyAuthViewModel spotifyAuthViewModel, DailyMixViewModel dailyMixViewModel) {
+
+    public LoggedInView(LoggedInViewModel loggedInViewModel,
+                        ViewManagerModel viewManagerModel,
+                        SpotifyAuthViewModel spotifyAuthViewModel,
+                        DailyMixViewModel dailyMixViewModel,
+                        GetTopItemsViewModel getTopItemsViewModel) {
         this.loggedInViewModel = loggedInViewModel;
         this.viewManagerModel = viewManagerModel;
         this.spotifyAuthViewModel = spotifyAuthViewModel;
         this.dailyMixViewModel = dailyMixViewModel;
+        this.getTopItemsViewModel = getTopItemsViewModel;
 
         this.loggedInViewModel.addPropertyChangeListener(this);
         this.dailyMixViewModel.addPropertyChangeListener(this);  // 监听 DailyMix
+        this.getTopItemsViewModel.addPropertyChangeListener(this); // listen at getTopItems
         this.spotifyDAO = new SpotifyDataAccessObject();  // NEW
 
         final JLabel title = new JLabel("Better Wrapped - Dashboard");
@@ -102,6 +123,27 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
         generateDailyMixButton = new JButton("Generate Daily Mix");
         generateDailyMixButton.setEnabled(false);  // 先禁用，连上 Spotify 后再启用
         buttons.add(generateDailyMixButton);
+
+        // TopItems text
+        TopItemsArea = new JTextArea(10, 30);
+        TopItemsArea.setEditable(false);
+        TopItemsArea.setFont(new Font("Monospaced", Font.PLAIN, 12));
+        JScrollPane TopItemsScroll = new JScrollPane(TopItemsArea);
+
+        // get TopItems button
+        artistsButton =  new JButton("Top Artists");
+        artistsButton.setEnabled(false); // disabled until Spotify connected
+        tracksButton = new JButton("Top Tracks");
+        tracksButton.setEnabled(false);
+        short_termButton = new JButton("1 month");
+        short_termButton.setEnabled(false);
+        medium_termButton = new JButton("6 months");
+        medium_termButton.setEnabled(false);
+        long_termButton = new JButton("1 year");
+        long_termButton.setEnabled(false);
+        getTopItemButton =  new JButton("Get your Top Tracks/Artists");
+        getTopItemButton.setEnabled(false); // disabled until time and item selected
+
 
 
         // Log out button listener
@@ -171,6 +213,96 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
             }
         });
 
+        // Generate time button listener
+        short_termButton.addActionListener(evt -> {
+            if (evt.getSource().equals(short_termButton)) {
+                if (getTopItemsController == null || currentSpotifyUser == null) {
+                    JOptionPane.showMessageDialog(this,
+                            "Please connect your Spotify account first.",
+                            "No Spotify User",
+                            JOptionPane.WARNING_MESSAGE);
+                } else {
+                    set_time_shortTerm();
+                    checkEnableGetTopItemButton();
+                }
+            }
+        });
+
+        medium_termButton.addActionListener(evt -> {
+            if (evt.getSource().equals(medium_termButton)) {
+                if (getTopItemsController == null || currentSpotifyUser == null) {
+                    JOptionPane.showMessageDialog(this,
+                            "Please connect your Spotify account first.",
+                            "No Spotify User",
+                            JOptionPane.WARNING_MESSAGE);
+                } else {
+                    set_time_mediumTerm();
+                    checkEnableGetTopItemButton();
+                }
+            }
+        });
+
+        long_termButton.addActionListener(evt -> {
+            if (evt.getSource().equals(long_termButton)) {
+                if (getTopItemsController == null || currentSpotifyUser == null) {
+                    JOptionPane.showMessageDialog(this,
+                            "Please connect your Spotify account first.",
+                            "No Spotify User",
+                            JOptionPane.WARNING_MESSAGE);
+                } else {
+                    set_time_longTerm();
+                    checkEnableGetTopItemButton();
+                }
+            }
+        });
+        // Generate item button listener
+        artistsButton.addActionListener(evt -> {
+            if (evt.getSource().equals(artistsButton)) {
+                if (getTopItemsController == null || currentSpotifyUser == null) {
+                    JOptionPane.showMessageDialog(this,
+                            "Please connect your Spotify account first.",
+                            "No Spotify User",
+                            JOptionPane.WARNING_MESSAGE);
+                } else {
+                    set_item_artist();
+                    checkEnableGetTopItemButton();
+                }
+            }
+        });
+
+        tracksButton.addActionListener(evt -> {
+            if (evt.getSource().equals(tracksButton)) {
+                if (getTopItemsController == null || currentSpotifyUser == null) {
+                    JOptionPane.showMessageDialog(this,
+                            "Please connect your Spotify account first.",
+                            "No Spotify User",
+                            JOptionPane.WARNING_MESSAGE);
+                } else {
+                    set_item_tracks();
+                    checkEnableGetTopItemButton();
+                }
+            }
+        });
+
+        // Generate getTopItems button listener
+        getTopItemButton.addActionListener(evt -> {
+            if (evt.getSource().equals(getTopItemButton)) {
+                if (getTopItemsController == null || currentSpotifyUser == null) {
+                    JOptionPane.showMessageDialog(this,
+                            "Please select time range and top item first.",
+                            "unselected item or time",
+                            JOptionPane.WARNING_MESSAGE);
+                    return;
+                }
+
+                final GetTopItemsState getTopItemsState = getTopItemsViewModel.getState();
+                TopItem topItem = getTopItemsState.getSelectedTopItem();
+                TimeRange timeRange = getTopItemsState.getSelectedTime();
+                getTopItemsController.execute(currentSpotifyUser, topItem, timeRange);
+            }
+        });
+
+
 
         // Add all components to view
         this.add(title);
@@ -183,6 +315,7 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
         this.add(Box.createVerticalStrut(10));
         this.add(new JLabel("Your Daily Mix:"));
         this.add(dailyMixScroll);
+        this.add(TopItemsScroll);
     }
 
     // REPLACE the showArtistLoyaltyScores() method with this corrected version
@@ -319,6 +452,11 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
                     connectSpotifyButton.setText("Spotify Connected");
                     showLoyaltyScoresButton.setEnabled(true);   // Enable loyalty button
                     generateDailyMixButton.setEnabled(true);    // Enable Daily Mix
+                    tracksButton.setEnabled(true);
+                    artistsButton.setEnabled(true);
+                    short_termButton.setEnabled(true);
+                    medium_termButton.setEnabled(true);
+                    long_termButton.setEnabled(true);       // enable time and item button
                 } else {
                     spotifyStatusLabel.setText("Not Connected");
                     spotifyStatusLabel.setForeground(Color.RED);
@@ -326,6 +464,12 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
                     connectSpotifyButton.setText("Connect Spotify");
                     showLoyaltyScoresButton.setEnabled(false);  // Disable loyalty button
                     generateDailyMixButton.setEnabled(false);   // Disable Daily Mix
+                    tracksButton.setEnabled(false);
+                    artistsButton.setEnabled(false);
+                    short_termButton.setEnabled(false);
+                    medium_termButton.setEnabled(false);
+                    long_termButton.setEnabled(false);  // Disable time and item button
+                    getTopItemButton.setEnabled(false); // Disable getTopItem button
                 }
             }
             else if (evt.getPropertyName().equals("password")) {
@@ -367,13 +511,137 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
             dailyMixArea.setText(sb.toString());
             dailyMixArea.setCaretPosition(0);
         }
+
+        // 3. GetTopItemState update
+        else if (newValue instanceof GetTopItemsState) {
+            GetTopItemsState getTopItemsState = (GetTopItemsState) newValue;
+
+            if(!getTopItemsState.getSuccess()){
+                JOptionPane.showMessageDialog(this,
+                        getTopItemsState.getSuccess(),
+                        "GetTop Items Error",
+                        JOptionPane.ERROR_MESSAGE);
+                return;
+        }
+            StringBuilder sb = new StringBuilder();
+            if(getTopItemsState.getTopItems() == null || getTopItemsState.getTopItems().isEmpty()) {
+                sb.append("no items found. Try listening to some music on Spotify!");
+            } else {
+                int index = 1;
+                for (String item : getTopItemsState.getTopItems()) {
+                    sb.append(index).append(". ").append(item).append("\n");
+                    index++;
+                }
+            }
+
+            TopItemsArea.setText(sb.toString());
+            TopItemsArea.setCaretPosition(0);
+        }
     }
+
+
+
+    // setting time
+    // set the selected time to short_term
+    private void set_time_shortTerm() {
+        // check if we have a Spotify user
+        if(currentSpotifyUser == null) {
+            JOptionPane.showMessageDialog(this,
+                    "No Spotify user found. Please reconnect to Spotify.",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        final GetTopItemsState getTopItemsState = getTopItemsViewModel.getState();
+        getTopItemsState.setSelectedTime(TimeRange.short_term);
+        getTopItemsViewModel.setState(getTopItemsState);
+        getTopItemsViewModel.firePropertyChange();
+    }
+
+    // set the selected time to medium_term
+    private void set_time_mediumTerm(){
+        // check if we have a Spotify user
+        if(currentSpotifyUser == null) {
+            JOptionPane.showMessageDialog(this,
+                    "No Spotify user found. Please reconnect to Spotify.",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        final GetTopItemsState getTopItemsState = getTopItemsViewModel.getState();
+        getTopItemsState.setSelectedTime(TimeRange.medium_term);
+        getTopItemsViewModel.setState(getTopItemsState);
+        getTopItemsViewModel.firePropertyChange();
+    }
+
+    // set the selected time to long_term
+    private void set_time_longTerm(){
+        // check if we have a Spotify user
+        if(currentSpotifyUser == null) {
+            JOptionPane.showMessageDialog(this,
+                    "No Spotify user found. Please reconnect to Spotify.",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        final GetTopItemsState getTopItemsState = getTopItemsViewModel.getState();
+        getTopItemsState.setSelectedTime(TimeRange.long_term);
+        getTopItemsViewModel.setState(getTopItemsState);
+        getTopItemsViewModel.firePropertyChange();
+    }
+
+
+    // setting item
+    // set the item to tracks
+    private void set_item_tracks() {
+        // check if we have a Spotify user
+        if (currentSpotifyUser == null) {
+            JOptionPane.showMessageDialog(this,
+                    "No Spotify user found. Please reconnect to Spotify.",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        final GetTopItemsState getTopItemsState = getTopItemsViewModel.getState();
+        getTopItemsState.setSelectedTopItem(TopItem.tracks);
+        getTopItemsViewModel.setState(getTopItemsState);
+        getTopItemsViewModel.firePropertyChange();
+    }
+
+    // set the item to artists
+    private void set_item_artist() {
+        // check if we have a Spotify user
+        if (currentSpotifyUser == null) {
+            JOptionPane.showMessageDialog(this,
+                    "No Spotify user found. Please reconnect to Spotify.",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        final GetTopItemsState getTopItemsState = getTopItemsViewModel.getState();
+        getTopItemsState.setSelectedTopItem(TopItem.artists);
+        getTopItemsViewModel.setState(getTopItemsState);
+        getTopItemsViewModel.firePropertyChange();
+    }
+
+
+    // check whether GetTopItemButton is enabled
+    private void checkEnableGetTopItemButton(){
+        final GetTopItemsState getTopItemsState = getTopItemsViewModel.getState();
+        boolean enabled = getTopItemsState.getSelectedTopItem() != null
+                && getTopItemsState.getSelectedTime() != null;
+        getTopItemButton.setEnabled(enabled);
+    }
+
 
 
     public void setDailyMixController(DailyMixController dailyMixController) {
         this.dailyMixController = dailyMixController;
     }
 
+    public void setGetTopItemsController(GetTopItemsController getTopItemsController) {
+        this.getTopItemsController = getTopItemsController;
+    }
 
     public String getViewName() {
         return viewName;
