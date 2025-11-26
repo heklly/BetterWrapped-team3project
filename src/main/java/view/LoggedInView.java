@@ -49,6 +49,10 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
     private final JTextField passwordInputField = new JTextField(15);
     private final JButton changePassword;
 
+    private final JButton groupAnalyticsButton = new JButton("Group analytics");
+
+    public LoggedInView(LoggedInViewModel loggedInViewModel, ViewManagerModel viewManagerModel,
+                        SpotifyAuthViewModel spotifyAuthViewModel) {
     private final DailyMixViewModel dailyMixViewModel;
     private DailyMixController dailyMixController;   // NEW
     private final JButton generateDailyMixButton;    // NEW
@@ -113,6 +117,7 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
         showLoyaltyScoresButton.setEnabled(false);  // Disabled until Spotify connected
         buttons.add(showLoyaltyScoresButton);  // NEW
 
+        buttons.add(groupAnalyticsButton);
         // Daily Mix text
         dailyMixArea = new JTextArea(10, 40);
         dailyMixArea.setEditable(false);
@@ -196,6 +201,11 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
             if (evt.getSource().equals(showLoyaltyScoresButton) && currentSpotifyUser != null) {
                 showArtistLoyaltyScores();
             }
+        });
+
+        groupAnalyticsButton.addActionListener(e -> {
+            viewManagerModel.setState("group analytics");
+            viewManagerModel.firePropertyChange();
         });
 
         // NEW: Generate Daily Mix button listener
