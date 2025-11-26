@@ -13,26 +13,19 @@ public class Group {
     private String group_name;
     private final List<SpotifyUser> users;
     private final List<Playlist> group_playlists;
-    private final SpotifyUser owner;
     private final String groupCode;
 
 
     /**
      * Creates a new group given these parameters:
      *
-     * @para group_name the group's name
-     * @para owner the user who created the group
+     * @param group_name the group's name
      */
-    public Group(String group_name, SpotifyUser owner ) {
-        this.owner = owner;
+    public Group(String group_name ) {
         this.group_name = group_name;
-        this.users = new ArrayList<SpotifyUser>();
+        this.users = new ArrayList<>();
         this.group_playlists = new ArrayList<Playlist>();
-        this.users.add(owner);
         this.groupCode = generateGroupCode();
-    }
-    public SpotifyUser getOwner() {
-        return owner;
     }
 
     public String getGroup_name() {

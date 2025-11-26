@@ -9,9 +9,8 @@ import static org.junit.jupiter.api.Assertions.*;
 public class JoinGroupInteractorTest {
     public void testJoinGroupSuccess() {
         GroupDataAccessInterface mockDao = mock(GroupDataAccessInterface.class);
-        SpotifyUser owner = new SpotifyUser("owner","owneraccesstoken", "owner refreshtoken","ownerID");
         SpotifyUser newUser = new SpotifyUser("newUser", "newaccesstoken", "newrefreshtoken","newID" );
-        Group group = new Group("FunGroup", owner);
+        Group group = new Group("FunGroup");
         when(mockDao.getGroupByCode("FunGroup")).thenReturn(group);
         JoinGroupOutputBoundary presenter = new JoinGroupOutputBoundary() {
             @Override

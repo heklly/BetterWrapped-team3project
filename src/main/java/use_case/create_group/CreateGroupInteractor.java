@@ -2,7 +2,6 @@ package use_case.create_group;
 
 import entity.Group;
 import entity.SpotifyUser;
-
 import java.util.List;
 
 /**
@@ -14,7 +13,7 @@ public abstract class CreateGroupInteractor implements CreateGroupInputBoundary 
     @Override
     public CreateGroupOutputData execute(CreateGroupInputData inputData) {
 
-        Group group = new Group(inputData.getGroup_name(), inputData.getOwner());
+        Group group = new Group(inputData.getGroup_name());
 
         List<SpotifyUser> initialMembers = inputData.getInitialMembers();
         if (initialMembers != null) {
@@ -26,7 +25,6 @@ public abstract class CreateGroupInteractor implements CreateGroupInputBoundary 
         // Return output data
         return new CreateGroupOutputData(
                 group.getGroup_name(),
-                group.getOwner(),
                 group.getUsers()
         );
     }
