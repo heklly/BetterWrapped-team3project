@@ -9,4 +9,9 @@ public interface LoyaltyScoreOutputBoundary {
      */
     void prepareView(LoyaltyScoreOutputData outputData);
 
+
+    /**
+     * Return to the previous the view.
+     */
+    void returnPreviousView();
 }

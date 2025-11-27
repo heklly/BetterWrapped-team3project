@@ -30,4 +30,17 @@ public interface LoyaltyScoreDataAccessInterface {
      * Saves loyalty score
      */
     void saveLoyalty(String userid, String date, String artist_name, int score);
+
+    /**
+     * @return A map where the key is the date, integer is
+     * saved loyalty_score for that artist
+     */
+
+    Map<String, Integer> getLoyaltyArtist(String userid, String artist_name);
+
+
+    /**
+     * @return all previous calculated dates
+     */
+    List<String> getDates(String userid);
 }

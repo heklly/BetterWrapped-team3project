@@ -25,7 +25,7 @@ public class Group {
     public Group(String group_name, SpotifyUser owner ) {
         this.owner = owner;
         this.group_name = group_name;
-        this.date_created = "";
+        this.date_created = "20241212";
         this.users = new ArrayList<SpotifyUser>();
         this.group_playlists = new ArrayList<Playlist>();
     }
@@ -57,7 +57,7 @@ public class Group {
         } this.group_name = group_name;
     }
 
-    public List <SpotifyUser> getUsers() {
+    public List<SpotifyUser> getUsers() {
         return this.users;
     }
 

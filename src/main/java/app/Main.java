@@ -3,6 +3,11 @@ package app;
 import javax.swing.*;
 
 public class Main {
+    // VARIABLES CLIENT_ID AND CLIENT_SECRET MUST BE SET:
+
+    String CLIENT_ID;
+    String CLIENT_SECRET;
+
     public static void main(String[] args) {
         String clientId = System.getenv("SPOTIFY_CLIENT_ID");
 
@@ -16,7 +21,6 @@ public class Main {
         AppBuilder appBuilder = new AppBuilder();
         JFrame application = appBuilder
                 .addViewModels()         // ✅ Create ALL view models FIRST
-                .addSignupView()         // Now all views can reference any view model
                 .addLoginView()
                 .addLoggedInView()
                 .addSpotifyAuthView()
@@ -25,6 +29,8 @@ public class Main {
                 .addChangePasswordUseCase()
                 .addLogoutUseCase()
                 .addSpotifyAuthUseCase()
+                .addDailyMixUseCase()
+                .addGetTopItemsUseCase()
                 .build();
         application.pack();
         application.setLocationRelativeTo(null);

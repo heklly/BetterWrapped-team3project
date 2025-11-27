@@ -15,6 +15,10 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.SecureRandom;
 import java.util.*;
+import se.michaelthelin.spotify.model_objects.specification.Artist;
+import se.michaelthelin.spotify.model_objects.specification.Paging;
+import java.util.HashSet;
+import java.util.Set;
 
 public class SpotifyDataAccessObject {
     private final SpotifyApi spotifyApi;
@@ -298,4 +302,97 @@ public class SpotifyDataAccessObject {
             throw new RuntimeException("Failed to get artist loyalty scores: " + e.getMessage(), e);
         }
     }
+
+    public Set<String> getUserTopGenres(SpotifyUser user) {
+        try {
+            SpotifyApi userApi = getSpotifyApiForUser(user);
+
+            // Get user's top artists (50, medium term)
+            Paging<Artist> topArtists = userApi.getUsersTopArtists()
+                    .limit(50)
+                    .time_range("medium_term")
+                    .build()
+                    .execute();
+
+            Set<String> genres = new HashSet<>();
+
+            for (Artist artist : topArtists.getItems()) {
+                String[] artistGenres = artist.getGenres();
+                if (artistGenres != null) {
+                    for (String g : artistGenres) {
+                        if (g != null && !g.isBlank()) {
+                            genres.add(g.toLowerCase());
+                        }
+                    }
+                }
+            }
+
+            return genres;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("Failed to fetch top genres: " + e.getMessage(), e);
+        }
+    }
+    // NEW: Generate a Daily Mix of tracks based on user's saved and recently played tracks
+    public List<String> generateDailyMix(SpotifyUser user, int mixSize) {
+        try {
+            SpotifyApi userApi = getSpotifyApiForUser(user);
+
+            List<Track> pool = new ArrayList<>();
+
+            // 1. Saved tracks
+            Paging<SavedTrack> savedTracks = userApi.getUsersSavedTracks()
+                    .limit(50)
+                    .build()
+                    .execute();
+
+            for (SavedTrack savedTrack : savedTracks.getItems()) {
+                pool.add(savedTrack.getTrack());
+            }
+
+            // 2. Recently played
+            PagingCursorbased<PlayHistory> recentlyPlayed = userApi
+                    .getCurrentUsersRecentlyPlayedTracks()
+                    .limit(50)
+                    .build()
+                    .execute();
+
+            for (PlayHistory history : recentlyPlayed.getItems()) {
+                pool.add(history.getTrack());
+            }
+
+            if (pool.isEmpty()) {
+                return Collections.emptyList();
+            }
+
+            // sample
+            Collections.shuffle(pool);
+            int n = Math.min(mixSize, pool.size());
+
+            List<String> mix = new ArrayList<>();
+            for (int i = 0; i < n; i++) {
+                Track t = pool.get(i);
+                StringBuilder artists = new StringBuilder();
+                ArtistSimplified[] artistArray = t.getArtists();
+                for (int j = 0; j < artistArray.length; j++) {
+                    if (j > 0) {
+                        artists.append(", ");
+                    }
+                    artists.append(artistArray[j].getName());
+                }
+
+                // Song Name - Artist1, Artist2
+                String line = String.format("%s - %s", t.getName(), artists);
+                mix.add(line);
+            }
+
+            return mix;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("Failed to generate Daily Mix: " + e.getMessage(), e);
+        }
+    }
+
 }
