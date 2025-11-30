@@ -2,6 +2,7 @@ package use_case.loyaltyscore;
 
 import interface_adapter.ViewManagerModel;
 import interface_adapter.loyalty_score.LoyaltyState;
+import interface_adapter.loyalty_score.LoyaltyViewModel;
 import view.LoyaltyScoreView;
 
 import javax.swing.*;
@@ -32,7 +33,11 @@ public class LoyaltyScoreViewTest {
 
         ViewManagerModel viewManagerModel = new ViewManagerModel();
 
-        LoyaltyScoreView loyaltyScoreView = new LoyaltyScoreView(loyaltyState, viewManagerModel);
+        LoyaltyViewModel loyaltyViewModel = new LoyaltyViewModel();
+
+        loyaltyViewModel.setState(loyaltyState);
+
+        LoyaltyScoreView loyaltyScoreView = new LoyaltyScoreView(loyaltyViewModel, viewManagerModel);
 
         // Add to the frame
         JFrame frame = new JFrame("Loyalty Scores");
