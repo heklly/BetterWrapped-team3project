@@ -11,18 +11,17 @@ import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
-public class NoGroupView extends JPanel implements ActionListener {
+public class NoGroupView extends JPanel implements ActionListener, PropertyChangeListener {
 
     private final String viewName = "no group";
     private final NoGroupViewModel noGroupViewModel;
     private final ViewManagerModel viewManagerModel;
 
     private final JTextField inputGroupNameField = new JTextField();
-//    private final JLabel groupNameErrorField = new JLabel();
-//    private final JTextField searchGroupName = new JTextField();
-//    private final JLabel joinGroupErrorField = new JLabel();
+    private final JLabel nameErrorField = new JLabel();
 
     private final JButton createGroup;
     private final JButton joinGroup;
@@ -32,7 +31,7 @@ public class NoGroupView extends JPanel implements ActionListener {
     public NoGroupView(NoGroupViewModel noGroupViewModel, ViewManagerModel viewManagerModel) {
         this.noGroupViewModel = noGroupViewModel;
         this.viewManagerModel = viewManagerModel;
-//        this.noGroupViewModel.addPropertyChangeListener(this);
+        this.noGroupViewModel.addPropertyChangeListener(this);
 
         final JLabel title = new JLabel("You're not in a group");
         title.setAlignmentX(CENTER_ALIGNMENT);
@@ -41,6 +40,7 @@ public class NoGroupView extends JPanel implements ActionListener {
                 new JLabel("Group Name"), inputGroupNameField);
 
         final JPanel buttons = new JPanel();
+        buttons.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         createGroup = new JButton("Create Group");
         buttons.add(createGroup);
         joinGroup = new JButton("Join Group");
@@ -52,10 +52,11 @@ public class NoGroupView extends JPanel implements ActionListener {
                         if (evt.getSource().equals(createGroup)) {
                             final UserGroupState currentState = noGroupViewModel.getState();
 
-//                            createGroupController.execute(
-//                                    currentState.getGroupName(),
-//                                    currentState.getGroupUsernames()
-//                            );
+                            createGroupController.execute(
+                                    currentState.getGroupName(),
+                                    currentState.getSpotifyUser(),
+                                    currentState.getGroupUsers()
+                            );
                         }
                     }
                 }
@@ -65,6 +66,8 @@ public class NoGroupView extends JPanel implements ActionListener {
 //                new ActionListener() {
 //                    public void actionPerformed(ActionEvent evt) {
 //                        if (evt.getSource().equals(joinGroup)) {
+//                            final UserGroupState = noGroupViewModel.getState();
+//                            joinGroupController.execute();
 //                            TODO
 //                        }
 //                    }
@@ -94,10 +97,33 @@ public class NoGroupView extends JPanel implements ActionListener {
             }
         });
 
-        this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-        this.add(title);
-        this.add(enterGroupName);
-        this.add(buttons);
+        this.setLayout(new GridBagLayout());
+        GridBagConstraints gbcTitle = new GridBagConstraints();
+        gbcTitle.fill = GridBagConstraints.HORIZONTAL;
+        gbcTitle.anchor = GridBagConstraints.CENTER;
+        gbcTitle.gridx = 1;
+        gbcTitle.gridy = 1;
+        gbcTitle.weighty = 0.2;
+        this.add(title, gbcTitle);
+
+        GridBagConstraints gbcGroup = new GridBagConstraints();
+        gbcGroup.gridheight = 4;
+        gbcGroup.gridwidth = 3;
+        gbcGroup.anchor = GridBagConstraints.LINE_START;
+        gbcGroup.fill = GridBagConstraints.HORIZONTAL;
+        gbcGroup.gridx = 0;
+        gbcGroup.gridy = 2;
+        gbcGroup.gridwidth = 2;
+        gbcGroup.weighty = 0.3;
+        this.add(enterGroupName, gbcGroup);
+
+        GridBagConstraints gbcButtons = new GridBagConstraints();
+        gbcButtons.fill = GridBagConstraints.VERTICAL;
+        gbcButtons.anchor = GridBagConstraints.CENTER;
+        gbcButtons.gridx = 2;
+        gbcButtons.gridy = 2;
+        gbcButtons.weighty = 0.5;
+        this.add(buttons, gbcButtons);
     }
     /**
      * React to a button click that results in evt.
@@ -107,7 +133,12 @@ public class NoGroupView extends JPanel implements ActionListener {
         System.out.println("Click " + evt.getActionCommand());
     }
 
-    private String getViewName() { return viewName; }
+    public void propertyChange(PropertyChangeEvent evt) {
+//        if (evt.getPropertyName().equals("creatError")) {}
+        setNameError(noGroupViewModel.getState().getNameError());
+    }
+
+    public String getViewName() { return viewName; }
 
     public void setCreateGroupController(CreateGroupController createGroupController) {
         this.createGroupController = createGroupController;
@@ -115,5 +146,5 @@ public class NoGroupView extends JPanel implements ActionListener {
 //    public void setJoinGroupController(JoinGorupController joinGroupController) {
 //        this.joinGroupController = joinGroupController
 //    }
-//
+    public void setNameError(String nameError) { this.nameErrorField.setText("nameError"); }
 }

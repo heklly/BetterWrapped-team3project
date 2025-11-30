@@ -1,5 +1,10 @@
 package interface_adapter.create_group;
 
+import entity.Group;
+import entity.SpotifyUser;
+import entity.UserTasteProfile;
+
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -7,10 +12,25 @@ import java.util.List;
  */
 public class UserGroupState {
 
+    // input data that need to be passed to use case controllers
+    private SpotifyUser spotifyUser;
+    private List<SpotifyUser> groupUsers;
+//    private List<UserTasteProfile> profiles;
+
     private String groupName = "";
     private List<String> groupUsernames = null;
     private boolean inGroup =  false;
+    private String nameError = "";
 
+    public SpotifyUser getSpotifyUser() { return spotifyUser; }
+
+    public void setSpotifyUser(SpotifyUser spotifyUser) { this.spotifyUser = spotifyUser; }
+
+    public List<SpotifyUser> getGroupUsers() { return this.groupUsers; }
+
+    public void setGroupUsers(List<SpotifyUser> groupUsers) {
+        this.groupUsers = new ArrayList<SpotifyUser>(groupUsers);
+    }
     public String getGroupName() {
         return groupName;
     }
@@ -34,4 +54,10 @@ public class UserGroupState {
     public void setInGroup(boolean inGroup) {
         this.inGroup = inGroup;
     }
+
+    public String getNameError() { return nameError; }
+
+    public void setNameError(String nameError) { this.nameError = nameError; }
+
+
 }

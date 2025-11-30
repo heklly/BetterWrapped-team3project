@@ -20,7 +20,7 @@ public class LeaveGroupPresenter implements LeaveGroupOutputBoundary {
     public LeaveGroupPresenter(ViewManagerModel viewManagerModel, InGroupViewModel inGroupViewModel, NoGroupViewModel noGroupViewModel) {
         this.viewManagerModel = viewManagerModel;
         this.inGroupViewModel = inGroupViewModel;
-//        this.noGroupViewModel = noGroupViewModel;
+        this.noGroupViewModel = noGroupViewModel;
     }
 
     @Override
