@@ -38,7 +38,7 @@ public class LoyaltyScoreInteractor implements LoyaltyScoreInputBoundary {
         final List<String> dates = loyaltyDataAccessObject.getDates(userid);
 
         // output data is loyalty scores
-        final LoyaltyScoreOutputData outputData = new LoyaltyScoreOutputData(loyalty_scores, dates);
+        final LoyaltyScoreOutputData outputData = new LoyaltyScoreOutputData(loyalty_scores, dates, chosen_artist);
 
         //
         loyaltyPresenter.prepareView(outputData);
