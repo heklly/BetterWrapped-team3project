@@ -44,6 +44,10 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
     private final JButton logOut;
     private final JButton connectSpotifyButton;
 
+    private final JButton groupAnalyticsButton = new JButton("Group analytics");
+
+    public LoggedInView(LoggedInViewModel loggedInViewModel, ViewManagerModel viewManagerModel,
+                        SpotifyAuthViewModel spotifyAuthViewModel) {
     private final DailyMixViewModel dailyMixViewModel;
     private DailyMixController dailyMixController;
     private final JButton generateDailyMixButton;
@@ -92,6 +96,16 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
         connectSpotifyButton = new JButton("Connect Spotify");
         buttons.add(connectSpotifyButton);
 
+        showLoyaltyScoresButton = new JButton("Show Artist Loyalty");  // NEW
+        showLoyaltyScoresButton.setEnabled(false);  // Disabled until Spotify connected
+        buttons.add(showLoyaltyScoresButton);  // NEW
+
+        buttons.add(groupAnalyticsButton);
+        // Daily Mix text
+        dailyMixArea = new JTextArea(10, 40);
+        dailyMixArea.setEditable(false);
+        dailyMixArea.setFont(new Font("Monospaced", Font.PLAIN, 12));
+        JScrollPane dailyMixScroll = new JScrollPane(dailyMixArea);
 
         // Daily Mix button
         generateDailyMixButton = new JButton("Generate Daily Mix");
@@ -130,7 +144,12 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
             viewManagerModel.firePropertyChange();
         });
 
-        // Daily Mix listener
+        groupAnalyticsButton.addActionListener(e -> {
+            viewManagerModel.setState("group analytics");
+            viewManagerModel.firePropertyChange();
+        });
+
+        // NEW: Generate Daily Mix button listener
         generateDailyMixButton.addActionListener(evt -> {
             if (dailyMixController == null || currentSpotifyUser == null) {
                 JOptionPane.showMessageDialog(this,
