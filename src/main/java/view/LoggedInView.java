@@ -44,10 +44,6 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
     private final JButton logOut;
     private final JButton connectSpotifyButton;
 
-    private final JButton groupAnalyticsButton = new JButton("Group analytics");
-
-    public LoggedInView(LoggedInViewModel loggedInViewModel, ViewManagerModel viewManagerModel,
-                        SpotifyAuthViewModel spotifyAuthViewModel) {
     private final DailyMixViewModel dailyMixViewModel;
     private DailyMixController dailyMixController;
     private final JButton generateDailyMixButton;
@@ -100,7 +96,6 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
         showLoyaltyScoresButton.setEnabled(false);  // Disabled until Spotify connected
         buttons.add(showLoyaltyScoresButton);  // NEW
 
-        buttons.add(groupAnalyticsButton);
         // Daily Mix text
         dailyMixArea = new JTextArea(10, 40);
         dailyMixArea.setEditable(false);
@@ -141,11 +136,6 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
         // Connect Spotify listener
         connectSpotifyButton.addActionListener(evt -> {
             viewManagerModel.setState(spotifyAuthViewModel.getViewName());
-            viewManagerModel.firePropertyChange();
-        });
-
-        groupAnalyticsButton.addActionListener(e -> {
-            viewManagerModel.setState("group analytics");
             viewManagerModel.firePropertyChange();
         });
 
@@ -269,6 +259,31 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
             showDailyMixInNewWindow(mixState.getTracks());
         }
 
+        // 3. GetTopItemState update
+        else if (newValue instanceof GetTopItemsState) {
+            GetTopItemsState getTopItemsState = (GetTopItemsState) newValue;
+
+            if(!getTopItemsState.getSuccess()){
+                JOptionPane.showMessageDialog(this,
+                        getTopItemsState.getSuccess(),
+                        "GetTop Items Error",
+                        JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            StringBuilder sb = new StringBuilder();
+            if(getTopItemsState.getTopItems() == null || getTopItemsState.getTopItems().isEmpty()) {
+                sb.append("no items found. Try listening to some music on Spotify!");
+            } else {
+                int index = 1;
+                for (String item : getTopItemsState.getTopItems()) {
+                    sb.append(index).append(". ").append(item).append("\n");
+                    index++;
+                }
+            }
+
+            TopItemsArea.setText(sb.toString());
+            TopItemsArea.setCaretPosition(0);
+        }
     }
 
     // --- Time and Item helpers ---
