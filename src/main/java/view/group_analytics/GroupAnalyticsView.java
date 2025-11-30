@@ -4,7 +4,6 @@ import entity.UserTasteProfile;
 import interface_adapter.group_analytics.GroupAnalyticsController;
 import interface_adapter.group_analytics.GroupAnalyticsState;
 import interface_adapter.group_analytics.GroupAnalyticsViewModel;
-import view.View;
 
 import javax.swing.*;
 import java.awt.*;
@@ -18,7 +17,9 @@ import java.util.Set;
  * For now it uses a demo group; your teammate's group-forming use case
  * should call controller.analyzeGroup(...) with real UserTasteProfiles.
  */
-public class GroupAnalyticsView extends JPanel implements PropertyChangeListener, View {
+
+// got rid of implements View interface. You need to actually specify a view interface.
+public class GroupAnalyticsView extends JPanel implements PropertyChangeListener {
 
     private final GroupAnalyticsViewModel viewModel;
     private GroupAnalyticsController controller;
@@ -107,7 +108,7 @@ public class GroupAnalyticsView extends JPanel implements PropertyChangeListener
         outputArea.setText(sb.toString());
     }
 
-    @Override
+    // commented out so code compiles. You need to specify an interface for @Override
     public String getViewName() {
         return viewModel.getViewName();
     }
