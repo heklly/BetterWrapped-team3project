@@ -1,5 +1,6 @@
 package app;
 
+import data_access.LoyaltyScoreDataAccessObject;
 import data_access.SpotifyDataAccessObject;
 import data_access.TopItemDataAccessObject;
 import interface_adapter.ViewManagerModel;
@@ -9,6 +10,9 @@ import interface_adapter.get_topItems.GetTopItemsViewModel;
 import interface_adapter.logged_in.LoggedInViewModel;
 import interface_adapter.login.LoginPresenter;
 import interface_adapter.login.LoginViewModel;
+import interface_adapter.loyalty_score.LoyaltyController;
+import interface_adapter.loyalty_score.LoyaltyPresenter;
+import interface_adapter.loyalty_score.LoyaltyViewModel;
 import interface_adapter.spotify_auth.SpotifyAuthController;
 import interface_adapter.spotify_auth.SpotifyAuthPresenter;
 import interface_adapter.spotify_auth.SpotifyAuthViewModel;
@@ -21,6 +25,9 @@ import use_case.get_topItems.GetTopItemsOutputBoundary;
 import use_case.login.LoginInputBoundary;
 import use_case.login.LoginInteractor;
 import use_case.login.LoginOutputBoundary;
+import use_case.loyalty_score.LoyaltyScoreInputBoundary;
+import use_case.loyalty_score.LoyaltyScoreInteractor;
+import use_case.loyalty_score.LoyaltyScoreOutputBoundary;
 import use_case.spotify_auth.SpotifyAuthInputBoundary;
 import use_case.spotify_auth.SpotifyAuthInteractor;
 import use_case.spotify_auth.SpotifyAuthOutputBoundary;
@@ -29,10 +36,7 @@ import use_case.daily_mix.DailyMixInputData;
 import use_case.daily_mix.DailyMixInteractor;
 import use_case.daily_mix.DailyMixOutputBoundary;
 import use_case.daily_mix.DailyMixOutputData;
-import view.LoggedInView;
-import view.LoginView;
-import view.SpotifyAuthView;
-import view.ViewManager;
+import view.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -51,6 +55,8 @@ public class AppBuilder {
     private SpotifyAuthViewModel spotifyAuthViewModel;
     private DailyMixViewModel dailyMixViewModel;
     private GetTopItemsViewModel getTopItemsViewModel;
+    private LoyaltyViewModel loyaltyViewModel;
+    private LoyaltyScoreView loyaltyView;
 
     public AppBuilder() {
         cardPanel.setLayout(cardLayout);
@@ -62,6 +68,7 @@ public class AppBuilder {
         spotifyAuthViewModel = new SpotifyAuthViewModel();
         dailyMixViewModel = new DailyMixViewModel();
         getTopItemsViewModel = new GetTopItemsViewModel();
+        loyaltyViewModel = new LoyaltyViewModel();
         return this;
     }
 
@@ -88,22 +95,19 @@ public class AppBuilder {
         return this;
     }
 
+    public AppBuilder addLoyaltyView() {
+        loyaltyView = new LoyaltyScoreView(loyaltyViewModel, viewManagerModel);
+        cardPanel.add(loyaltyView, loyaltyView.getViewName());
+        return this;
+    }
+
     public AppBuilder addSignupUseCase() {
         // emptied; do not need
         return this;
     }
 
     public AppBuilder addLoginUseCase() {
-        final LoginOutputBoundary loginOutputBoundary = new LoginPresenter(viewManagerModel,
-                loggedInViewModel, loginViewModel);
-        // final LoginInputBoundary loginInteractor = new LoginInteractor(
-        //        userDataAccessObject, loginOutputBoundary);
-        // TODO: add back in LoginInputBoundary loginInteractor variable
-
-
-        // LoginController loginController = new LoginController(loginInteractor);
-        // TODO: Add back in LoginController
-        // loginView.setLoginController(loginController);
+        // emptied, do not need
         return this;
     }
 
@@ -165,13 +169,26 @@ public class AppBuilder {
         return this;
     }
 
+    public AppBuilder addLoyaltyUseCase() {
+        final LoyaltyScoreOutputBoundary loyaltyScoreOutputBoundary = new LoyaltyPresenter(viewManagerModel, loyaltyViewModel);
+
+        final LoyaltyScoreInputBoundary loyaltyScoreInteractor = new LoyaltyScoreInteractor(new LoyaltyScoreDataAccessObject(),
+                                                    loyaltyScoreOutputBoundary, new SpotifyDataAccessObject());
+
+        LoyaltyController loyaltyController = new LoyaltyController(loyaltyScoreInteractor);
+        loyaltyView.setLoyaltyController(loyaltyController);
+        loggedInView.setLoyaltyLookupController(loyaltyController);
+
+        return this;
+    }
+
     public JFrame build() {
         final JFrame application = new JFrame("Better Wrapped - Spotify Analysis");
         application.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
         application.add(cardPanel);
 
-        viewManagerModel.setState(loginView.getViewName());
+        viewManagerModel.setState(loggedInView.getViewName());
         viewManagerModel.firePropertyChange();
 
         return application;

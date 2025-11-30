@@ -1,6 +1,7 @@
 package view;
 
 import interface_adapter.ViewManagerModel;
+import interface_adapter.loyalty_score.LoyaltyController;
 import interface_adapter.loyalty_score.LoyaltyViewModel;
 
 import javax.swing.*;
@@ -27,22 +28,27 @@ public class LoyaltyScoreView extends JPanel implements ActionListener, Property
     private JButton backButton;
     private final LoyaltyViewModel loyaltyViewModel;
     private final ViewManagerModel viewManagerModel;
-    private final String previousView;
+    private final String viewName = "loyalty";
+    public LoyaltyController loyaltyController;
 
     // Constructor to initialize the view
     public LoyaltyScoreView(LoyaltyViewModel loyaltyViewModel, ViewManagerModel viewManagerModel) {
         this.loyaltyViewModel = loyaltyViewModel;
         this.viewManagerModel = viewManagerModel;
-        this.previousView = viewManagerModel.getViewName();
+
+        this.loyaltyViewModel.addPropertyChangeListener(this);
+        this.viewManagerModel.addPropertyChangeListener(this);
 
         setLayout(new BorderLayout());
 
         // Initialize components
         initializeComponents();
+
     }
 
     private void initializeComponents() {
         // Create a panel for the artist name at the top
+
         JPanel artistPanel = new JPanel(new BorderLayout());
         JLabel artistNameLabel = new JLabel(loyaltyViewModel.getState().getCurrentArtist() + " Loyalty Scores", JLabel.CENTER);
         artistNameLabel.setFont(new Font("Calibri", Font.BOLD, 30));
@@ -77,7 +83,8 @@ public class LoyaltyScoreView extends JPanel implements ActionListener, Property
         loyaltyScoreTable.getTableHeader().setFont(new Font("Verdana", Font.BOLD, 14));
         loyaltyScoreTable.setFont(new Font("Verdana", Font.PLAIN, 16));
         loyaltyScoreTable.setRowHeight(30);
-        loyaltyScoreTable.getColumnModel().getColumn(0).setPreferredWidth(20);
+        // TODO: FIX for null
+        // loyaltyScoreTable.getColumnModel().getColumn(0).setPreferredWidth(20);
 
         // Create pane to hold table
 
@@ -126,6 +133,8 @@ public class LoyaltyScoreView extends JPanel implements ActionListener, Property
         Map<String, Integer> scores = loyaltyViewModel.getState().getLoyaltyScores();
         ArrayList<String> dates = loyaltyViewModel.getState().getDates();
 
+        if ( dates == null){ return; }
+
         dates.sort(Comparator.reverseOrder());
         String[] columnNames = {"Previous Visit Date", "Loyalty Score"};
 
@@ -149,7 +158,8 @@ public class LoyaltyScoreView extends JPanel implements ActionListener, Property
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == backButton) {
-            viewManagerModel.setState(previousView);
+            viewManagerModel.setState("logged in");
+            viewManagerModel.firePropertyChange();
             // for debug
             System.out.println("back button pressed!");
         }
@@ -159,19 +169,19 @@ public class LoyaltyScoreView extends JPanel implements ActionListener, Property
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         // Update the table with the latest loyalty scores when the state changes
-        if (evt.getPropertyName().equals("loyaltyScores")) {
             updateTableData();
-            evt.getNewValue();
-        }
-
-        if (evt.getPropertyName().equals("currentArtist")) {
-            JLabel artistNameLabel = new JLabel("Artist: " + evt.getNewValue(), JLabel.CENTER);
+            JLabel artistNameLabel = new JLabel("Loyalty Scores for: " + loyaltyViewModel.getState().getCurrentArtist(), JLabel.CENTER);
             artistNameLabel.setFont(new Font("Arial", Font.BOLD, 16));
             JPanel artistPanel = (JPanel) getComponent(0);
             artistPanel.removeAll();
             artistPanel.add(artistNameLabel);
             artistPanel.revalidate();
             artistPanel.repaint();
-        }
+    }
+
+    public String getViewName() { return viewName; }
+
+    public void setLoyaltyController(LoyaltyController loyaltyController) {
+        this.loyaltyController = loyaltyController;
     }
 }
