@@ -1,32 +1,41 @@
 package use_case.create_group;
 
+import data_access.GroupDataAccessObject;
 import entity.Group;
 import entity.SpotifyUser;
+import use_case.GroupDataAccessInterface;
 
 import java.util.List;
 
 /**
  * Interactor for the Create Group use case.
  * Implements the input boundary.
+ * Creates a group and persists it immediately.
  */
-public abstract class CreateGroupInteractor implements CreateGroupInputBoundary {
+public class CreateGroupInteractor implements CreateGroupInputBoundary {
+
+    private final GroupDataAccessInterface groupDAO;
+
+    // Constructor takes a GroupDataAccessInterface for persistence
+    public CreateGroupInteractor(GroupDataAccessInterface groupDAO) {
+        this.groupDAO = groupDAO;
+    }
 
     @Override
     public CreateGroupOutputData execute(CreateGroupInputData inputData) {
 
-        Group group = new Group(inputData.getGroup_name(), inputData.getUsers());
+        // Create the group with initial users
+        List<SpotifyUser> initialUsers = inputData.getUsers();
+        Group group = new Group(inputData.getGroup_name(), initialUsers);
 
-        List<SpotifyUser> initialMembers = inputData.getUsers();
-        if (initialMembers != null) {
-            for (SpotifyUser user : initialMembers) {
-                group.addUser(user);
-            }
-        }
+        // Persist the group
+        groupDAO.saveGroup(group);
 
         // Return output data
         return new CreateGroupOutputData(
                 group.getGroup_name(),
-                group.getUsers()
+                group.getUsers(),
+                group.getGroupCode()
         );
     }
 }

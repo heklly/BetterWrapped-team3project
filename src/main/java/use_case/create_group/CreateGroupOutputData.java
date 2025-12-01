@@ -17,9 +17,10 @@ public class CreateGroupOutputData {
      * Constructs CreateGroupOutputData object
      *
      * @param group_name name of newly created group
+     * @param groupCode
      */
 
-    public CreateGroupOutputData(String group_name, List<SpotifyUser> users) {
+    public CreateGroupOutputData(String group_name, List<SpotifyUser> users, String groupCode) {
         this.group_name = group_name;
         this.users = users;
 }
