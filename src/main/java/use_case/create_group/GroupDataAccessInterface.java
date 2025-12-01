@@ -19,11 +19,11 @@ public interface GroupDataAccessInterface {
     void saveGroup (Group group);
 
     /**
-     * Retrieves a group by its group_name, or returns null if no such group exists
-     * @param group_name trying to be retrieved
+     * Retrieves a group by its unique and random code, or returns null if no such group exists
+     * @param groupCode the unique and random code corresponding to a given group
      * @return Group entity or null if no such group exists
      */
-    Group getGroupByName(String group_name);
+    Group getGroupByCode(String groupCode);
 
     /**
      * Updates existing Group entity in storage.
