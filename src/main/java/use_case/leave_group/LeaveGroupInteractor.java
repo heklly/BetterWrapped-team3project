@@ -20,7 +20,7 @@ public class LeaveGroupInteractor implements LeaveGroupInputBoundary {
      * @param inputData the input data for leaving a group
      */
     @Override
-    public void execute(LeaveGroupInputData inputData) {
+    public void execute(LeaveGroupInputData inputData, LeaveGroupDataAccessInterface GroupDAO) {
         final SpotifyUser user = inputData.getUser();
         final String groupName = inputData.getGroupName();
 

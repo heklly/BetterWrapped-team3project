@@ -8,5 +8,5 @@ public interface LeaveGroupInputBoundary {
      * executes Leave Group Use Case. After this executes the user will not have a group.
      * @param inputData the input data for leaving a group
      */
-    void execute(LeaveGroupInputData inputData);
+    void execute(LeaveGroupInputData inputData, LeaveGroupDataAccessInterface groupDAO);
 }
