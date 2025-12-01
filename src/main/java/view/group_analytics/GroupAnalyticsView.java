@@ -65,7 +65,7 @@ public class GroupAnalyticsView extends JPanel implements PropertyChangeListener
     private void runDemo() {
         // TEMP: demo data. Replace with real group from your teammate later.
         List<UserTasteProfile> demoGroup = List.of(
-                new UserTasteProfile("Nisarg", "me", Set.of("dance pop", "edm", "k-pop")),
+                new UserTasteProfile("Dev", "me", Set.of("dance pop", "edm", "k-pop")),
                 new UserTasteProfile("Friend 1", "f1", Set.of("indie pop", "acoustic", "sad")),
                 new UserTasteProfile("Friend 2", "f2", Set.of("rock", "classic rock", "country"))
         );
