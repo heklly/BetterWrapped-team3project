@@ -17,7 +17,7 @@ public class CreateGroupOutputData {
      * Constructs CreateGroupOutputData object
      *
      * @param group_name name of newly created group
-     * @param groupCode
+     * @param groupCode the code used by users to join a group
      */
 
     public CreateGroupOutputData(String group_name, List<SpotifyUser> users, String groupCode) {
