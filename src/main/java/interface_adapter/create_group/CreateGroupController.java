@@ -25,11 +25,10 @@ public class CreateGroupController {
      * Creates a group using the provided user input.
      *
      * @param group_name the name of the group
-     * @param owner the user creating the group
-     * @param initialMembers  list of initial members
+     * @param users list of initial members
      */
-    public void create(String group_name, SpotifyUser owner, List<SpotifyUser> initialMembers) {
-        CreateGroupInputData inputData = new CreateGroupInputData(group_name, owner, initialMembers);
+    public void create(String group_name, SpotifyUser owner, List<SpotifyUser> users) {
+        CreateGroupInputData inputData = new CreateGroupInputData(group_name, users);
         createGroupUseCase.execute(inputData);
 
     }

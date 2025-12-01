@@ -4,6 +4,8 @@ import entity.Group;
 import entity.SpotifyUser;
 import use_case.GroupDataAccessInterface;
 
+import java.util.List;
+
 
 public class JoinGroupInteractor implements JoinGroupInputBoundary {
 
@@ -17,9 +19,9 @@ public class JoinGroupInteractor implements JoinGroupInputBoundary {
     }
 
     @Override
-    public void joinGroup(JoinGroupInputData data) {
+    public void joinGroup(JoinGroupInputData data, List<SpotifyUser> users) {
 
-        Group group = groupDAO.getGroupByCode(data.getGroupCode());
+        Group group = groupDAO.getGroupByCode(data.getGroupCode(), data.getUsers(users));
         if (group == null) {
             outputBoundary.prepareFailView("Group code does not exist.");
             return;

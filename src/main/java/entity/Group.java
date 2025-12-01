@@ -13,7 +13,6 @@ public class Group {
     private String group_name;
     private final List<SpotifyUser> users;
     private final List<Playlist> group_playlists;
-    private final SpotifyUser owner;
     private final String groupCode;
 
 
@@ -22,17 +21,13 @@ public class Group {
      * Creates a new group given these parameters:
      *
      * @param group_name the group's name
-     * @param owner the user who created the group
+     * @param users the users who are in the group
      */
-    public Group(String group_name, SpotifyUser owner ) {
-        this.owner = owner;
+    public Group(String group_name, List<SpotifyUser> users) {
         this.group_name = group_name;
-        this.users = new ArrayList<SpotifyUser>();
-        this.group_playlists = new ArrayList<Playlist>();
+        this.users = new ArrayList<>();
+        this.group_playlists = new ArrayList<>();
         this.groupCode = generateGroupCode();
-    }
-    public SpotifyUser getOwner() {
-        return owner;
     }
 
     public String getGroup_name() {
@@ -42,16 +37,15 @@ public class Group {
         return groupCode;
     }
 
+
     public void addUser(SpotifyUser user) {
         if (user == null) {
-            throw new IllegalArgumentException("User does not exist.");
+            throw new IllegalArgumentException("User cannot be null.");
         }
         if (users.size() >= MAX_MEMBERS) {
-            throw new IllegalStateException("Cannot have more than 7 members in group");}
-                    this.users.add(user);
-    }
-    public void removeUser (SpotifyUser user) {
-        this.users.remove(user);
+            throw new IllegalStateException("Cannot have more than 7 members in group");
+        }
+        users.add(user);
     }
 
     public void addPlaylist(Playlist playlist) { this.group_playlists.add(playlist); }
@@ -72,6 +66,8 @@ public class Group {
         int code = rand.nextInt(900000) + 100000; // random 6-digit codes associated with each group
         return String.valueOf(code);
     }
+
+
 
 
 }

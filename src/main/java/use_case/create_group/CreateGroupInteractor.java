@@ -14,9 +14,9 @@ public abstract class CreateGroupInteractor implements CreateGroupInputBoundary 
     @Override
     public CreateGroupOutputData execute(CreateGroupInputData inputData) {
 
-        Group group = new Group(inputData.getGroup_name(), inputData.getOwner());
+        Group group = new Group(inputData.getGroup_name(), inputData.getUsers());
 
-        List<SpotifyUser> initialMembers = inputData.getInitialMembers();
+        List<SpotifyUser> initialMembers = inputData.getUsers();
         if (initialMembers != null) {
             for (SpotifyUser user : initialMembers) {
                 group.addUser(user);
@@ -26,7 +26,6 @@ public abstract class CreateGroupInteractor implements CreateGroupInputBoundary 
         // Return output data
         return new CreateGroupOutputData(
                 group.getGroup_name(),
-                group.getOwner(),
                 group.getUsers()
         );
     }
