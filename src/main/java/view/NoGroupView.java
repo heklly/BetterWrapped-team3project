@@ -23,6 +23,7 @@ public class NoGroupView extends JPanel implements ActionListener, PropertyChang
     private final JTextField inputGroupNameField = new JTextField();
     private final JLabel nameErrorField = new JLabel();
 
+    private final JButton loggedIn;
     private final JButton createGroup;
     private final JButton joinGroup;
     private CreateGroupController createGroupController = null;
@@ -39,12 +40,24 @@ public class NoGroupView extends JPanel implements ActionListener, PropertyChang
         final LabelTextPanel enterGroupName = new LabelTextPanel(
                 new JLabel("Group Name"), inputGroupNameField);
 
+        loggedIn = new JButton("Main Page");
         final JPanel buttons = new JPanel();
         buttons.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         createGroup = new JButton("Create Group");
         buttons.add(createGroup);
         joinGroup = new JButton("Join Group");
         buttons.add(joinGroup);
+
+        loggedIn.addActionListener(
+                new ActionListener() {
+                    public void actionPerformed(ActionEvent evt) {
+                        if (evt.getSource().equals(loggedIn)) {
+                            viewManagerModel.setState("logged in");
+                            viewManagerModel.firePropertyChange();
+                        }
+                    }
+                }
+        );
 
         createGroup.addActionListener(
                 new ActionListener() {
@@ -124,6 +137,13 @@ public class NoGroupView extends JPanel implements ActionListener, PropertyChang
         gbcButtons.gridy = 2;
         gbcButtons.weighty = 0.5;
         this.add(buttons, gbcButtons);
+
+        GridBagConstraints c = new GridBagConstraints();
+        c.anchor = GridBagConstraints.CENTER;
+        c.fill = GridBagConstraints.BOTH;
+        c.gridx = 1;
+        c.gridy = 0;
+        this.add(loggedIn, c);
     }
     /**
      * React to a button click that results in evt.

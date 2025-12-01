@@ -26,6 +26,7 @@ public class InGroupView extends JPanel implements ActionListener, PropertyChang
     private final SharedSongViewModel sharedSongViewModel;
     private final GroupAnalyticsViewModel groupAnalyticsViewModel;
 
+    private final JButton loggedIn;
     private final JLabel groupName;
     private final JPanel groupPanel;
     private final JButton leaveGroup;
@@ -55,9 +56,21 @@ public class InGroupView extends JPanel implements ActionListener, PropertyChang
         groupPanel = new JPanel();
         setGroupPanel(currentState);
 
+        loggedIn = new JButton("Main Page");
         sharedSong = new JButton("Shared Song");
         groupAnalytics = new JButton("Group Analytics");
         leaveGroup = new JButton("Leave Group");
+
+        loggedIn.addActionListener(
+                new ActionListener() {
+                    public void actionPerformed(ActionEvent evt) {
+                        if (evt.getSource().equals(loggedIn)) {
+                            viewManagerModel.setState("logged in");
+                            viewManagerModel.firePropertyChange();
+                        }
+                    }
+                }
+        );
 
         leaveGroup.addActionListener(
                 new ActionListener() {
@@ -129,6 +142,13 @@ public class InGroupView extends JPanel implements ActionListener, PropertyChang
 
         c.gridy = 3;
         this.add(groupAnalytics, c);
+
+        c.weightx = 0;
+        c.fill = GridBagConstraints.BOTH;
+        c.gridx = 1;
+        c.gridy = 0;
+        this.add(loggedIn, c);
+
     }
 
     /**

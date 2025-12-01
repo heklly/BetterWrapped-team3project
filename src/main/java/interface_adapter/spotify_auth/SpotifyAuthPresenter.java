@@ -1,24 +1,30 @@
 package interface_adapter.spotify_auth;
 
 import interface_adapter.ViewManagerModel;
+import interface_adapter.daily_mix.DailyMixState;
+import interface_adapter.daily_mix.DailyMixViewModel;
 import interface_adapter.logged_in.LoggedInState;
 import interface_adapter.logged_in.LoggedInViewModel;
 import use_case.spotify_auth.SpotifyAuthOutputBoundary;
 import use_case.spotify_auth.SpotifyAuthOutputData;
 import view.LoggedInView;
+import view.ProfileView;
 
 public class SpotifyAuthPresenter implements SpotifyAuthOutputBoundary {
     private final SpotifyAuthViewModel spotifyAuthViewModel;
     private final LoggedInViewModel loggedInViewModel;
     private final ViewManagerModel viewManagerModel;
+    private final DailyMixViewModel dailyMixViewModel;
     private LoggedInView loggedInView;
 
     public SpotifyAuthPresenter(ViewManagerModel viewManagerModel,
                                 SpotifyAuthViewModel spotifyAuthViewModel,
-                                LoggedInViewModel loggedInViewModel) {
+                                LoggedInViewModel loggedInViewModel,
+                                DailyMixViewModel dailyMixViewModel) {
         this.viewManagerModel = viewManagerModel;
         this.spotifyAuthViewModel = spotifyAuthViewModel;
         this.loggedInViewModel = loggedInViewModel;
+        this.dailyMixViewModel = dailyMixViewModel;
     }
 
     public void setLoggedInView(LoggedInView view) {
