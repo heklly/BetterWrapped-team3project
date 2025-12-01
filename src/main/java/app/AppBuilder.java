@@ -2,6 +2,7 @@ package app;
 
 import data_access.SpotifyDataAccessObject;
 import data_access.TopItemDataAccessObject;
+import data_access.SpotifyDataAccessObject;
 import interface_adapter.ViewManagerModel;
 import interface_adapter.get_topItems.GetTopItemsController;
 import interface_adapter.get_topItems.GetTopItemsPresenter;
@@ -159,21 +160,23 @@ public class AppBuilder {
     }
 
     public AppBuilder addGroupAnalyticsUseCase() {
-        // presenter
         final GroupAnalyticsViewModel vm = groupAnalyticsViewModel;
         final GroupAnalyticsOutputBoundary outputBoundary =
                 new GroupAnalyticsPresenter(vm);
 
-        // interactor
         final GroupAnalyticsInputBoundary interactor =
                 new GroupAnalyticsInteractor(outputBoundary);
 
-        // controller
-        GroupAnalyticsController controller =
-                new GroupAnalyticsController(interactor);
+        SpotifyDataAccessObject spotifyDAO = new SpotifyDataAccessObject();
 
-        // wire into view
+        GroupAnalyticsController controller =
+                new GroupAnalyticsController(interactor, spotifyDAO);
+
         groupAnalyticsView.setGroupAnalyticsController(controller);
+
+        return this;
+    }
+
     public AppBuilder addDailyMixUseCase() {
         // use new DailyMixPresenter and Interactor
         final DailyMixOutputBoundary dailyMixOutputBoundary =

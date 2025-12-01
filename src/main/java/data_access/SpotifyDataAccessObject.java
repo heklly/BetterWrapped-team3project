@@ -1,7 +1,9 @@
 package data_access;
 
 import entity.ArtistLoyaltyScore;
+import entity.Group;
 import entity.SpotifyUser;
+import entity.UserTasteProfile;
 import okhttp3.*;
 import org.json.JSONObject;
 import se.michaelthelin.spotify.SpotifyApi;
@@ -41,6 +43,52 @@ public class SpotifyDataAccessObject {
                 .setClientId(this.clientId)
                 .setRedirectUri(URI.create(this.redirectUri))
                 .build();
+    }
+
+    public UserTasteProfile buildTasteProfileForUser(SpotifyUser user) {
+        SpotifyUser freshUser = refreshAccessToken(user);
+        Set<String> genres = getUserTopGenres(freshUser);
+
+        return new UserTasteProfile(
+                user.getUsername(),
+                user.getSpotifyUserId(),
+                genres
+        );
+    }
+
+    public List<UserTasteProfile> buildTasteProfilesForGroup(Group group) {
+        List<UserTasteProfile> profiles = new ArrayList<>();
+
+        if (group == null || group.getUsers() == null) {
+            return profiles;
+        }
+
+        for (SpotifyUser user : group.getUsers()) {
+            if (user == null) {
+                continue;
+            }
+
+            // Reuse the method you just added
+            UserTasteProfile profile = buildTasteProfileForUser(user);
+            profiles.add(profile);
+        }
+
+        return profiles;
+    }
+
+    public List<UserTasteProfile> buildTasteProfilesForUsers(List<SpotifyUser> users) {
+        List<UserTasteProfile> profiles = new ArrayList<>();
+        if (users == null) {
+            return profiles;
+        }
+
+        for (SpotifyUser user : users) {
+            if (user == null) continue;
+            UserTasteProfile profile = buildTasteProfileForUser(user);
+            profiles.add(profile);
+        }
+
+        return profiles;
     }
 
     private String generateCodeVerifier() {

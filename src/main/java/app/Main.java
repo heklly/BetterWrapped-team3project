@@ -24,6 +24,7 @@ public class Main {
                 .addLoginView()
                 .addLoggedInView()
                 .addSpotifyAuthView()
+                .addGroupAnalyticsView()     // 🔹 add the new screen as a card
                 .addSignupUseCase()
                 .addLoginUseCase()
                 .addChangePasswordUseCase()
@@ -31,6 +32,7 @@ public class Main {
                 .addSpotifyAuthUseCase()
                 .addDailyMixUseCase()
                 .addGetTopItemsUseCase()
+                .addGroupAnalyticsUseCase()  // 🔹 wire controller + interactor + presenter
                 .build();
         application.pack();
         application.setLocationRelativeTo(null);

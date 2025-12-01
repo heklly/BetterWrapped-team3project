@@ -1,39 +1,32 @@
 package view.group_analytics;
 
-import entity.UserTasteProfile;
+import entity.Group;
+import entity.SpotifyUser;
+import interface_adapter.ViewManagerModel;
 import interface_adapter.group_analytics.GroupAnalyticsController;
 import interface_adapter.group_analytics.GroupAnalyticsState;
 import interface_adapter.group_analytics.GroupAnalyticsViewModel;
-import view.View;
 
 import javax.swing.*;
 import java.awt.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.List;
-import java.util.Set;
 
 /**
- * Simple view showing the verdict and scores.
- * For now it uses a demo group; your teammate's group-forming use case
- * should call controller.analyzeGroup(...) with real UserTasteProfiles.
+ * View for showing group analytics verdict and scores.
+ * This view only works with REAL data (real Group / SpotifyUser list).
  */
-public class GroupAnalyticsView extends JPanel implements PropertyChangeListener, View {
+public class GroupAnalyticsView extends JPanel implements PropertyChangeListener {
 
     private final GroupAnalyticsViewModel viewModel;
     private GroupAnalyticsController controller;
 
     private final JTextArea outputArea = new JTextArea(15, 40);
-    private final JButton demoButton = new JButton("Run demo group");
-
-    public void setGroupAnalyticsController(GroupAnalyticsController controller) {
-        this.controller = controller;
-    }
 
     public GroupAnalyticsView(GroupAnalyticsViewModel viewModel,
-                              GroupAnalyticsController controller) {
+                              ViewManagerModel viewManagerModel) {
         this.viewModel = viewModel;
-        this.controller = controller;
 
         this.viewModel.addPropertyChangeListener(this);
 
@@ -48,29 +41,39 @@ public class GroupAnalyticsView extends JPanel implements PropertyChangeListener
         JPanel top = new JPanel(new BorderLayout());
         top.add(title, BorderLayout.CENTER);
 
-        JPanel bottom = new JPanel();
-        bottom.add(demoButton);
-
         add(top, BorderLayout.NORTH);
         add(scrollPane, BorderLayout.CENTER);
-        add(bottom, BorderLayout.SOUTH);
-
-        wireActions();
     }
 
-    private void wireActions() {
-        demoButton.addActionListener(e -> runDemo());
+    // Called from AppBuilder
+    public void setGroupAnalyticsController(GroupAnalyticsController controller) {
+        this.controller = controller;
     }
 
-    private void runDemo() {
-        // TEMP: demo data. Replace with real group from your teammate later.
-        List<UserTasteProfile> demoGroup = List.of(
-                new UserTasteProfile("Dev", "me", Set.of("dance pop", "edm", "k-pop")),
-                new UserTasteProfile("Friend 1", "f1", Set.of("indie pop", "acoustic", "sad")),
-                new UserTasteProfile("Friend 2", "f2", Set.of("rock", "classic rock", "country"))
-        );
+    // Called from group UI / presenter when a real Group is ready
+    public void analyzeRealGroup(Group group) {
+        if (controller == null) {
+            outputArea.setText("Controller not set yet.");
+            return;
+        }
+        if (group == null) {
+            outputArea.setText("No group provided.");
+            return;
+        }
+        controller.analyzeGroup(group);
+    }
 
-        controller.analyzeGroup(demoGroup);
+    // Alternative: if you only have a list of SpotifyUsers
+    public void analyzeRealUsers(List<SpotifyUser> users) {
+        if (controller == null) {
+            outputArea.setText("Controller not set yet.");
+            return;
+        }
+        if (users == null || users.isEmpty()) {
+            outputArea.setText("No users provided.");
+            return;
+        }
+        controller.analyzeFromUsers(users);
     }
 
     @Override
@@ -107,7 +110,7 @@ public class GroupAnalyticsView extends JPanel implements PropertyChangeListener
         outputArea.setText(sb.toString());
     }
 
-    @Override
+    // Used by AppBuilder to register the card name
     public String getViewName() {
         return viewModel.getViewName();
     }
