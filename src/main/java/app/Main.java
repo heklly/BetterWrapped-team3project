@@ -28,14 +28,16 @@ public class Main {
                 .addLoyaltyView()
                 .addLoggedInView()
                 .addSpotifyAuthView()
-                .addSignupUseCase()
-                // not needed .addLoginUseCase()
-                .addChangePasswordUseCase()
-                // not needed .addLogoutUseCase()
+                .addInGroupView()
+                .addNoGroupView()
+                .addSharedSongView()
+                .addGroupAnalyticsView()
                 .addSpotifyAuthUseCase()
                 .addDailyMixUseCase()
                 .addGetTopItemsUseCase()
                 .addLoyaltyUseCase()
+                .addSharedSongUseCase()
+                .addGroupAnalyticsUseCase()
                 .build();
         application.pack();
         application.setLocationRelativeTo(null);
