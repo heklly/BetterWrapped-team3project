@@ -10,7 +10,6 @@ import view.SharedSongView;
  */
 public class SharedSongPresenter implements SharedSongOutputBoundary {
 
-    // may be same as group tab view model
     private final SharedSongViewModel sharedSongViewModel;
     private final ViewManagerModel viewManagerModel;
 

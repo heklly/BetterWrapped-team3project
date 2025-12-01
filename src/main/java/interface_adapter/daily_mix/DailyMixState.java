@@ -1,6 +1,5 @@
 package interface_adapter.daily_mix;
 
-import entity.SpotifyUser;
 
 import java.util.ArrayList;
 import java.util.List;

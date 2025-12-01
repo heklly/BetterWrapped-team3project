@@ -34,6 +34,7 @@ import interface_adapter.daily_mix.DailyMixController;
 import interface_adapter.daily_mix.DailyMixPresenter;
 import use_case.create_group.CreateGroupInteractor;
 import use_case.create_group.CreateGroupOutputBoundary;
+import use_case.create_group.GroupDataAccessInterface;
 import use_case.get_topItems.GetTopItemsInputBoundary;
 import use_case.get_topItems.GetTopItemsInteractor;
 import use_case.get_topItems.GetTopItemsOutputBoundary;
@@ -150,7 +151,7 @@ public class AppBuilder {
     }
 
     public AppBuilder addLoyaltyView() {
-        loyaltyView = new LoyaltyScoreView(new LoyaltyState(), viewManagerModel);
+        loyaltyView = new LoyaltyScoreView(loyaltyViewModel, viewManagerModel);
         cardPanel.add(loyaltyView, loyaltyView.getViewName());
         return this;
     }
@@ -172,6 +173,27 @@ public class AppBuilder {
         SpotifyAuthController controller = new SpotifyAuthController(spotifyAuthInteractor);
         spotifyAuthView.setSpotifyAuthController(controller);
 
+        return this;
+    }
+
+    public AppBuilder addLeaveGroupUseCase() {
+//        TODO uncomment once GroupDAO is done
+//        final LeaveGroupOutputBoundary leaveGroupPresenter =
+//                new LeaveGroupPresenter(viewManagerModel, inGroupViewModel, noGroupViewModel);
+//        final LeaveGroupInputBoundary leaveGroupInteractor =
+//                new LeaveGroupInteractor(new GroupDataAccessObject(), leaveGroupPresenter);
+//        LeaveGroupController leaveGroupController = new LeaveGroupController(leaveGroupInteractor);
+//        inGroupView.setLeaveGroupController(leaveGroupController);
+        return this;
+    }
+
+    public AppBuilder addSharedSongUseCase() {
+        final SharedSongOutputBoundary sharedSongPresenter =
+                new SharedSongPresenter(sharedSongViewModel, viewManagerModel);
+        final SharedSongInputBoundary sharedSongInteractor =
+                new SharedSongInteractor(sharedSongPresenter, new SpotifyDataAccessObject());
+        final SharedSongController sharedSongController = new SharedSongController(sharedSongInteractor);
+        inGroupView.setSharedSongController(sharedSongController);
         return this;
     }
 
