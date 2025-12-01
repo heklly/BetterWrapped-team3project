@@ -6,6 +6,6 @@ import entity.SpotifyUser;
 import java.util.List;
 
 public interface JoinGroupInputBoundary {
-    void joinGroup(JoinGroupInputData data, List<SpotifyUser> users);
+    void joinGroup(JoinGroupInputData data);
 }
 

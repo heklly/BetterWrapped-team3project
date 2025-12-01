@@ -19,7 +19,9 @@ public class GroupDataAccessObject implements GroupDataAccessInterface {
         JSONArray groups = readGroupsFile();
         for (Object obj : groups) {
             JSONObject g = (JSONObject) obj;
-            if (g.getString("groupName").equalsIgnoreCase(groupName)) return true;
+            if (g.getString("groupName").equalsIgnoreCase(groupName)) {
+                return true;
+            }
         }
         return false;
     }
@@ -29,7 +31,9 @@ public class GroupDataAccessObject implements GroupDataAccessInterface {
         JSONArray groups = readGroupsFile();
         for (Object obj : groups) {
             JSONObject g = (JSONObject) obj;
-            if (g.getString("groupCode").equals(groupCode)) return true;
+            if (g.getString("groupCode").equals(groupCode)) {
+                return true;
+            }
         }
         return false;
     }
@@ -42,12 +46,12 @@ public class GroupDataAccessObject implements GroupDataAccessInterface {
     }
 
     @Override
-    public Group getGroupByCode(String groupCode, List<SpotifyUser> loggedInUsers) {
+    public Group getGroupByCode(String groupCode) {
         JSONArray groups = readGroupsFile();
         for (Object obj : groups) {
             JSONObject g = (JSONObject) obj;
             if (g.getString("groupCode").equals(groupCode)) {
-                return jsonToGroup(g, loggedInUsers);  // pass the logged-in users
+                return jsonToGroup(g);
             }
         }
         return null;
@@ -97,28 +101,24 @@ public class GroupDataAccessObject implements GroupDataAccessInterface {
 
         JSONArray usersArray = new JSONArray();
         for (SpotifyUser user : group.getUsers()) {
-            usersArray.put(user.getUsername()); // store usernames only
+            usersArray.put(user.getUsername());
         }
         json.put("users", usersArray);
 
         return json;
     }
 
-    private Group jsonToGroup(JSONObject json, List<SpotifyUser> loggedInUsers) {
+    private Group jsonToGroup(JSONObject json) {
         JSONArray usersArray = json.optJSONArray("users");
-        List<SpotifyUser> groupUsers = new ArrayList<>();
+        List<SpotifyUser> users = new ArrayList<>();
 
         if (usersArray != null) {
             for (Object u : usersArray) {
                 String username = u.toString();
-                // Find the real SpotifyUser object
-                loggedInUsers.stream()
-                        .filter(user -> user.getUsername().equals(username))
-                        .findFirst()
-                        .ifPresent(groupUsers::add);
+                users.add(new SpotifyUser(username)); // minimal reconstruction
             }
         }
 
-        return new Group(json.getString("groupName"), groupUsers);
+        return new Group(json.getString("groupName"), users);
     }
 }

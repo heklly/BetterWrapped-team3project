@@ -21,8 +21,4 @@ public class JoinGroupInputData {
     public SpotifyUser getUser() {
         return user;
     }
-
-    public List<SpotifyUser> getUsers(List<SpotifyUser> users) {
-    return users;
-    }
 }

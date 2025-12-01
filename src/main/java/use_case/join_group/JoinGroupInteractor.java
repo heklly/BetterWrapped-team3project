@@ -6,7 +6,6 @@ import use_case.GroupDataAccessInterface;
 
 import java.util.List;
 
-
 public class JoinGroupInteractor implements JoinGroupInputBoundary {
 
     private final GroupDataAccessInterface groupDAO;
@@ -19,9 +18,10 @@ public class JoinGroupInteractor implements JoinGroupInputBoundary {
     }
 
     @Override
-    public void joinGroup(JoinGroupInputData data, List<SpotifyUser> users) {
+    public void joinGroup(JoinGroupInputData data) {
 
-        Group group = groupDAO.getGroupByCode(data.getGroupCode(), data.getUsers(users));
+        // 1. lookup group
+        Group group = groupDAO.getGroupByCode(data.getGroupCode());
         if (group == null) {
             outputBoundary.prepareFailView("Group code does not exist.");
             return;
@@ -29,11 +29,13 @@ public class JoinGroupInteractor implements JoinGroupInputBoundary {
 
         SpotifyUser user = data.getUser();
 
+        // 2. check if already in group
         if (group.getUsers().contains(user)) {
             outputBoundary.prepareFailView("You are already a member of this group.");
             return;
         }
 
+        // 3. try adding the user
         try {
             group.addUser(user);
         } catch (Exception e) {
@@ -41,8 +43,10 @@ public class JoinGroupInteractor implements JoinGroupInputBoundary {
             return;
         }
 
+        // 4. persist update
         groupDAO.updateGroup(group);
 
+        // 5. return success
         JoinGroupOutputData outputData = new JoinGroupOutputData(
                 group.getGroup_name(),
                 true,
@@ -50,4 +54,5 @@ public class JoinGroupInteractor implements JoinGroupInputBoundary {
         );
 
         outputBoundary.prepareSuccessView(outputData);
-    }}
+    }
+}
