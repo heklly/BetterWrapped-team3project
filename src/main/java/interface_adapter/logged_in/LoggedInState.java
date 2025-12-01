@@ -4,8 +4,8 @@ public class LoggedInState {
     private String username = "";
     private String password = "";
     private String passwordError;
-    private boolean spotifyAuthenticated = false; // NEW FIELD
-    private String spotifyUserId = ""; // NEW FIELD
+    private boolean spotifyAuthenticated = false;
+    private String spotifyUserId = "";
 
     public LoggedInState(LoggedInState copy) {
         username = copy.username;

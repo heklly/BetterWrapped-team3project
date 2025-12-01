@@ -5,7 +5,9 @@ import org.json.JSONObject;
 import use_case.loyalty_score.LoyaltyScoreDataAccessInterface;
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -120,6 +122,28 @@ public class LoyaltyScoreDataAccessObject implements LoyaltyScoreDataAccessInter
             }
         });
         return loyaltyScores;
+    }
+
+    @Override
+    public List<String> getDates(String userid) {
+        ArrayList<String> dates = new ArrayList<>();
+        JSONObject rootNode = readUserFile(userid);
+        if (rootNode == null) {
+            return dates;  // Early return if empty node
+        }
+
+        JSONArray loyaltyScoresArray = rootNode.optJSONArray("loyalty_scores");
+        if (loyaltyScoresArray == null) {
+            return dates;  // Early return if no loyalty scores in array
+        }
+
+        loyaltyScoresArray.forEach(entry -> {
+            JSONObject loyaltyScore = (JSONObject) entry;
+            String date = loyaltyScore.getString("date");
+            if (!dates.contains(date)) { dates.add(date); }
+        });
+
+        return dates;
     }
 
     // Helper method to get the file for a specific user

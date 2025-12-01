@@ -1,5 +1,8 @@
 package app;
 
+import interface_adapter.loyalty_score.LoyaltyController;
+import view.LoyaltyScoreView;
+
 import javax.swing.*;
 
 public class Main {
@@ -21,18 +24,22 @@ public class Main {
         AppBuilder appBuilder = new AppBuilder();
         JFrame application = appBuilder
                 .addViewModels()         // ✅ Create ALL view models FIRST
-                .addLoginView()
+                // not needed .addLoginView()
+                .addLoyaltyView()
                 .addLoggedInView()
                 .addSpotifyAuthView()
                 .addSignupUseCase()
-                .addLoginUseCase()
+                // not needed .addLoginUseCase()
                 .addChangePasswordUseCase()
-                .addLogoutUseCase()
+                // not needed .addLogoutUseCase()
                 .addSpotifyAuthUseCase()
                 .addDailyMixUseCase()
+                .addGetTopItemsUseCase()
+                .addLoyaltyUseCase()
                 .build();
         application.pack();
         application.setLocationRelativeTo(null);
         application.setVisible(true);
+
     }
 }

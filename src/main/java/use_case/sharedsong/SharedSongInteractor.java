@@ -18,18 +18,18 @@ import java.util.Map;
  */
 public class SharedSongInteractor implements SharedSongInputBoundary {
     private final SharedSongOutputBoundary sharedSongPresenter;
-    private final SpotifyDataAccessObject spotifyDataAccessObject;
+    private final SpotifyDataAccessObject spotifyDAO;
 
     public SharedSongInteractor(SharedSongOutputBoundary sharedSongPresenter,
                                 SpotifyDataAccessObject spotifyDAO) {
         this.sharedSongPresenter = sharedSongPresenter;
-        this.spotifyDataAccessObject = spotifyDAO;
-
+        this.spotifyDAO = spotifyDAO;
     }
 
     public void execute(SharedSongInputData inputData,
                         SpotifyDataAccessObject spotifyDataAccessObject) {
         final SpotifyUser user = inputData.getUser();
+
         final GetUsersCurrentlyPlayingTrackRequest request = spotifyDataAccessObject
                 .getSpotifyApiForUser(user)
                 .getUsersCurrentlyPlayingTrack()
@@ -65,7 +65,7 @@ public class SharedSongInteractor implements SharedSongInputBoundary {
     }
 
     private boolean checkUserSavedTrack(SpotifyUser user, String trackId) throws IOException, SpotifyWebApiException, ParseException {
-        final CheckUsersSavedTracksRequest request = spotifyDataAccessObject
+        final CheckUsersSavedTracksRequest request = spotifyDAO
                 .getSpotifyApiForUser(user)
                 .checkUsersSavedTracks(new String[]{trackId})
                 .build();

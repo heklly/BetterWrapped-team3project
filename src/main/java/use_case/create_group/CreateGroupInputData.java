@@ -9,9 +9,9 @@ import java.util.List;
  */
 public class CreateGroupInputData {
 
-    private final String group_name;
     private final SpotifyUser owner;
     private final List<SpotifyUser> initialMembers;
+    private final String group_name;
 
 
     public CreateGroupInputData(String group_name, SpotifyUser owner, List<SpotifyUser> initialMembers) {
