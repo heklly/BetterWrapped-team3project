@@ -20,14 +20,14 @@ public class Group {
     /**
      * Creates a new group given these parameters:
      *
-     * @para group_name the group's name
-     * @para owner the user who created the group
+     * @param  group_name the group's name
+     * @param owner the user who created the group
      */
     public Group(String group_name, SpotifyUser owner ) {
         this.owner = owner;
         this.group_name = group_name;
-        this.users = new ArrayList<SpotifyUser>();
-        this.group_playlists = new ArrayList<Playlist>();
+        this.users = new ArrayList<>();
+        this.group_playlists = new ArrayList<>();
         this.users.add(owner);
         this.groupCode = generateGroupCode();
     }
@@ -58,7 +58,7 @@ public class Group {
 
     public void addPlaylist(Playlist playlist) { this.group_playlists.add(playlist); }
 
-    public void changeName(String group_name) {
+    public void setGroup_name(String group_name) {
         if (group_name == null || group_name.isBlank()){
             throw new IllegalArgumentException("Group name cannot be empty.");
         } this.group_name = group_name;
