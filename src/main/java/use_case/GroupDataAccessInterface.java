@@ -1,4 +1,4 @@
-package use_case.create_group;
+package use_case;
 
 import entity.Group;
 

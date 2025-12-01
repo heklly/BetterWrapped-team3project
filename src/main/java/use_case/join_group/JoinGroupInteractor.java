@@ -2,7 +2,7 @@ package use_case.join_group;
 
 import entity.Group;
 import entity.SpotifyUser;
-import use_case.create_group.GroupDataAccessInterface;
+import use_case.GroupDataAccessInterface;
 
 
 public class JoinGroupInteractor implements JoinGroupInputBoundary {

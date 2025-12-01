@@ -1,4 +1,5 @@
 package entity;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,22 +13,23 @@ public class Group {
     private String group_name;
     private final List<SpotifyUser> users;
     private final List<Playlist> group_playlists;
-    private final String date_created;
     private final SpotifyUser owner;
+    private final String groupCode;
+
 
 
     /**
      * Creates a new group given these parameters:
      *
      * @param group_name the group's name
-     * @param owner      the user who created the group
+     * @param owner the user who created the group
      */
     public Group(String group_name, SpotifyUser owner ) {
         this.owner = owner;
         this.group_name = group_name;
-        this.date_created = "20241212";
         this.users = new ArrayList<SpotifyUser>();
         this.group_playlists = new ArrayList<Playlist>();
+        this.groupCode = generateGroupCode();
     }
     public SpotifyUser getOwner() {
         return owner;
@@ -36,7 +38,10 @@ public class Group {
     public String getGroup_name() {
         return this.group_name;
     }
-    public String getDate() { return this.date_created; }
+    public String getGroupCode() {
+        return groupCode;
+    }
+
     public void addUser(SpotifyUser user) {
         if (user == null) {
             throw new IllegalArgumentException("User does not exist.");
@@ -51,14 +56,22 @@ public class Group {
 
     public void addPlaylist(Playlist playlist) { this.group_playlists.add(playlist); }
 
-    public void changeName(String group_name) {
+    public void setGroup_name(String group_name) {
         if (group_name == null || group_name.isBlank()){
             throw new IllegalArgumentException("Group name cannot be empty.");
         } this.group_name = group_name;
     }
 
+
     public List<SpotifyUser> getUsers() {
         return this.users;
     }
+
+    private String generateGroupCode() {
+        SecureRandom rand = new SecureRandom();
+        int code = rand.nextInt(900000) + 100000; // random 6-digit codes associated with each group
+        return String.valueOf(code);
+    }
+
 
 }
