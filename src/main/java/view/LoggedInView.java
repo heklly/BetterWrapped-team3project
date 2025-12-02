@@ -45,6 +45,24 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
     private final JButton logOut;
     private final JButton connectSpotifyButton;
 
+    private final JButton groupAnalyticsButton = new JButton("Group analytics");
+
+    public LoggedInView(LoggedInViewModel loggedInViewModel, ViewManagerModel viewManagerModel,
+                        SpotifyAuthViewModel spotifyAuthViewModel) {
+    final DailyMixViewModel dailyMixViewModel;
+    DailyMixController dailyMixController;   // NEW
+    final JButton generateDailyMixButton;    // NEW
+    final JTextArea dailyMixArea;            // NEW
+
+    final GetTopItemsViewModel getTopItemsViewModel;
+    GetTopItemsController getTopItemsController;
+    final JButton artistsButton;
+    final JButton tracksButton;
+    final JButton short_termButton;
+    final JButton medium_termButton;
+    final JButton long_termButton;
+    final JButton getTopItemButton;
+    final JTextArea TopItemsArea;
     private final DailyMixViewModel dailyMixViewModel;
     private DailyMixController dailyMixController;
     private final JButton generateDailyMixButton;

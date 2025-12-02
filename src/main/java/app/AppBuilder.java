@@ -3,6 +3,7 @@ package app;
 import data_access.LoyaltyScoreDataAccessObject;
 import data_access.SpotifyDataAccessObject;
 import data_access.TopItemDataAccessObject;
+import data_access.SpotifyDataAccessObject;
 import interface_adapter.ViewManagerModel;
 import interface_adapter.create_group.CreateGroupController;
 import interface_adapter.create_group.CreateGroupPresenter;
@@ -198,6 +199,20 @@ public class AppBuilder {
     }
 
     public AppBuilder addGroupAnalyticsUseCase() {
+        final GroupAnalyticsViewModel vm = groupAnalyticsViewModel;
+        final GroupAnalyticsOutputBoundary outputBoundary =
+                new GroupAnalyticsPresenter(vm);
+
+        final GroupAnalyticsInputBoundary interactor =
+                new GroupAnalyticsInteractor(outputBoundary);
+
+        SpotifyDataAccessObject spotifyDAO = new SpotifyDataAccessObject();
+
+        GroupAnalyticsController controller =
+                new GroupAnalyticsController(interactor, spotifyDAO);
+
+        groupAnalyticsView.setGroupAnalyticsController(controller);
+
         // presenter
         final GroupAnalyticsOutputBoundary outputBoundary = new GroupAnalyticsPresenter(groupAnalyticsViewModel);
         // interactor

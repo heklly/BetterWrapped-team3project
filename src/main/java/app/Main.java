@@ -28,6 +28,15 @@ public class Main {
                 .addLoyaltyView()
                 .addLoggedInView()
                 .addSpotifyAuthView()
+                .addGroupAnalyticsView()     // 🔹 add the new screen as a card
+                .addSignupUseCase()
+                .addLoginUseCase()
+                .addChangePasswordUseCase()
+                .addLogoutUseCase()
+                .addSpotifyAuthUseCase()
+                .addDailyMixUseCase()
+                .addGetTopItemsUseCase()
+                .addGroupAnalyticsUseCase()  // 🔹 wire controller + interactor + presenter
                 .addInGroupView()
                 .addNoGroupView()
                 .addSharedSongView()

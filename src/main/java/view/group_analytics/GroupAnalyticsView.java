@@ -1,5 +1,7 @@
 package view.group_analytics;
 
+import entity.Group;
+import entity.SpotifyUser;
 import entity.UserTasteProfile;
 import interface_adapter.ViewManagerModel;
 import interface_adapter.group_analytics.GroupAnalyticsController;
@@ -13,13 +15,12 @@ import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.List;
-import java.util.Set;
 
 /**
- * Simple view showing the verdict and scores.
- * For now it uses a demo group; your teammate's group-forming use case
- * should call controller.analyzeGroup(...) with real UserTasteProfiles.
+ * View for showing group analytics verdict and scores.
+ * This view only works with REAL data (real Group / SpotifyUser list).
  */
+public class GroupAnalyticsView extends JPanel implements PropertyChangeListener {
 public class GroupAnalyticsView extends JPanel implements ActionListener, PropertyChangeListener {
 
     private final GroupAnalyticsViewModel viewModel;
@@ -52,6 +53,8 @@ public class GroupAnalyticsView extends JPanel implements ActionListener, Proper
         JPanel top = new JPanel(new BorderLayout());
         top.add(title, BorderLayout.CENTER);
 
+        add(top, BorderLayout.NORTH);
+        add(scrollPane, BorderLayout.CENTER);
         JPanel bottom = new JPanel();
         bottom.add(demoButton);
         // TODO: fix if you dont like it
@@ -67,19 +70,35 @@ public class GroupAnalyticsView extends JPanel implements ActionListener, Proper
 
     }
 
-    private void wireActions() {
-        demoButton.addActionListener(e -> runDemo());
+    // Called from AppBuilder
+    public void setGroupAnalyticsController(GroupAnalyticsController controller) {
+        this.controller = controller;
     }
 
-    private void runDemo() {
-        // TEMP: demo data. Replace with real group from your teammate later.
-        List<UserTasteProfile> demoGroup = List.of(
-                new UserTasteProfile("Nisarg", "me", Set.of("dance pop", "edm", "k-pop")),
-                new UserTasteProfile("Friend 1", "f1", Set.of("indie pop", "acoustic", "sad")),
-                new UserTasteProfile("Friend 2", "f2", Set.of("rock", "classic rock", "country"))
-        );
+    // Called from group UI / presenter when a real Group is ready
+    public void analyzeRealGroup(Group group) {
+        if (controller == null) {
+            outputArea.setText("Controller not set yet.");
+            return;
+        }
+        if (group == null) {
+            outputArea.setText("No group provided.");
+            return;
+        }
+        controller.analyzeGroup(group);
+    }
 
-        controller.analyzeGroup(demoGroup);
+    // Alternative: if you only have a list of SpotifyUsers
+    public void analyzeRealUsers(List<SpotifyUser> users) {
+        if (controller == null) {
+            outputArea.setText("Controller not set yet.");
+            return;
+        }
+        if (users == null || users.isEmpty()) {
+            outputArea.setText("No users provided.");
+            return;
+        }
+        controller.analyzeFromUsers(users);
     }
 
     public void actionPerformed(ActionEvent evt) {
@@ -122,6 +141,7 @@ public class GroupAnalyticsView extends JPanel implements ActionListener, Proper
         outputArea.setText(sb.toString());
     }
 
+    // Used by AppBuilder to register the card name
     public String getViewName() {
         return viewModel.getViewName();
     }
