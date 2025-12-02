@@ -48,7 +48,7 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
     private final DailyMixViewModel dailyMixViewModel;
     private DailyMixController dailyMixController;
     private final JButton generateDailyMixButton;
-
+    private interface_adapter.create_group.CreateGroupController createGroupController;
     private final GetTopItemsViewModel getTopItemsViewModel;
     private GetTopItemsController getTopItemsController;
     private LoyaltyController loyaltyController;
