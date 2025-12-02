@@ -5,7 +5,7 @@ import entity.SpotifyUser;
 
 import interface_adapter.logged_in.LoggedInState;
 import interface_adapter.logged_in.LoggedInViewModel;
-import interface_adapter.logout.LogoutController;
+//import interface_adapter.logout.LogoutController;
 import interface_adapter.ViewManagerModel;
 import interface_adapter.loyalty_score.LoyaltyController;
 import interface_adapter.spotify_auth.SpotifyAuthViewModel;
@@ -36,7 +36,7 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
     private final ViewManagerModel viewManagerModel;
     private final SpotifyAuthViewModel spotifyAuthViewModel;
 
-    private LogoutController logoutController;
+//    private LogoutController logoutController;
     private SpotifyDataAccessObject spotifyDAO;
     private SpotifyUser currentSpotifyUser;
 
@@ -125,12 +125,12 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
         long_termButton.setEnabled(false);
 
 
-        // Log out button listener
-        logOut.addActionListener(evt -> {
-            if (logoutController != null) {
-                logoutController.execute();
-            }
-        });
+//        // Log out button listener
+//        logOut.addActionListener(evt -> {
+//            if (logoutController != null) {
+//                logoutController.execute();
+//            }
+//        });
 
         // Connect Spotify listener
         connectSpotifyButton.addActionListener(evt -> {
@@ -448,9 +448,9 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
         this.getTopItemsController = getTopItemsController;
     }
 
-    public void setLogoutController(LogoutController logoutController) {
-        this.logoutController = logoutController;
-    }
+//    public void setLogoutController(LogoutController logoutController) {
+//        this.logoutController = logoutController;
+//    }
 
     public void setLoyaltyLookupController(LoyaltyController loyaltyController) {
         this.loyaltyController = loyaltyController;

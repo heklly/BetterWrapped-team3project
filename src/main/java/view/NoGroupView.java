@@ -53,10 +53,12 @@ public class NoGroupView extends JPanel implements ActionListener, PropertyChang
         inputGroupUsersField.setFont(new Font("Calibri", Font.PLAIN, 15));
         inputGroupNameField.setColumns(40);
         inputGroupNameField.setFont(new Font("Calibri", Font.PLAIN, 15));
+
         final LabelTextPanel enterGroupName = new LabelTextPanel(
                 new JLabel("Enter Group Name"), inputGroupNameField);
         final LabelTextPanel enterGroupUsers = new LabelTextPanel(
                 new JLabel("Enter Group Users"), inputGroupUsersField);
+
         fields.add(title);
         fields.add(Box.createVerticalStrut(10));
         fields.add(nameErrorField);

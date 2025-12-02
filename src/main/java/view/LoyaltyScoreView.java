@@ -28,6 +28,7 @@ public class LoyaltyScoreView extends JPanel implements ActionListener, Property
     private JButton backButton;
     private final LoyaltyViewModel loyaltyViewModel;
     private final ViewManagerModel viewManagerModel;
+    private final String viewName = "loyalty";
     public LoyaltyController loyaltyController;
 
     // Constructor to initialize the view
