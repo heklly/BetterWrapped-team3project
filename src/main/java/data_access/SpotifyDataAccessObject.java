@@ -71,7 +71,15 @@ public class SpotifyDataAccessObject {
             System.out.println("Generated code challenge: " + codeChallenge);
 
             // Build authorization URL manually with PKCE parameters
-            String scope = "user-library-read user-read-recently-played user-top-read";
+            String scope = String.join(" ",
+                    "user-library-read",
+                    "user-read-recently-played",
+                    "user-top-read",
+                    "playlist-read-private",
+                    "user-read-currently-playing",
+                    "user-read-playback-state"
+            );
+
             String authUrl = String.format(
                     "https://accounts.spotify.com/authorize?" +
                             "client_id=%s&" +
@@ -144,7 +152,7 @@ public class SpotifyDataAccessObject {
                 System.out.println("Got user profile: " + userProfile.getDisplayName());
 
                 SpotifyUser spotifyUser = new SpotifyUser(
-                        username,
+                        userProfile.getDisplayName(),
                         accessToken,
                         refreshToken,
                         userProfile.getId()

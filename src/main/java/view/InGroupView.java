@@ -1,5 +1,8 @@
 package view;
 
+import data_access.SpotifyDataAccessObject;
+import entity.SpotifyUser;
+import entity.UserTasteProfile;
 import interface_adapter.ViewManagerModel;
 import interface_adapter.create_group.InGroupViewModel;
 import interface_adapter.create_group.UserGroupState;
@@ -11,12 +14,17 @@ import interface_adapter.sharedsong.SharedSongState;
 import interface_adapter.sharedsong.SharedSongViewModel;
 import se.michaelthelin.spotify.model_objects.specification.User;
 
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
+import java.util.Set;
+import java.util.List;
+
 
 public class InGroupView extends JPanel implements ActionListener, PropertyChangeListener {
 
@@ -47,6 +55,9 @@ public class InGroupView extends JPanel implements ActionListener, PropertyChang
         this.sharedSongViewModel = sharedSongViewModel;
         this.groupAnalyticsViewModel = groupAnalyticsViewModel;
 
+        // Listen to changes in the InGroupViewModel
+        this.inGroupViewModel.addPropertyChangeListener(this);
+
         final UserGroupState currentState = inGroupViewModel.getState();
 
         groupName = new JLabel();
@@ -76,45 +87,139 @@ public class InGroupView extends JPanel implements ActionListener, PropertyChang
                 new ActionListener() {
                     public void actionPerformed(ActionEvent evt) {
                         if (evt.getSource().equals(leaveGroup)) {
+                            if (leaveGroupController == null) {
+                                JOptionPane.showMessageDialog(InGroupView.this,
+                                        "Leaving a group is not implemented yet.",
+                                        "Not Available",
+                                        JOptionPane.INFORMATION_MESSAGE);
+                                return;
+                            }
+
+                            UserGroupState state = inGroupViewModel.getState();
                             leaveGroupController.execute(
-                                    currentState.getSpotifyUser(),
-                                    currentState.getGroup()
-
+                                    state.getSpotifyUser(),
+                                    state.getGroup()
                             );
                         }
                     }
                 }
         );
 
-        sharedSong.addActionListener(
-                new ActionListener() {
-                    public void actionPerformed(ActionEvent evt) {
-                        if (evt.getSource().equals(sharedSong)) {
-                            final SharedSongState currentState = sharedSongViewModel.getState();
-                            sharedSongController.execute(
-                                    currentState.getSpotifyUser(),
-                                    currentState.getGroupUsers()
-                            );
-                        }
-                    }
-                }
-        );
+        sharedSong.addActionListener(evt -> {
+            if (!evt.getSource().equals(sharedSong)) {
+                return;
+            }
 
-        groupAnalytics.addActionListener(
-                new ActionListener() {
-                    public void actionPerformed(ActionEvent evt) {
-                        if (evt.getSource().equals(groupAnalytics)) {
-//                            final GroupAnalyticsState currentState = groupAnalyticsViewModel.getState();
-//                            groupAnalyticsController.analyzeGroup()
+            if (sharedSongController == null) {
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Shared Song controller is not wired.",
+                        "Internal Error",
+                        JOptionPane.ERROR_MESSAGE
+                );
+                return;
+            }
 
-                            // TODO: implement this button
-                            //  Issue is that there is no List<UserTasteProfiles> to call controller with
-                            //  For now, only calling view manager to show group analytics view
-                            viewManagerModel.setState(groupAnalyticsViewModel.getViewName());
-                        }
+            UserGroupState state = inGroupViewModel.getState();
+
+            if (state.getSpotifyUser() == null) {
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Current user is missing. Try reconnecting Spotify.",
+                        "Shared Song Error",
+                        JOptionPane.WARNING_MESSAGE
+                );
+                return;
+            }
+
+            if (state.getGroupUsers() == null || state.getGroupUsers().isEmpty()) {
+                JOptionPane.showMessageDialog(
+                        this,
+                        "No group members available for shared song.",
+                        "Shared Song Error",
+                        JOptionPane.WARNING_MESSAGE
+                );
+                return;
+            }
+
+            sharedSongController.execute(
+                    state.getSpotifyUser(),
+                    state.getGroupUsers()
+            );
+        });
+
+        groupAnalytics.addActionListener(evt -> {
+            if (!evt.getSource().equals(groupAnalytics)) {
+                return;
+            }
+
+            UserGroupState state = inGroupViewModel.getState();
+
+            if (state.getGroupUsers() == null || state.getGroupUsers().isEmpty()) {
+                JOptionPane.showMessageDialog(
+                        this,
+                        "No group members found to analyze.",
+                        "Group Analytics",
+                        JOptionPane.WARNING_MESSAGE
+                );
+                return;
+            }
+
+            if (groupAnalyticsController == null) {
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Group analytics controller is not wired.",
+                        "Internal Error",
+                        JOptionPane.ERROR_MESSAGE
+                );
+                return;
+            }
+
+            try {
+                SpotifyDataAccessObject spotifyDAO = new SpotifyDataAccessObject();
+                List<UserTasteProfile> profiles = new ArrayList<>();
+
+                for (SpotifyUser u : state.getGroupUsers()) {
+                    if (u == null || u.getAccessToken() == null) {
+                        // Skip placeholder users with no tokens
+                        continue;
                     }
+                    Set<String> genres = spotifyDAO.getUserTopGenres(u);
+
+                    profiles.add(new UserTasteProfile(
+                            u.getUsername(),
+                            u.getSpotifyUserId(),
+                            genres
+                    ));
                 }
-        );
+
+                if (profiles.isEmpty()) {
+                    JOptionPane.showMessageDialog(
+                            this,
+                            "Couldn't build taste profiles for any group members.",
+                            "Group Analytics",
+                            JOptionPane.WARNING_MESSAGE
+                    );
+                    return;
+                }
+
+                // ✅ Call the use case
+                groupAnalyticsController.analyzeGroup(profiles);
+
+                // ✅ Switch to the group analytics view (the presenter updates the VM)
+                viewManagerModel.setState(groupAnalyticsViewModel.getViewName());
+                viewManagerModel.firePropertyChange();
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Failed to analyze group: " + e.getMessage(),
+                        "Group Analytics Error",
+                        JOptionPane.ERROR_MESSAGE
+                );
+            }
+        });
 
         this.setLayout(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();

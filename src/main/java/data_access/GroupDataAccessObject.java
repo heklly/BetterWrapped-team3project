@@ -68,7 +68,12 @@ public class GroupDataAccessObject implements GroupDataAccessInterface {
                 }
 
                 // Add user
-                usersArray.put(loggedInUser.getUsername());
+                JSONObject userJson = new JSONObject();
+                userJson.put("username", loggedInUser.getUsername());
+                userJson.put("accessToken", loggedInUser.getAccessToken());
+                userJson.put("refreshToken", loggedInUser.getRefreshToken());
+                userJson.put("spotifyUserId", loggedInUser.getSpotifyUserId());
+                usersArray.put(userJson);
 
                 // Write back to file
                 writeGroupsFile(groups);
@@ -109,19 +114,26 @@ public class GroupDataAccessObject implements GroupDataAccessInterface {
 
                 JSONArray usersArray = g.optJSONArray("users");
                 if (usersArray != null) {
-                    for (Object u : usersArray) {
-                        String username = u.toString();
-                        // Try to match with a logged-in user if available
-                        SpotifyUser match = loggedInUsers.stream()
-                                .filter(user -> user.getUsername().equals(username))
-                                .findFirst()
-                                .orElse(null);
+                    for (Object uObj : usersArray) {
+                        JSONObject userJson = (JSONObject) uObj;
 
-                        if (match != null) {
-                            users.add(match);
+                        String username = userJson.getString("username");
+                        String spotifyUserId = userJson.optString("spotifyUserId");
+
+                        // Try to load full user (with tokens)
+                        SpotifyUser fullUser =
+                                SpotifyUserDataAccessObject.getInstance().getUserById(spotifyUserId);
+
+                        if (fullUser != null) {
+                            users.add(fullUser);
                         } else {
-                            // Placeholder SpotifyUser with null tokens
-                            users.add(new SpotifyUser(username, null, null, null));
+                            // fallback to stored JSON
+                            users.add(new SpotifyUser(
+                                    username,
+                                    userJson.optString("accessToken", null),
+                                    userJson.optString("refreshToken", null),
+                                    spotifyUserId
+                            ));
                         }
                     }
                 }

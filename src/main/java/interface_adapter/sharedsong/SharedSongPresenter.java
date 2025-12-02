@@ -21,18 +21,22 @@ public class SharedSongPresenter implements SharedSongOutputBoundary {
     }
 
     public void prepareSuccessView(SharedSongOutputData response) {
-        // on success, display song and who has saved it
-        final SharedSongState sharedSongState = sharedSongViewModel.getState();
-        sharedSongState.setUsernameToShared(response.getSharedSongOutputData());
-        sharedSongState.setErrorMessage("");
+        SharedSongState state = sharedSongViewModel.getState();
+        state.setUsernameToShared(response.getSharedSongOutputData());
+        state.setErrorMessage("");
+
+        sharedSongViewModel.setState(state);
         sharedSongViewModel.firePropertyChange("shared song");
-        viewManagerModel.firePropertyChange(sharedSongViewModel.getViewName());
+
+        viewManagerModel.setState(sharedSongViewModel.getViewName());
+        viewManagerModel.firePropertyChange();
     }
     public void prepareFailureView(String errorMessage) {
-        // on failure, display error message
-        final SharedSongState sharedSongState = new SharedSongState();
-        sharedSongState.setErrorMessage(errorMessage);
-        sharedSongViewModel.setState(sharedSongState);
+        SharedSongState state = new SharedSongState();
+        state.setErrorMessage(errorMessage);
+
+        sharedSongViewModel.setState(state);
         sharedSongViewModel.firePropertyChange("error");
     }
+
 }

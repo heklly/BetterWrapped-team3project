@@ -26,6 +26,9 @@ public class Group {
     public Group(String group_name, List<SpotifyUser> users) {
         this.group_name = group_name;
         this.users = new ArrayList<>();
+        if (users != null) {
+            this.users.addAll(users);
+        }
         this.group_playlists = new ArrayList<>();
         this.groupCode = generateGroupCode();
     }

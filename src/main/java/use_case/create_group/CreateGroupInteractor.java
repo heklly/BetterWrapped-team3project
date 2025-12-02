@@ -35,6 +35,7 @@ public class CreateGroupInteractor implements CreateGroupInputBoundary {
         return new CreateGroupOutputData(
                 group.getGroup_name(),
                 group.getUsers(),
+                group,
                 group.getGroupCode()
         );
     }

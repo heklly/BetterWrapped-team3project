@@ -121,6 +121,31 @@ public class AppBuilder {
         cardPanel.add(noGroupView, noGroupView.getViewName());
         return this;
     }
+    public AppBuilder addCreateGroupUseCase() {
+        // Presenter
+        use_case.create_group.CreateGroupOutputBoundary outputBoundary =
+                new interface_adapter.create_group.CreateGroupPresenter(
+                        inGroupViewModel,
+                        noGroupViewModel,
+                        viewManagerModel);
+
+        // Interactor
+        use_case.create_group.CreateGroupInputBoundary interactor =
+                new use_case.create_group.CreateGroupInteractor(
+                        new data_access.GroupDataAccessObject());
+
+        // Controller gets BOTH interactor and presenter
+        interface_adapter.create_group.CreateGroupController controller =
+                new interface_adapter.create_group.CreateGroupController(interactor, outputBoundary);
+
+        // Give controller to the LoggedInView (popup)
+        loggedInView.setCreateGroupController(controller);
+
+        // Also give controller to NoGroupView (join/create group screen)
+        noGroupView.setCreateGroupController(controller);
+
+        return this;
+    }
 
     public AppBuilder addSharedSongView() {
         sharedSongView = new SharedSongView(inGroupViewModel, sharedSongViewModel, viewManagerModel);
@@ -184,15 +209,18 @@ public class AppBuilder {
     }
 
     public AppBuilder addGroupAnalyticsUseCase() {
-        // presenter
-        final GroupAnalyticsOutputBoundary outputBoundary = new GroupAnalyticsPresenter(groupAnalyticsViewModel);
-        // interactor
-        final GroupAnalyticsInputBoundary interactor = new GroupAnalyticsInteractor(outputBoundary);
-        // controller
+        final GroupAnalyticsOutputBoundary outputBoundary =
+                new GroupAnalyticsPresenter(groupAnalyticsViewModel);
+
+        final GroupAnalyticsInputBoundary interactor =
+                new GroupAnalyticsInteractor(outputBoundary);
+
         GroupAnalyticsController controller =
                 new GroupAnalyticsController(interactor);
-        // wire into view
-        groupAnalyticsView.setGroupAnalyticsController(controller);
+
+        // The button that triggers analytics lives inside InGroupView
+        inGroupView.setGroupAnalyticsController(controller);
+
         return this;
     }
 

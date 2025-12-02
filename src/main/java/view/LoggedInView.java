@@ -81,12 +81,6 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
         this.getTopItemsViewModel.addPropertyChangeListener(this);
         this.spotifyDAO = new SpotifyDataAccessObject();
 
-        // Initialize the CreateGroupController
-        this.createGroupController = new interface_adapter.create_group.CreateGroupController(
-                new use_case.create_group.CreateGroupInteractor(
-                        new data_access.GroupDataAccessObject()
-                )
-        );
 
         final JLabel title = new JLabel("Better Wrapped - Dashboard");
         title.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -107,7 +101,7 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
         connectSpotifyButton = new JButton("Connect Spotify");
         buttons.add(connectSpotifyButton);
 
-        groupTabButton = new JButton("Groups");
+        groupTabButton = new JButton("Create Group");
 
         // Daily Mix button
         generateDailyMixButton = new JButton("Generate Daily Mix");
@@ -178,32 +172,8 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
         //Group tab button listeners
 
         groupTabButton.addActionListener(evt -> {
-            // Create a new popup frame
-            JFrame popup = new JFrame("Groups");
-            popup.setLayout(new FlowLayout());
-
-            JButton popupCreate = new JButton("Create Group");
-            JButton popupJoin = new JButton("Join Group");
-
-            // Add action listeners for the popup buttons
-            popupCreate.addActionListener(e -> {
-                openCreateGroupPopup();  // open the Create Group popup
-                popup.dispose();          // close the first Groups popup
-            });
-
-            popupJoin.addActionListener(e -> {
-                viewManagerModel.setState("joinGroupView");
-                viewManagerModel.firePropertyChange();
-                popup.dispose(); // close popup
-            });
-
-            // Add buttons to popup
-            popup.add(popupCreate);
-            popup.add(popupJoin);
-
-            popup.pack();
-            popup.setLocationRelativeTo(this); // center on main window
-            popup.setVisible(true);
+            // Go straight to the create group popup
+            openCreateGroupPopup();
         });
 
 
@@ -321,7 +291,7 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
         groupPanel.setLayout(new BoxLayout(groupPanel, BoxLayout.Y_AXIS));
         goToGroup = new JButton("Group");
         goToGroup.addActionListener(e -> {
-            if (currentSpotifyUser.isInGroup()) {
+            if (currentSpotifyUser != null && currentSpotifyUser.isInGroup()) {
                 viewManagerModel.setState("in group");
                 viewManagerModel.firePropertyChange();
             } else {
@@ -329,6 +299,7 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
                 viewManagerModel.firePropertyChange();
             }
         });
+
         goToGroup.setEnabled(false);
         groupPanel.add(goToGroup);
 
@@ -522,12 +493,17 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
 
             if (createGroupController != null) {
                 createGroupController.execute(groupName, currentSpotifyUser, members);
+
+                // mark logged-in user as in a group
+                currentSpotifyUser.setInGroup(true);
+
                 JOptionPane.showMessageDialog(createGroupFrame,
                         "Group created successfully!",
                         "Success",
                         JOptionPane.INFORMATION_MESSAGE);
                 createGroupFrame.dispose();
-            } else {
+            }
+            else {
                 JOptionPane.showMessageDialog(createGroupFrame,
                         "Error creating group. Make sure the controller is initialized.",
                         "Error",

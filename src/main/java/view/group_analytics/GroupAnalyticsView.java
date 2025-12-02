@@ -27,7 +27,6 @@ public class GroupAnalyticsView extends JPanel implements ActionListener, Proper
     //Added these
     private final ViewManagerModel viewManagerModel;
     private final JTextArea outputArea = new JTextArea(15, 40);
-    private final JButton demoButton = new JButton("Run demo group");
     private final JButton backButton = new JButton("Back to Group");
 
     public void setGroupAnalyticsController(GroupAnalyticsController controller) {
@@ -36,6 +35,7 @@ public class GroupAnalyticsView extends JPanel implements ActionListener, Proper
 
     public GroupAnalyticsView(GroupAnalyticsViewModel viewModel,
                               ViewManagerModel viewManagerModel) {
+
         this.viewModel = viewModel;
         this.viewManagerModel = viewManagerModel;
 
@@ -53,40 +53,25 @@ public class GroupAnalyticsView extends JPanel implements ActionListener, Proper
         top.add(title, BorderLayout.CENTER);
 
         JPanel bottom = new JPanel();
-        bottom.add(demoButton);
-        // TODO: fix if you dont like it
+
         bottom.add(backButton);
         backButton.addActionListener(this);
 
         add(top, BorderLayout.NORTH);
         add(scrollPane, BorderLayout.CENTER);
         add(bottom, BorderLayout.SOUTH);
-
-        wireActions();
-
-
     }
 
-    private void wireActions() {
-        demoButton.addActionListener(e -> runDemo());
-    }
 
-    private void runDemo() {
-        // TEMP: demo data. Replace with real group from your teammate later.
-        List<UserTasteProfile> demoGroup = List.of(
-                new UserTasteProfile("Nisarg", "me", Set.of("dance pop", "edm", "k-pop")),
-                new UserTasteProfile("Friend 1", "f1", Set.of("indie pop", "acoustic", "sad")),
-                new UserTasteProfile("Friend 2", "f2", Set.of("rock", "classic rock", "country"))
-        );
-
-        controller.analyzeGroup(demoGroup);
-    }
-
+    @Override
     public void actionPerformed(ActionEvent evt) {
         if (evt.getSource() == backButton) {
+            //Go back to InGroupView
             viewManagerModel.setState("in group");
+            viewManagerModel.firePropertyChange();
         }
     }
+
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {

@@ -63,13 +63,38 @@ public class NoGroupView extends JPanel implements ActionListener, PropertyChang
                 new ActionListener() {
                     public void actionPerformed(ActionEvent evt) {
                         if (evt.getSource().equals(createGroup)) {
+                            if (createGroupController == null) {
+                                JOptionPane.showMessageDialog(NoGroupView.this,
+                                        "Group creation is not wired up yet.",
+                                        "Error",
+                                        JOptionPane.ERROR_MESSAGE);
+                                return;
+                            }
+
+                            String name = inputGroupNameField.getText().trim();
+                            if (name.isEmpty()) {
+                                JOptionPane.showMessageDialog(NoGroupView.this,
+                                        "Please enter a group name.",
+                                        "Invalid Group Name",
+                                        JOptionPane.WARNING_MESSAGE);
+                                return;
+                            }
+
+                            // For now, we don't have members here; pass null/empty list
                             final UserGroupState currentState = noGroupViewModel.getState();
 
-                            createGroupController.execute(
-                                    currentState.getGroupName(),
-                                    currentState.getSpotifyUser(),
-                                    currentState.getGroupUsers()
-                            );
+                            try {
+                                createGroupController.execute(
+                                        name,
+                                        currentState.getSpotifyUser(), // may be null; that's OK if controller handles it
+                                        currentState.getGroupUsers()   // may be null; controller will treat as empty
+                                );
+                            } catch (IllegalArgumentException e) {
+                                JOptionPane.showMessageDialog(NoGroupView.this,
+                                        e.getMessage(),
+                                        "Create Group Error",
+                                        JOptionPane.ERROR_MESSAGE);
+                            }
                         }
                     }
                 }

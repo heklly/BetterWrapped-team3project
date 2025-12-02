@@ -1,6 +1,7 @@
 package use_case.spotify_auth;
 
 import data_access.SpotifyDataAccessObject;
+import data_access.SpotifyUserDataAccessObject;
 import entity.SpotifyUser;
 
 public class SpotifyAuthInteractor implements SpotifyAuthInputBoundary {
@@ -30,12 +31,21 @@ public class SpotifyAuthInteractor implements SpotifyAuthInputBoundary {
                     inputData.getUsername()
             );
 
+            // Add the user to the shared DAO
+            SpotifyUserDataAccessObject.getInstance().addUser(spotifyUser);
+
+            // Optional: debug print to verify
+            System.out.println("All users in DAO after Spotify login:");
+            SpotifyUserDataAccessObject.getInstance().getAllUsers()
+                    .forEach(u -> System.out.println(u.getUsername()));
+
             SpotifyAuthOutputData outputData = new SpotifyAuthOutputData(
                     spotifyUser.getUsername(),
                     spotifyUser.getSpotifyUserId(),
                     true,
-                    spotifyUser  // NEW: Pass the full SpotifyUser object
+                    spotifyUser
             );
+
 
             presenter.prepareSuccessView(outputData);
 

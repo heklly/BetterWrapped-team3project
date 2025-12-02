@@ -3,10 +3,14 @@ package interface_adapter.create_group;
 import interface_adapter.ViewManagerModel;
 import use_case.create_group.CreateGroupOutputBoundary;
 import use_case.create_group.CreateGroupOutputData;
+import entity.SpotifyUser;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Presenter for the Create Group use case.
- * Converts output data into a form suitable for the UI and updates the ViewModel.
+ * Converts output data into a form suitable for the UI and updates the InGroupViewModel.
  */
 public class CreateGroupPresenter implements CreateGroupOutputBoundary {
 
@@ -14,14 +18,6 @@ public class CreateGroupPresenter implements CreateGroupOutputBoundary {
     private final NoGroupViewModel noGroupViewModel;
     private final ViewManagerModel viewManagerModel;
 
-    /**
-     * Constructs a CreateGroupPresenter.
-     *
-     * @param noGroupViewModel the NoGroupViewModel associated with the Create Group screen.
-     * @param inGroupViewModel the InGroupViewModel to be updated
-     * @param viewManagerModel changes create/join group view to in group view
-     *
-     */
     public CreateGroupPresenter(InGroupViewModel inGroupViewModel,
                                 NoGroupViewModel noGroupViewModel,
                                 ViewManagerModel viewManagerModel) {
@@ -30,28 +26,43 @@ public class CreateGroupPresenter implements CreateGroupOutputBoundary {
         this.viewManagerModel = viewManagerModel;
     }
 
-    /**
-     * Updates the ViewModel based on output data from the interactor.
-     *
-     * @param outputData the output data containing the created group info
-     */
     @Override
     public void present(CreateGroupOutputData outputData) {
-        final UserGroupState currentState = inGroupViewModel.getState();
-        if (outputData != null) {
-            currentState.setGroupName(outputData.getGroup_name());
-            currentState.setInGroup(true);
-//            currentState.setGroupUsernames(outputData.getUsers());
-//            currentState.setGroup(outputData.getGroup());
-//            currentState.setSpotifyUser(outputData.);
-            inGroupViewModel.firePropertyChange();
-            noGroupViewModel.setState(new UserGroupState());
-
-            viewManagerModel.setState(inGroupViewModel.getViewName());
-            viewManagerModel.firePropertyChange();
-        } else {
-            currentState.setNameError("Failed to create group");
+        if (outputData == null) {
+            // Handle error case
+            UserGroupState errorState = noGroupViewModel.getState();
+            errorState.setNameError("Failed to create group");
             noGroupViewModel.firePropertyChange("createError");
+            return;
         }
+
+        // Update InGroupViewModel state
+        UserGroupState currentState = inGroupViewModel.getState();
+        currentState.setGroup(outputData.getGroup());               // full Group entity
+        currentState.setGroupName(outputData.getGroup_name());
+
+        currentState.setGroupUsers(outputData.getUsers());
+
+        // Map SpotifyUser list to usernames for UI display
+        List<String> usernames = outputData.getUsers()
+                .stream()
+                .map(SpotifyUser::getUsername)
+                .collect(Collectors.toList());
+        currentState.setGroupUsernames(usernames);
+
+        // Set the creator as the SpotifyUser for state
+        if (!outputData.getUsers().isEmpty()) {
+            currentState.setSpotifyUser(outputData.getUsers().get(0));
+        }
+
+        // Notify the InGroupView to update UI
+        inGroupViewModel.firePropertyChange();
+
+        // Reset NoGroupViewModel state
+        noGroupViewModel.setState(new UserGroupState());
+
+        // Switch the view to InGroupView
+        viewManagerModel.setState(inGroupViewModel.getViewName());
+        viewManagerModel.firePropertyChange();
     }
 }

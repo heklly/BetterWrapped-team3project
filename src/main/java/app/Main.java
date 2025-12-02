@@ -32,7 +32,10 @@ public class Main {
                 .addNoGroupView()
                 .addSharedSongView()
                 .addGroupAnalyticsView()
+
                 .addSpotifyAuthUseCase()
+                .addCreateGroupUseCase()
+                .addLeaveGroupUseCase()
                 .addDailyMixUseCase()
                 .addGetTopItemsUseCase()
                 .addLoyaltyUseCase()

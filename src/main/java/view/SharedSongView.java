@@ -50,8 +50,8 @@ public class SharedSongView extends JPanel implements ActionListener, PropertyCh
 
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == backButton) {
-            viewManagerModel.firePropertyChange(inGroupViewModel.getViewName());
-            sharedSongViewModel.firePropertyChange("back");
+            viewManagerModel.setState(inGroupViewModel.getViewName());
+            viewManagerModel.firePropertyChange();
         }
     }
     public void propertyChange(PropertyChangeEvent evt) {
@@ -66,11 +66,14 @@ public class SharedSongView extends JPanel implements ActionListener, PropertyCh
     public void setDataPanel(Map<String, String> UsernameToShared) {
         dataPanel.removeAll();
 
-        dataPanel.setLayout(new BoxLayout(dataPanel, BoxLayout.Y_AXIS));
         for (String username : UsernameToShared.keySet()) {
-            dataPanel.add(new JLabel(String.format("%s: %s", username, UsernameToShared.get(username))));
+            dataPanel.add(new JLabel(username + ": " + UsernameToShared.get(username)));
         }
+
+        dataPanel.revalidate();
+        dataPanel.repaint();
     }
+
 
     public String getViewName() { return this.viewName; }
 }

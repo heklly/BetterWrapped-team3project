@@ -43,7 +43,7 @@ public class UserGroupState {
         // fills user id list list
         this.groupUsernames = new ArrayList<>();
         for (SpotifyUser u : groupUsers) {
-            this.groupUsernames.add(u.getSpotifyUserId()); //
+            this.groupUsernames.add(u.getUsername());
         }
     }
 
@@ -62,6 +62,7 @@ public class UserGroupState {
     public void setGroupUsernames(List<String> groupUsernames) {
         this.groupUsernames = groupUsernames;
     }
+
 
     public boolean isInGroup() {
         return inGroup;
