@@ -12,7 +12,7 @@ import java.util.List;
  * Implements the input boundary.
  * Creates a group and persists it immediately.
  */
-public class CreateGroupInteractor implements CreateGroupInputBoundary {
+public class  CreateGroupInteractor implements CreateGroupInputBoundary {
 
     private final GroupDataAccessInterface groupDAO;
 

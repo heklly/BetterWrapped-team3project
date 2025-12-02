@@ -203,10 +203,10 @@ public class InGroupView extends JPanel implements ActionListener, PropertyChang
                     return;
                 }
 
-                // ✅ Call the use case
+                //Call the use case
                 groupAnalyticsController.analyzeGroup(profiles);
 
-                // ✅ Switch to the group analytics view (the presenter updates the VM)
+                // Switch to the group analytics view (the presenter updates the VM)
                 viewManagerModel.setState(groupAnalyticsViewModel.getViewName());
                 viewManagerModel.firePropertyChange();
 
