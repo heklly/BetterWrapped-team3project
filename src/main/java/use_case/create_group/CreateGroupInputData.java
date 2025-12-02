@@ -13,7 +13,7 @@ public class CreateGroupInputData {
     private final String group_name;
 
 
-    public CreateGroupInputData(String group_name, List<SpotifyUser> users) {
+    public CreateGroupInputData(String group_name, SpotifyUser spotifyUser, List<SpotifyUser> users) {
         if (group_name == null || group_name.isBlank()) {
             throw new IllegalArgumentException("Group name is invalid.");
         }

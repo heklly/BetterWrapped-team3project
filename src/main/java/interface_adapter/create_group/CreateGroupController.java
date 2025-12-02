@@ -29,7 +29,7 @@ public class CreateGroupController {
      * @param initialMembers list of initial members
      */
     public void execute(String group_name, SpotifyUser spotifyUser, List<SpotifyUser> initialMembers) {
-        CreateGroupInputData inputData = new CreateGroupInputData(group_name, initialMembers);
+        CreateGroupInputData inputData = new CreateGroupInputData(group_name, spotifyUser, initialMembers);
         createGroupUseCase.execute(inputData);
 
     }

@@ -521,7 +521,7 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
             }
 
             if (createGroupController != null) {
-                createGroupController.execute(groupName, members);
+                createGroupController.execute(groupName, currentSpotifyUser, members);
                 JOptionPane.showMessageDialog(createGroupFrame,
                         "Group created successfully!",
                         "Success",
