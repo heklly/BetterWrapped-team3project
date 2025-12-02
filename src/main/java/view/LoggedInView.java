@@ -397,6 +397,7 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
                 short_termButton.setEnabled(connected);
                 medium_termButton.setEnabled(connected);
                 long_termButton.setEnabled(connected);
+                goToGroup.setEnabled(connected);
             }
         }
 
