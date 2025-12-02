@@ -3,8 +3,6 @@ package use_case;
 import entity.Group;
 import entity.SpotifyUser;
 
-import java.util.List;
-
 /**
  * DAO interface for the Create Group and Join Group Use Cases.
  */
@@ -30,10 +28,14 @@ public interface GroupDataAccessInterface {
 
     /**
      * Retrieves a group by its unique and random code, or returns null if no such group exists
+     *
      * @param groupCode the unique and random code corresponding to a given group
      * @return Group entity or null if no such group exists
      */
-    Group getGroupByCode(String groupCode, List<SpotifyUser> loggedInUsers);
+    Group getGroupByCode(String groupCode);
+
+    boolean joinGroup(String groupCode, SpotifyUser loggedInUser);
+
     /**
      * Updates existing Group entity in storage.
      * Used to update group members in join_group use case

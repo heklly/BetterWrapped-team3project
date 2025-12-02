@@ -46,15 +46,37 @@ public class GroupDataAccessObject implements GroupDataAccessInterface {
     }
 
     @Override
-    public Group getGroupByCode(String groupCode) {
+    public boolean joinGroup(String groupCode, SpotifyUser loggedInUser) {
         JSONArray groups = readGroupsFile();
-        for (Object obj : groups) {
-            JSONObject g = (JSONObject) obj;
+
+        for (int i = 0; i < groups.length(); i++) {
+            JSONObject g = groups.getJSONObject(i);
+
             if (g.getString("groupCode").equals(groupCode)) {
-                return jsonToGroup(g);
+                // Get users array
+                JSONArray usersArray = g.optJSONArray("users");
+                if (usersArray == null) {
+                    usersArray = new JSONArray();
+                    g.put("users", usersArray);
+                }
+
+                // Check if user is already in the group
+                for (Object u : usersArray) {
+                    if (u.toString().equals(loggedInUser.getUsername())) {
+                        return false; // Already in group
+                    }
+                }
+
+                // Add user
+                usersArray.put(loggedInUser.getUsername());
+
+                // Write back to file
+                writeGroupsFile(groups);
+                return true; // Successfully joined
             }
         }
-        return null;
+
+        return false; // Group not found
     }
 
     @Override
@@ -68,6 +90,46 @@ public class GroupDataAccessObject implements GroupDataAccessInterface {
                 return;
             }
         }
+    }
+
+    // ------------------- Interface method -------------------
+    @Override
+    public Group getGroupByCode(String groupCode) {
+        // Satisfies interface
+        return getGroupByCode(groupCode, new ArrayList<>());
+    }
+
+    // ------------------- New method with logged-in users -------------------
+    public Group getGroupByCode(String groupCode, List<SpotifyUser> loggedInUsers) {
+        JSONArray groups = readGroupsFile();
+        for (Object obj : groups) {
+            JSONObject g = (JSONObject) obj;
+            if (g.getString("groupCode").equals(groupCode)) {
+                List<SpotifyUser> users = new ArrayList<>();
+
+                JSONArray usersArray = g.optJSONArray("users");
+                if (usersArray != null) {
+                    for (Object u : usersArray) {
+                        String username = u.toString();
+                        // Try to match with a logged-in user if available
+                        SpotifyUser match = loggedInUsers.stream()
+                                .filter(user -> user.getUsername().equals(username))
+                                .findFirst()
+                                .orElse(null);
+
+                        if (match != null) {
+                            users.add(match);
+                        } else {
+                            // Placeholder SpotifyUser with null tokens
+                            users.add(new SpotifyUser(username, null, null, null));
+                        }
+                    }
+                }
+
+                return new Group(g.getString("groupName"), users);
+            }
+        }
+        return null; // group code not found
     }
 
     // ------------------- Helpers -------------------
@@ -88,7 +150,7 @@ public class GroupDataAccessObject implements GroupDataAccessInterface {
 
     private void writeGroupsFile(JSONArray groups) {
         try (FileWriter writer = new FileWriter(groupFile)) {
-            writer.write(groups.toString(4));
+            writer.write(groups.toString(4)); // pretty print
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -101,7 +163,12 @@ public class GroupDataAccessObject implements GroupDataAccessInterface {
 
         JSONArray usersArray = new JSONArray();
         for (SpotifyUser user : group.getUsers()) {
-            usersArray.put(user.getUsername());
+            JSONObject userJson = new JSONObject();
+            userJson.put("username", user.getUsername());
+            userJson.put("accessToken", user.getAccessToken());
+            userJson.put("refreshToken", user.getRefreshToken());
+            userJson.put("spotifyUserId", user.getSpotifyUserId());
+            usersArray.put(userJson);
         }
         json.put("users", usersArray);
 
@@ -114,11 +181,18 @@ public class GroupDataAccessObject implements GroupDataAccessInterface {
 
         if (usersArray != null) {
             for (Object u : usersArray) {
-                String username = u.toString();
-                users.add(new SpotifyUser(username)); // minimal reconstruction
+                JSONObject userJson = (JSONObject) u;
+                users.add(new SpotifyUser(
+                        userJson.getString("username"),
+                        userJson.getString("accessToken"),
+                        userJson.getString("refreshToken"),
+                        userJson.getString("spotifyUserId")
+                ));
             }
         }
 
-        return new Group(json.getString("groupName"), users);
+        // Create group with users
+        Group group = new Group(json.getString("groupName"), users);
+        return group;
     }
 }

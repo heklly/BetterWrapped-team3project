@@ -13,7 +13,7 @@ public class JoinGroupController {
     }
 
     public void joinGroup(String groupCode, SpotifyUser user) {
-        JoinGroupInputData inputData = new JoinGroupInputData(groupCode);
+        JoinGroupInputData inputData = new JoinGroupInputData(groupCode, user);
         joinGroupInteractor.joinGroup(inputData);
     }
 }
