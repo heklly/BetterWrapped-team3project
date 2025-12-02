@@ -6,6 +6,8 @@ public class SpotifyAuthState {
     private String authError = "";
     private String username = "";
     private boolean isAuthenticated = false;
+    private boolean isWaitingForCallback = false;  // NEW
+    private String statusMessage = "";  // NEW
 
     public SpotifyAuthState() {}
 
@@ -15,9 +17,11 @@ public class SpotifyAuthState {
         authError = copy.authError;
         username = copy.username;
         isAuthenticated = copy.isAuthenticated;
+        isWaitingForCallback = copy.isWaitingForCallback;
+        statusMessage = copy.statusMessage;
     }
 
-    // Getters and Setters
+    // Existing getters and setters
     public String getAuthorizationUrl() { return authorizationUrl; }
     public void setAuthorizationUrl(String authorizationUrl) { this.authorizationUrl = authorizationUrl; }
 
@@ -32,4 +36,13 @@ public class SpotifyAuthState {
 
     public boolean isAuthenticated() { return isAuthenticated; }
     public void setAuthenticated(boolean authenticated) { isAuthenticated = authenticated; }
+
+    // NEW getters and setters
+    public boolean isWaitingForCallback() { return isWaitingForCallback; }
+    public void setWaitingForCallback(boolean waitingForCallback) {
+        isWaitingForCallback = waitingForCallback;
+    }
+
+    public String getStatusMessage() { return statusMessage; }
+    public void setStatusMessage(String statusMessage) { this.statusMessage = statusMessage; }
 }

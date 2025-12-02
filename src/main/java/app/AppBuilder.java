@@ -137,7 +137,7 @@ public class AppBuilder {
     }
 
     public AppBuilder addSharedSongView() {
-        sharedSongView = new SharedSongView(inGroupViewModel, viewManagerModel, sharedSongViewModel);
+        sharedSongView = new SharedSongView(sharedSongViewModel, inGroupViewModel, viewManagerModel);
         cardPanel.add(sharedSongView, sharedSongView.getViewName());
         return this;
     }
@@ -156,8 +156,10 @@ public class AppBuilder {
     }
 
     public AppBuilder addSpotifyAuthUseCase() {
-        // PKCE doesn't need client secret!
         data_access.SpotifyDataAccessObject spotifyDAO = new data_access.SpotifyDataAccessObject();
+
+        // Create browser launcher
+        data_access.SystemBrowserLauncher browserLauncher = new data_access.SystemBrowserLauncher();
 
         final SpotifyAuthOutputBoundary spotifyAuthOutputBoundary =
                 new SpotifyAuthPresenter(viewManagerModel, spotifyAuthViewModel, loggedInViewModel);
@@ -167,7 +169,7 @@ public class AppBuilder {
         }
 
         final SpotifyAuthInputBoundary spotifyAuthInteractor =
-                new SpotifyAuthInteractor(spotifyDAO, spotifyAuthOutputBoundary);
+                new SpotifyAuthInteractor(spotifyDAO, spotifyAuthOutputBoundary, browserLauncher);
 
         SpotifyAuthController controller = new SpotifyAuthController(spotifyAuthInteractor);
         spotifyAuthView.setSpotifyAuthController(controller);

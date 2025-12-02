@@ -2,24 +2,64 @@ package use_case.spotify_auth;
 
 import data_access.SpotifyDataAccessObject;
 import entity.SpotifyUser;
+import util.CallbackServer;
 
 public class SpotifyAuthInteractor implements SpotifyAuthInputBoundary {
     private final SpotifyDataAccessObject spotifyDataAccessObject;
     private final SpotifyAuthOutputBoundary presenter;
+    private final BrowserLauncher browserLauncher;
+    private CallbackServer callbackServer;
 
     public SpotifyAuthInteractor(SpotifyDataAccessObject spotifyDataAccessObject,
-                                 SpotifyAuthOutputBoundary presenter) {
+                                 SpotifyAuthOutputBoundary presenter,
+                                 BrowserLauncher browserLauncher) {
         this.spotifyDataAccessObject = spotifyDataAccessObject;
         this.presenter = presenter;
+        this.browserLauncher = browserLauncher;
     }
 
     @Override
-    public String getAuthorizationUrl() {
-        try {
-            return spotifyDataAccessObject.getAuthorizationUrl();
-        } catch (Exception e) {
-            return null;
-        }
+    public void startAuthorization(String username) {
+        new Thread(() -> {
+            try {
+                // Get authorization URL
+                String authUrl = spotifyDataAccessObject.getAuthorizationUrl();
+                if (authUrl == null) {
+                    presenter.prepareFailView("Failed to generate authorization URL");
+                    return;
+                }
+
+                // Notify presenter to update UI and open browser
+                presenter.prepareAuthUrlView(authUrl);
+
+                // Start callback server
+                callbackServer = new CallbackServer();
+                presenter.updateStatus("Waiting for authorization...");
+
+                // Wait for callback (blocking)
+                String code = callbackServer.startAndWaitForCode(120);
+
+                // Exchange code for tokens
+                presenter.updateStatus("Completing authorization...");
+                SpotifyUser spotifyUser = spotifyDataAccessObject.exchangeCodeForTokens(code, username);
+
+                SpotifyAuthOutputData outputData = new SpotifyAuthOutputData(
+                        spotifyUser.getUsername(),
+                        spotifyUser.getSpotifyUserId(),
+                        true,
+                        spotifyUser
+                );
+
+                presenter.prepareSuccessView(outputData);
+
+            } catch (Exception e) {
+                if (e.getMessage() != null && e.getMessage().contains("timeout")) {
+                    presenter.prepareFailView("Authorization timed out. Please try again.");
+                } else {
+                    presenter.prepareFailView("Authorization failed: " + e.getMessage());
+                }
+            }
+        }).start();
     }
 
     @Override
@@ -34,7 +74,7 @@ public class SpotifyAuthInteractor implements SpotifyAuthInputBoundary {
                     spotifyUser.getUsername(),
                     spotifyUser.getSpotifyUserId(),
                     true,
-                    spotifyUser  // NEW: Pass the full SpotifyUser object
+                    spotifyUser
             );
 
             presenter.prepareSuccessView(outputData);

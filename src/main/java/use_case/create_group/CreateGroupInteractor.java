@@ -2,7 +2,6 @@ package use_case.create_group;
 
 import entity.Group;
 import entity.SpotifyUser;
-import interface_adapter.create_group.CreateGroupPresenter;
 
 import java.util.List;
 
@@ -12,15 +11,14 @@ import java.util.List;
  */
 public class CreateGroupInteractor implements CreateGroupInputBoundary {
 
-    private final CreateGroupOutputBoundary createGroupPresenter;
-//    private GroupDataAccessInterface groupDAO;
+    private final CreateGroupOutputBoundary presenter;  // ADD THIS FIELD
 
-    public CreateGroupInteractor(CreateGroupOutputBoundary createGroupPresenter
-//                                 ,GroupDataAccessInterface groupDAO
-    ) {
-        this.createGroupPresenter = createGroupPresenter;
+    // ADD THIS CONSTRUCTOR
+    public CreateGroupInteractor(CreateGroupOutputBoundary presenter) {
+        this.presenter = presenter;
     }
 
+    @Override
     public CreateGroupOutputData execute(CreateGroupInputData inputData) {
 
         Group group = new Group(inputData.getGroup_name(), inputData.getOwner());
@@ -30,20 +28,20 @@ public class CreateGroupInteractor implements CreateGroupInputBoundary {
             for (SpotifyUser user : initialMembers) {
                 group.addUser(user);
             }
-        } else {
-            return null;
         }
 
-        // Create output data
+        // Create output data WITH the group object
         CreateGroupOutputData outputData = new CreateGroupOutputData(
                 group.getGroup_name(),
                 group.getOwner(),
-                group.getUsers()
+                group.getUsers(),
+                group
         );
 
-        //call presenter
-        createGroupPresenter.present(outputData);
+        // CALL THE PRESENTER
+        presenter.present(outputData);
 
+        // Return output data (some architectures return it, others don't)
         return outputData;
     }
 }
