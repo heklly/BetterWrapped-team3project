@@ -81,6 +81,13 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
         this.getTopItemsViewModel.addPropertyChangeListener(this);
         this.spotifyDAO = new SpotifyDataAccessObject();
 
+        // Initialize the CreateGroupController
+        this.createGroupController = new interface_adapter.create_group.CreateGroupController(
+                new use_case.create_group.CreateGroupInteractor(
+                        new data_access.GroupDataAccessObject()
+                )
+        );
+
         final JLabel title = new JLabel("Better Wrapped - Dashboard");
         title.setAlignmentX(Component.CENTER_ALIGNMENT);
 
@@ -426,7 +433,7 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
     }
     // group helpers
     private void openCreateGroupPopup() {
-        // Create popup frame
+        // Popup frame
         JFrame createGroupFrame = new JFrame("Create Group");
         createGroupFrame.setLayout(new BoxLayout(createGroupFrame.getContentPane(), BoxLayout.Y_AXIS));
         createGroupFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -438,18 +445,19 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
         groupNamePanel.add(groupNameLabel);
         groupNamePanel.add(groupNameField);
 
-        // Group Members
+        // Member Spotify User IDs
         JPanel membersPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        JLabel membersLabel = new JLabel("Member Spotify Usernames (comma-separated):");
+        JLabel membersLabel = new JLabel("Member Spotify User IDs (comma-separated):");
         JTextField membersField = new JTextField(30);
         membersPanel.add(membersLabel);
         membersPanel.add(membersField);
 
+        // Create button
         JButton createButton = new JButton("Create");
-        // Create Button
         createButton.addActionListener(e -> {
             String groupName = groupNameField.getText().trim();
             String membersText = membersField.getText().trim();
+
             if (groupName.isEmpty()) {
                 JOptionPane.showMessageDialog(createGroupFrame,
                         "Please enter a group name.",
@@ -458,27 +466,42 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
                 return;
             }
 
-            // Split usernames by comma
-            String[] memberUsernames = membersText.isEmpty() ? new String[0] : membersText.split("\\s*,\\s*");
+            // Split IDs
+            String[] memberIds = membersText.isEmpty() ? new String[0] :
+                    Arrays.stream(membersText.split("\\s*,\\s*"))
+                            .map(String::trim)
+                            .toArray(String[]::new);
 
-            // Convert usernames to SpotifyUser objects
-            List<SpotifyUser> members = new ArrayList<>();
             SpotifyUserDataAccessObject spotifyUserDao = SpotifyUserDataAccessObject.getInstance();
+            List<SpotifyUser> members = new ArrayList<>();
+            List<String> missingIds = new ArrayList<>();
 
-            for (String username : memberUsernames) {
-                SpotifyUser user = spotifyUserDao.getUserByUsername(username); // assuming you have a DAO to fetch users
+            for (String id : memberIds) {
+                SpotifyUser user = spotifyUserDao.getUserById(id);
                 if (user != null) {
                     members.add(user);
+                } else {
+                    missingIds.add(id);
                 }
             }
 
-            // Include current user as part of the group if needed
-            if (currentSpotifyUser != null) {
-                members.add(currentSpotifyUser);
+            if (members.isEmpty()) {
+                JOptionPane.showMessageDialog(createGroupFrame,
+                        "No valid users found. Please enter at least one valid Spotify User ID.",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            if (!missingIds.isEmpty()) {
+                JOptionPane.showMessageDialog(createGroupFrame,
+                        "These user IDs were not found: " + String.join(", ", missingIds) + "\nThey will be skipped.",
+                        "Warning",
+                        JOptionPane.WARNING_MESSAGE);
             }
 
             if (createGroupController != null) {
-                createGroupController.execute(groupName, members); // now matches method signature
+                createGroupController.execute(groupName, members);
                 JOptionPane.showMessageDialog(createGroupFrame,
                         "Group created successfully!",
                         "Success",
@@ -486,24 +509,18 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
                 createGroupFrame.dispose();
             } else {
                 JOptionPane.showMessageDialog(createGroupFrame,
-                        "Error creating group. Make sure you're logged in.",
+                        "Error creating group. Make sure the controller is initialized.",
                         "Error",
                         JOptionPane.ERROR_MESSAGE);
             }
         });
 
-        // Add panels to frame
-        createGroupFrame.add(Box.createVerticalStrut(10));
         createGroupFrame.add(groupNamePanel);
         createGroupFrame.add(membersPanel);
-        createGroupFrame.add(Box.createVerticalStrut(10));
         createGroupFrame.add(createButton);
-
         createGroupFrame.pack();
-        createGroupFrame.setLocationRelativeTo(this);
         createGroupFrame.setVisible(true);
     }
-
     // --- Time and Item helpers ---
     private void set_time_shortTerm() {
         final GetTopItemsState state = getTopItemsViewModel.getState();
@@ -540,17 +557,17 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
         getTopItemsViewModel.firePropertyChange();
     }
 
-    private List<SpotifyUser> convertUsernamesToSpotifyUsers(String[] usernames) {
+    private List<SpotifyUser> convertUserIdsToSpotifyUsers(String[] userIds) {
         SpotifyUserDataAccessObject spotifyUserDao = SpotifyUserDataAccessObject.getInstance(); // get the singleton
         List<SpotifyUser> users = new ArrayList<>();
 
-        for (String username : usernames) {
-            SpotifyUser user = spotifyUserDao.getUserByUsername(username);
+        for (String userId : userIds) {
+            SpotifyUser user = spotifyUserDao.getUserById(userId);
             if (user != null) {
                 users.add(user);
             } else {
-                // Optional: log or warn if the username does not exist
-                System.out.println("Warning: SpotifyUser \"" + username + "\" not found in DAO.");
+                // Optional: log or warn if the userId does not exist
+                System.out.println("Warning: SpotifyUser ID \"" + userId + "\" not found in DAO.");
             }
         }
 

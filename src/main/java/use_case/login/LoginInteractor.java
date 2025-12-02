@@ -39,8 +39,13 @@ public class LoginInteractor implements LoginInputBoundary {
                 // Set the current username in your existing DAO
                 userDataAccessObject.setCurrentUsername(username);
 
-                //  Add the SpotifyUser to the global DAO
+                // Add the SpotifyUser to the global DAO
                 SpotifyUserDataAccessObject.getInstance().addUser(user);
+
+                // ← Add temporary print here
+                System.out.println("All users in DAO after login:");
+                SpotifyUserDataAccessObject.getInstance().getAllUsers()
+                        .forEach(u -> System.out.println(u.getUsername()));
 
                 final LoginOutputData loginOutputData = new LoginOutputData(user.getUsername());
                 loginPresenter.prepareSuccessView(loginOutputData);
