@@ -78,6 +78,13 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
         this.getTopItemsViewModel.addPropertyChangeListener(this);
         this.spotifyDAO = new SpotifyDataAccessObject();
 
+        // Initialize the CreateGroupController
+        this.createGroupController = new interface_adapter.create_group.CreateGroupController(
+                new use_case.create_group.CreateGroupInteractor(
+                        new data_access.GroupDataAccessObject()
+                )
+        );
+
         final JLabel title = new JLabel("Better Wrapped - Dashboard");
         title.setAlignmentX(Component.CENTER_ALIGNMENT);
 
