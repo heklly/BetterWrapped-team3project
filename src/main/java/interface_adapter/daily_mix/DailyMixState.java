@@ -1,5 +1,6 @@
 package interface_adapter.daily_mix;
 
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,5 +24,6 @@ public class DailyMixState {
     public void setError(String error) {
         this.error = error;
     }
+
 }
 

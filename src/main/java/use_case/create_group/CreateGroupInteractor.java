@@ -9,7 +9,7 @@ import java.util.List;
  * Interactor for the Create Group use case.
  * Implements the input boundary.
  */
-public abstract class CreateGroupInteractor implements CreateGroupInputBoundary {
+public class CreateGroupInteractor implements CreateGroupInputBoundary {
 
     @Override
     public CreateGroupOutputData execute(CreateGroupInputData inputData) {
