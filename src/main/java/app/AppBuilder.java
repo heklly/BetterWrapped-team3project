@@ -8,8 +8,6 @@ import interface_adapter.get_topItems.GetTopItemsController;
 import interface_adapter.get_topItems.GetTopItemsPresenter;
 import interface_adapter.get_topItems.GetTopItemsViewModel;
 import interface_adapter.logged_in.LoggedInViewModel;
-import interface_adapter.login.LoginPresenter;
-import interface_adapter.login.LoginViewModel;
 import interface_adapter.loyalty_score.LoyaltyController;
 import interface_adapter.loyalty_score.LoyaltyPresenter;
 import interface_adapter.loyalty_score.LoyaltyViewModel;
@@ -22,9 +20,6 @@ import interface_adapter.daily_mix.DailyMixPresenter;
 import use_case.get_topItems.GetTopItemsInputBoundary;
 import use_case.get_topItems.GetTopItemsInteractor;
 import use_case.get_topItems.GetTopItemsOutputBoundary;
-import use_case.login.LoginInputBoundary;
-import use_case.login.LoginInteractor;
-import use_case.login.LoginOutputBoundary;
 import use_case.loyalty_score.LoyaltyScoreInputBoundary;
 import use_case.loyalty_score.LoyaltyScoreInteractor;
 import use_case.loyalty_score.LoyaltyScoreOutputBoundary;
@@ -47,10 +42,8 @@ public class AppBuilder {
     final ViewManagerModel viewManagerModel = new ViewManagerModel();
     ViewManager viewManager = new ViewManager(cardPanel, cardLayout, viewManagerModel);
 
-    private LoginViewModel loginViewModel;
     private LoggedInViewModel loggedInViewModel;
     private LoggedInView loggedInView;
-    private LoginView loginView;
     private SpotifyAuthView spotifyAuthView;
     private SpotifyAuthViewModel spotifyAuthViewModel;
     private DailyMixViewModel dailyMixViewModel;
@@ -63,18 +56,11 @@ public class AppBuilder {
     }
 
     public AppBuilder addViewModels() {
-        loginViewModel = new LoginViewModel();
         loggedInViewModel = new LoggedInViewModel();
         spotifyAuthViewModel = new SpotifyAuthViewModel();
         dailyMixViewModel = new DailyMixViewModel();
         getTopItemsViewModel = new GetTopItemsViewModel();
         loyaltyViewModel = new LoyaltyViewModel();
-        return this;
-    }
-
-    public AppBuilder addLoginView() {
-        loginView = new LoginView(loginViewModel, viewManagerModel);
-        cardPanel.add(loginView, loginView.getViewName());
         return this;
     }
 

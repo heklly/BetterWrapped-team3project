@@ -24,14 +24,11 @@ public class Main {
         AppBuilder appBuilder = new AppBuilder();
         JFrame application = appBuilder
                 .addViewModels()         // ✅ Create ALL view models FIRST
-                // not needed .addLoginView()
                 .addLoyaltyView()
                 .addLoggedInView()
                 .addSpotifyAuthView()
                 .addSignupUseCase()
-                // not needed .addLoginUseCase()
                 .addChangePasswordUseCase()
-                // not needed .addLogoutUseCase()
                 .addSpotifyAuthUseCase()
                 .addDailyMixUseCase()
                 .addGetTopItemsUseCase()
