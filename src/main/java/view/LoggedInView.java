@@ -5,7 +5,7 @@ import entity.SpotifyUser;
 
 import interface_adapter.logged_in.LoggedInState;
 import interface_adapter.logged_in.LoggedInViewModel;
-import interface_adapter.logout.LogoutController;
+//import interface_adapter.logout.LogoutController;
 import interface_adapter.ViewManagerModel;
 import interface_adapter.loyalty_score.LoyaltyController;
 import interface_adapter.spotify_auth.SpotifyAuthViewModel;
@@ -36,7 +36,7 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
     private final ViewManagerModel viewManagerModel;
     private final SpotifyAuthViewModel spotifyAuthViewModel;
 
-    private LogoutController logoutController;
+//    private LogoutController logoutController;
     private SpotifyDataAccessObject spotifyDAO;
     private SpotifyUser currentSpotifyUser;
 
@@ -44,6 +44,9 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
 
     private final JButton logOut;
     private final JButton connectSpotifyButton;
+
+    private final JButton goToGroup;
+//    private GroupDataAccessObject groupDAO;
 
     private final DailyMixViewModel dailyMixViewModel;
     private DailyMixController dailyMixController;
@@ -122,12 +125,12 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
         long_termButton.setEnabled(false);
 
 
-        // Log out button listener
-        logOut.addActionListener(evt -> {
-            if (logoutController != null) {
-                logoutController.execute();
-            }
-        });
+//        // Log out button listener
+//        logOut.addActionListener(evt -> {
+//            if (logoutController != null) {
+//                logoutController.execute();
+//            }
+//        });
 
         // Connect Spotify listener
         connectSpotifyButton.addActionListener(evt -> {
@@ -271,7 +274,21 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
         loyaltyLookUpPanel.add(loyaltyLookUpLabel);
         loyaltyLookUpPanel.add(lookupField);
 
-
+        // Go to Group View Button
+        JPanel groupPanel = new JPanel();
+        groupPanel.setLayout(new BoxLayout(groupPanel, BoxLayout.Y_AXIS));
+        goToGroup = new JButton("Group");
+        goToGroup.addActionListener(e -> {
+            if (currentSpotifyUser.isInGroup()) {
+                viewManagerModel.setState("in group");
+                viewManagerModel.firePropertyChange();
+            } else {
+                viewManagerModel.setState("no group");
+                viewManagerModel.firePropertyChange();
+            }
+        });
+        goToGroup.setEnabled(false);
+        groupPanel.add(goToGroup);
 
         // --- Center panel (CENTER) ---
         JPanel centerPanel = new JPanel();
@@ -281,6 +298,7 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
         topWrapper.setLayout(new BoxLayout(topWrapper, BoxLayout.Y_AXIS));
         topWrapper.add(title);
         topWrapper.add(spotifyPanel);
+        topWrapper.add(groupPanel);
         topWrapper.add(timePanel);
         loyaltyLookUpPanel.add(loyaltyLookUpLabel);
         loyaltyLookUpPanel.add(lookupField);
@@ -333,6 +351,8 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
                 short_termButton.setEnabled(connected);
                 medium_termButton.setEnabled(connected);
                 long_termButton.setEnabled(connected);
+
+                goToGroup.setEnabled(connected);
             }
         }
 
@@ -428,9 +448,9 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
         this.getTopItemsController = getTopItemsController;
     }
 
-    public void setLogoutController(LogoutController logoutController) {
-        this.logoutController = logoutController;
-    }
+//    public void setLogoutController(LogoutController logoutController) {
+//        this.logoutController = logoutController;
+//    }
 
     public void setLoyaltyLookupController(LoyaltyController loyaltyController) {
         this.loyaltyController = loyaltyController;

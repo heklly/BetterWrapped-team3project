@@ -36,10 +36,4 @@ public class LoyaltyPresenter implements LoyaltyScoreOutputBoundary {
         loyaltyViewModel.firePropertyChange();
         this.viewManagerModel.firePropertyChange();
     }
-
-    @Override
-    public void returnPreviousView() {
-        this.viewManagerModel.setState(previousViewName);
-        this.viewManagerModel.firePropertyChange();
-    }
 }

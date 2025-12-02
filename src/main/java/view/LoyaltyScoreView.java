@@ -182,5 +182,4 @@ public class LoyaltyScoreView extends JPanel implements ActionListener, Property
     public void setLoyaltyController(LoyaltyController loyaltyController) {
         this.loyaltyController = loyaltyController;
     }
-    public String getViewName() { return this.viewName; }
 }

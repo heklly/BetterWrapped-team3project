@@ -3,6 +3,7 @@ package app;
 import data_access.LoyaltyScoreDataAccessObject;
 import data_access.SpotifyDataAccessObject;
 import data_access.TopItemDataAccessObject;
+import data_access.SpotifyDataAccessObject;
 import interface_adapter.ViewManagerModel;
 import interface_adapter.create_group.CreateGroupController;
 import interface_adapter.create_group.CreateGroupPresenter;
@@ -17,8 +18,6 @@ import interface_adapter.group_analytics.GroupAnalyticsViewModel;
 import interface_adapter.leave_group.LeaveGroupController;
 import interface_adapter.leave_group.LeaveGroupPresenter;
 import interface_adapter.logged_in.LoggedInViewModel;
-import interface_adapter.login.LoginPresenter;
-import interface_adapter.login.LoginViewModel;
 import interface_adapter.loyalty_score.LoyaltyController;
 import interface_adapter.loyalty_score.LoyaltyPresenter;
 import interface_adapter.loyalty_score.LoyaltyViewModel;
@@ -32,6 +31,7 @@ import interface_adapter.spotify_auth.SpotifyAuthViewModel;
 import interface_adapter.daily_mix.DailyMixViewModel;
 import interface_adapter.daily_mix.DailyMixController;
 import interface_adapter.daily_mix.DailyMixPresenter;
+import use_case.create_group.CreateGroupInputBoundary;
 import use_case.create_group.CreateGroupInteractor;
 import use_case.create_group.CreateGroupOutputBoundary;
 import use_case.create_group.GroupDataAccessInterface;
@@ -71,7 +71,6 @@ public class AppBuilder {
     final ViewManagerModel viewManagerModel = new ViewManagerModel();
     ViewManager viewManager = new ViewManager(cardPanel, cardLayout, viewManagerModel);
 
-    private LoginViewModel loginViewModel;
     private LoggedInViewModel loggedInViewModel;
     private LoggedInView loggedInView;
     private SpotifyAuthView spotifyAuthView;
@@ -138,7 +137,7 @@ public class AppBuilder {
     }
 
     public AppBuilder addSharedSongView() {
-        sharedSongView = new SharedSongView(sharedSongViewModel, inGroupViewModel, viewManagerModel);  // ADD sharedSongViewModel parameter
+        sharedSongView = new SharedSongView(inGroupViewModel, viewManagerModel, sharedSongViewModel);
         cardPanel.add(sharedSongView, sharedSongView.getViewName());
         return this;
     }
@@ -187,6 +186,21 @@ public class AppBuilder {
         return this;
     }
 
+    public AppBuilder addCreateGroupUseCase() {
+        final CreateGroupOutputBoundary createGroupPresenter =
+                new CreateGroupPresenter(inGroupViewModel, noGroupViewModel, viewManagerModel);
+        final CreateGroupInputBoundary createGroupInteractor =
+                new CreateGroupInteractor(createGroupPresenter);
+        final CreateGroupController createGroupController =
+                new  CreateGroupController(createGroupInteractor);
+        noGroupView.setCreateGroupController(createGroupController);
+        return this;
+    }
+
+    public AppBuilder addJoinGroupUseCase() {
+        return this;
+    }
+
     public AppBuilder addSharedSongUseCase() {
         final SharedSongOutputBoundary sharedSongPresenter =
                 new SharedSongPresenter(sharedSongViewModel, viewManagerModel);
@@ -198,13 +212,23 @@ public class AppBuilder {
     }
 
     public AppBuilder addGroupAnalyticsUseCase() {
+        final GroupAnalyticsViewModel vm = groupAnalyticsViewModel;
+
         // presenter
-        final GroupAnalyticsOutputBoundary outputBoundary = new GroupAnalyticsPresenter(groupAnalyticsViewModel);
+        final GroupAnalyticsOutputBoundary outputBoundary =
+                new GroupAnalyticsPresenter(vm);
+
         // interactor
-        final GroupAnalyticsInputBoundary interactor = new GroupAnalyticsInteractor(outputBoundary);
-        // controller
+        final GroupAnalyticsInputBoundary interactor =
+                new GroupAnalyticsInteractor(outputBoundary);
+
+        SpotifyDataAccessObject spotifyDAO = new SpotifyDataAccessObject();
+
+        //controller
+
         GroupAnalyticsController controller =
-                new GroupAnalyticsController(interactor);
+                new GroupAnalyticsController(interactor, spotifyDAO);
+
         // wire into view
         groupAnalyticsView.setGroupAnalyticsController(controller);
         return this;
