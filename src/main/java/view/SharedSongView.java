@@ -22,22 +22,30 @@ public class SharedSongView extends JPanel implements ActionListener, PropertyCh
     private final JPanel dataPanel;
 
 
-    public SharedSongView(InGroupViewModel inGroupViewModel, ViewManagerModel viewManagerModel) {
+    public SharedSongView(InGroupViewModel inGroupViewModel,
+                          SharedSongViewModel sharedSongViewModel,
+                          ViewManagerModel viewManagerModel) {
+
         this.inGroupViewModel = inGroupViewModel;
+        this.sharedSongViewModel = sharedSongViewModel;
         this.viewManagerModel = viewManagerModel;
+
+        this.sharedSongViewModel.addPropertyChangeListener(this);
 
         JLabel title = new JLabel("Who shares your currently playing song?");
 
         dataPanel = new JPanel();
         dataPanel.setLayout(new BoxLayout(dataPanel, BoxLayout.Y_AXIS));
+
         setDataPanel(sharedSongViewModel.getState().getUsernameToShared());
 
         backButton = new JButton("Back to Group");
         backButton.addActionListener(this);
-        this.add(backButton);
 
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-        this.add(title, dataPanel);
+        this.add(title);
+        this.add(dataPanel);
+        this.add(backButton);
     }
 
     public void actionPerformed(ActionEvent e) {

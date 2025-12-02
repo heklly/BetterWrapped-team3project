@@ -66,8 +66,7 @@ public class Group {
         int code = rand.nextInt(900000) + 100000; // random 6-digit codes associated with each group
         return String.valueOf(code);
     }
-
-
-
-
+    public void removeUser(SpotifyUser user) {
+        users.remove(user);
+    }
 }

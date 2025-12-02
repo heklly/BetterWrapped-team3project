@@ -19,7 +19,7 @@ public class UserGroupState {
     private Group group;
 
     private String groupName = "";
-    private List<String> groupUsernames = null;
+    private List<String> groupUsernames = new ArrayList<>();
     private boolean inGroup =  false;
     private String nameError = "";
 
@@ -38,8 +38,15 @@ public class UserGroupState {
     public List<SpotifyUser> getGroupUsers() { return this.groupUsers; }
 
     public void setGroupUsers(List<SpotifyUser> groupUsers) {
-        this.groupUsers = new ArrayList<SpotifyUser>(groupUsers);
+        this.groupUsers = new ArrayList<>(groupUsers);
+
+        // fills user id list list
+        this.groupUsernames = new ArrayList<>();
+        for (SpotifyUser u : groupUsers) {
+            this.groupUsernames.add(u.getSpotifyUserId()); //
+        }
     }
+
     public String getGroupName() {
         return groupName;
     }
