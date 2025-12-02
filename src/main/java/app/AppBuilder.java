@@ -18,8 +18,6 @@ import interface_adapter.group_analytics.GroupAnalyticsViewModel;
 import interface_adapter.leave_group.LeaveGroupController;
 import interface_adapter.leave_group.LeaveGroupPresenter;
 import interface_adapter.logged_in.LoggedInViewModel;
-import interface_adapter.login.LoginPresenter;
-import interface_adapter.login.LoginViewModel;
 import interface_adapter.loyalty_score.LoyaltyController;
 import interface_adapter.loyalty_score.LoyaltyPresenter;
 import interface_adapter.loyalty_score.LoyaltyViewModel;
@@ -72,7 +70,6 @@ public class AppBuilder {
     final ViewManagerModel viewManagerModel = new ViewManagerModel();
     ViewManager viewManager = new ViewManager(cardPanel, cardLayout, viewManagerModel);
 
-    private LoginViewModel loginViewModel;
     private LoggedInViewModel loggedInViewModel;
     private LoggedInView loggedInView;
     private SpotifyAuthView spotifyAuthView;
