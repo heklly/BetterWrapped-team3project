@@ -13,6 +13,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class NoGroupView extends JPanel implements ActionListener, PropertyChangeListener {
 
@@ -22,6 +25,7 @@ public class NoGroupView extends JPanel implements ActionListener, PropertyChang
 
     private final JTextField inputGroupNameField = new JTextField();
     private final JLabel nameErrorField = new JLabel();
+    private final JTextField inputGroupUsersField = new JTextField();
 
     private final JButton loggedIn;
     private final JButton createGroup;
@@ -34,15 +38,26 @@ public class NoGroupView extends JPanel implements ActionListener, PropertyChang
         this.viewManagerModel = viewManagerModel;
         this.noGroupViewModel.addPropertyChangeListener(this);
 
+        JPanel topRow = new JPanel();
         final JLabel title = new JLabel("You're not in a group");
         title.setAlignmentX(CENTER_ALIGNMENT);
-
-        final LabelTextPanel enterGroupName = new LabelTextPanel(
-                new JLabel("Group Name"), inputGroupNameField);
-
+        topRow.add(title);
         loggedIn = new JButton("Main Page");
+        topRow.add(loggedIn);
+
+        JPanel fields = new JPanel();
+        fields.setLayout(new BoxLayout(fields, BoxLayout.Y_AXIS));
+        final LabelTextPanel enterGroupName = new LabelTextPanel(
+                new JLabel("Enter Group Name"), inputGroupNameField);
+        fields.add(enterGroupName);
+        final LabelTextPanel enterGroupUsers = new LabelTextPanel(
+                new JLabel("Enter Group Users"), inputGroupUsersField);
+        fields.add(enterGroupUsers);
+        fields.add(nameErrorField);
+
+
         final JPanel buttons = new JPanel();
-        buttons.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+        buttons.setLayout(new BoxLayout(buttons, BoxLayout.Y_AXIS));
         createGroup = new JButton("Create Group");
         buttons.add(createGroup);
         joinGroup = new JButton("Join Group");
@@ -110,40 +125,26 @@ public class NoGroupView extends JPanel implements ActionListener, PropertyChang
             }
         });
 
-        this.setLayout(new GridBagLayout());
-        GridBagConstraints gbcTitle = new GridBagConstraints();
-        gbcTitle.fill = GridBagConstraints.HORIZONTAL;
-        gbcTitle.anchor = GridBagConstraints.CENTER;
-        gbcTitle.gridx = 1;
-        gbcTitle.gridy = 1;
-        gbcTitle.weighty = 0.2;
-        this.add(title, gbcTitle);
+        inputGroupUsersField.getDocument().addDocumentListener(new DocumentListener() {
+            private void documentListenerHelper() {
+                final UserGroupState currentState = noGroupViewModel.getState();
+                List<String> groupUsernames = new ArrayList<>();
+                Collections.addAll(groupUsernames, inputGroupUsersField.getText().split(","));
+                currentState.setGroupUsernames(groupUsernames);
+                noGroupViewModel.setState(currentState);
+            }
+            @Override
+            public void insertUpdate(DocumentEvent e) { documentListenerHelper(); }
+            @Override
+            public void removeUpdate(DocumentEvent e) { documentListenerHelper(); }
+            @Override
+            public void changedUpdate(DocumentEvent e) { documentListenerHelper(); }
+        });
+        this.setLayout(new BorderLayout(5, 5));
+        this.add(topRow, BorderLayout.NORTH);
+        this.add(buttons, BorderLayout.EAST);
+        this.add(fields, BorderLayout.CENTER);
 
-        GridBagConstraints gbcGroup = new GridBagConstraints();
-        gbcGroup.gridheight = 4;
-        gbcGroup.gridwidth = 3;
-        gbcGroup.anchor = GridBagConstraints.LINE_START;
-        gbcGroup.fill = GridBagConstraints.HORIZONTAL;
-        gbcGroup.gridx = 0;
-        gbcGroup.gridy = 2;
-        gbcGroup.gridwidth = 2;
-        gbcGroup.weighty = 0.3;
-        this.add(enterGroupName, gbcGroup);
-
-        GridBagConstraints gbcButtons = new GridBagConstraints();
-        gbcButtons.fill = GridBagConstraints.VERTICAL;
-        gbcButtons.anchor = GridBagConstraints.CENTER;
-        gbcButtons.gridx = 2;
-        gbcButtons.gridy = 2;
-        gbcButtons.weighty = 0.5;
-        this.add(buttons, gbcButtons);
-
-        GridBagConstraints c = new GridBagConstraints();
-        c.anchor = GridBagConstraints.CENTER;
-        c.fill = GridBagConstraints.BOTH;
-        c.gridx = 1;
-        c.gridy = 0;
-        this.add(loggedIn, c);
     }
     /**
      * React to a button click that results in evt.

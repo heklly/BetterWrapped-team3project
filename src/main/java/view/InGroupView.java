@@ -1,5 +1,6 @@
 package view;
 
+import entity.Group;
 import interface_adapter.ViewManagerModel;
 import interface_adapter.create_group.InGroupViewModel;
 import interface_adapter.create_group.UserGroupState;
@@ -76,7 +77,9 @@ public class InGroupView extends JPanel implements ActionListener, PropertyChang
                 new ActionListener() {
                     public void actionPerformed(ActionEvent evt) {
                         if (evt.getSource().equals(leaveGroup)) {
-                            leaveGroupController.execute();
+                            final UserGroupState currentState = inGroupViewModel.getState();
+                            leaveGroupController.execute(currentState.getSpotifyUser(),
+                                    new Group("compiles", currentState.getSpotifyUser()));
                         }
                     }
                 }
@@ -187,13 +190,16 @@ public class InGroupView extends JPanel implements ActionListener, PropertyChang
     public void setGroupName(String groupName) {
         this.groupName.setText("Group Name: " + groupName);
     }
+
     public void setGroupPanel(UserGroupState state) {
         groupPanel.removeAll();
-        groupPanel.setLayout(new BoxLayout(groupPanel, BoxLayout.Y_AXIS));
-        for (String username : state.getGroupUsernames()) {
-            JLabel usernameLabel = new JLabel(username);
-            usernameLabel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-            groupPanel.add(usernameLabel);
+        if (state.getGroupUsernames() != null) {
+            groupPanel.setLayout(new BoxLayout(groupPanel, BoxLayout.Y_AXIS));
+            for (String username : state.getGroupUsernames()) {
+                JLabel usernameLabel = new JLabel(username);
+                usernameLabel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+                groupPanel.add(usernameLabel);
+            }
         }
     }
     public String getViewName() { return viewName; }

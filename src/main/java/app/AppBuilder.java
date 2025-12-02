@@ -138,7 +138,7 @@ public class AppBuilder {
     }
 
     public AppBuilder addSharedSongView() {
-        sharedSongView = new SharedSongView(inGroupViewModel, viewManagerModel);
+        sharedSongView = new SharedSongView(inGroupViewModel, viewManagerModel, sharedSongViewModel);
         cardPanel.add(sharedSongView, sharedSongView.getViewName());
         return this;
     }

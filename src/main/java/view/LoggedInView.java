@@ -45,6 +45,9 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
     private final JButton logOut;
     private final JButton connectSpotifyButton;
 
+    private final JButton goToGroup;
+//    private GroupDataAccessObject groupDAO;
+
     private final DailyMixViewModel dailyMixViewModel;
     private DailyMixController dailyMixController;
     private final JButton generateDailyMixButton;
@@ -271,7 +274,21 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
         loyaltyLookUpPanel.add(loyaltyLookUpLabel);
         loyaltyLookUpPanel.add(lookupField);
 
-
+        // Go to Group View Button
+        JPanel groupPanel = new JPanel();
+        groupPanel.setLayout(new BoxLayout(groupPanel, BoxLayout.Y_AXIS));
+        goToGroup = new JButton("Group");
+        goToGroup.addActionListener(e -> {
+//            if (user is in group) {
+//                viewManagerModel.setState("in group");
+//                viewManagerModel.firePropertyChange();
+//            return;
+//            } else {
+            viewManagerModel.setState("no group");
+            viewManagerModel.firePropertyChange();
+//              }
+        });
+        goToGroup.setEnabled(false);
 
         // --- Center panel (CENTER) ---
         JPanel centerPanel = new JPanel();
@@ -281,6 +298,7 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
         topWrapper.setLayout(new BoxLayout(topWrapper, BoxLayout.Y_AXIS));
         topWrapper.add(title);
         topWrapper.add(spotifyPanel);
+        topWrapper.add(groupPanel);
         topWrapper.add(timePanel);
         loyaltyLookUpPanel.add(loyaltyLookUpLabel);
         loyaltyLookUpPanel.add(lookupField);
@@ -333,6 +351,8 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
                 short_termButton.setEnabled(connected);
                 medium_termButton.setEnabled(connected);
                 long_termButton.setEnabled(connected);
+
+                goToGroup.setEnabled(connected);
             }
         }
 
