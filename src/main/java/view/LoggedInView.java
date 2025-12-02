@@ -337,6 +337,7 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
         topWrapper.setLayout(new BoxLayout(topWrapper, BoxLayout.Y_AXIS));
         topWrapper.add(title);
         topWrapper.add(spotifyPanel);
+        topWrapper.add(groupPanel);
         topWrapper.add(timePanel);
         loyaltyLookUpPanel.add(loyaltyLookUpLabel);
         loyaltyLookUpPanel.add(lookupField);
