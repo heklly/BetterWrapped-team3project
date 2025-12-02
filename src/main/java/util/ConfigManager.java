@@ -47,6 +47,7 @@ public class ConfigManager {
             properties.setProperty("spotify.client.secret", "default_client_secret");
         }
         if (redirectUri == null) {
+            System.err.println("WARNING: SPOTIFY_REDIRECT_URI environment variable not set");
             properties.setProperty("spotify.redirect.uri", "http://localhost:8080/callback");
         }
     }

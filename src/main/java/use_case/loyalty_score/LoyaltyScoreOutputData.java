@@ -15,14 +15,18 @@ public class LoyaltyScoreOutputData {
     // list of all previous dates calculated
     private final List<String> dates;
 
+    private final String artist;
 
-    public LoyaltyScoreOutputData(Map<String, Integer> loyalty_scores, List<String> dates)
+
+    public LoyaltyScoreOutputData(Map<String, Integer> loyalty_scores, List<String> dates, String artist_name)
     {
         this.loyalty_scores = loyalty_scores;
         this.dates = dates;
+        this.artist = artist_name;
     }
 
     public Map<String, Integer> getScores() { return loyalty_scores; }
     public List<String> getDates() { return dates; }
 
+    public String getArtistName() { return this.artist; }
 }

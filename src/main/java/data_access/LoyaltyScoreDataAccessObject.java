@@ -140,7 +140,7 @@ public class LoyaltyScoreDataAccessObject implements LoyaltyScoreDataAccessInter
         loyaltyScoresArray.forEach(entry -> {
             JSONObject loyaltyScore = (JSONObject) entry;
             String date = loyaltyScore.getString("date");
-            dates.add(date);
+            if (!dates.contains(date)) { dates.add(date); }
         });
 
         return dates;

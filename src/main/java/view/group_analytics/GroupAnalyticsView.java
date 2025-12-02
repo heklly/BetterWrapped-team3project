@@ -2,6 +2,7 @@ package view.group_analytics;
 
 import entity.Group;
 import entity.SpotifyUser;
+import entity.UserTasteProfile;
 import interface_adapter.ViewManagerModel;
 import interface_adapter.group_analytics.GroupAnalyticsController;
 import interface_adapter.group_analytics.GroupAnalyticsState;
@@ -9,6 +10,8 @@ import interface_adapter.group_analytics.GroupAnalyticsViewModel;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.List;
@@ -18,15 +21,24 @@ import java.util.List;
  * This view only works with REAL data (real Group / SpotifyUser list).
  */
 public class GroupAnalyticsView extends JPanel implements PropertyChangeListener {
+public class GroupAnalyticsView extends JPanel implements ActionListener, PropertyChangeListener {
 
     private final GroupAnalyticsViewModel viewModel;
     private GroupAnalyticsController controller;
-
+    //Added these
+    private final ViewManagerModel viewManagerModel;
     private final JTextArea outputArea = new JTextArea(15, 40);
+    private final JButton demoButton = new JButton("Run demo group");
+    private final JButton backButton = new JButton("Back to Group");
+
+    public void setGroupAnalyticsController(GroupAnalyticsController controller) {
+        this.controller = controller;
+    }
 
     public GroupAnalyticsView(GroupAnalyticsViewModel viewModel,
                               ViewManagerModel viewManagerModel) {
         this.viewModel = viewModel;
+        this.viewManagerModel = viewManagerModel;
 
         this.viewModel.addPropertyChangeListener(this);
 
@@ -43,6 +55,19 @@ public class GroupAnalyticsView extends JPanel implements PropertyChangeListener
 
         add(top, BorderLayout.NORTH);
         add(scrollPane, BorderLayout.CENTER);
+        JPanel bottom = new JPanel();
+        bottom.add(demoButton);
+        // TODO: fix if you dont like it
+        bottom.add(backButton);
+        backButton.addActionListener(this);
+
+        add(top, BorderLayout.NORTH);
+        add(scrollPane, BorderLayout.CENTER);
+        add(bottom, BorderLayout.SOUTH);
+
+        wireActions();
+
+
     }
 
     // Called from AppBuilder
@@ -74,6 +99,12 @@ public class GroupAnalyticsView extends JPanel implements PropertyChangeListener
             return;
         }
         controller.analyzeFromUsers(users);
+    }
+
+    public void actionPerformed(ActionEvent evt) {
+        if (evt.getSource() == backButton) {
+            viewManagerModel.setState("in group");
+        }
     }
 
     @Override
@@ -114,4 +145,5 @@ public class GroupAnalyticsView extends JPanel implements PropertyChangeListener
     public String getViewName() {
         return viewModel.getViewName();
     }
+
 }
