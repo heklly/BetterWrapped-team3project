@@ -1,19 +1,26 @@
 package data_access;
 
 import entity.SpotifyUser;
-import java.util.*;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * Singleton DAO to store SpotifyUser objects across the app.
+ */
 public class SpotifyUserDataAccessObject {
 
-    private static SpotifyUserDataAccessObject instance; // singleton instance
+    private static SpotifyUserDataAccessObject instance;
 
-    private final Map<String, SpotifyUser> usernameToUser = new HashMap<>();
+    // This map lives inside the DAO, not the entity
+    private final Map<String, SpotifyUser> userIdToUser;
 
     private SpotifyUserDataAccessObject() {
-        // private constructor to prevent external instantiation
+        this.userIdToUser = new HashMap<>();
     }
 
-    // Accessor for singleton
     public static SpotifyUserDataAccessObject getInstance() {
         if (instance == null) {
             instance = new SpotifyUserDataAccessObject();
@@ -21,17 +28,25 @@ public class SpotifyUserDataAccessObject {
         return instance;
     }
 
-    // Add a user
+    // Add or update a SpotifyUser
     public void addUser(SpotifyUser user) {
-        usernameToUser.put(user.getUsername(), user);
+        if (user != null) {
+            userIdToUser.put(user.getSpotifyUserId(), user);
+        }
     }
 
-    // Get a user by username
-    public SpotifyUser getUserByUsername(String username) {
-        return usernameToUser.get(username);
+    // Lookup a SpotifyUser by their Spotify User ID
+    public SpotifyUser getUserById(String userId) {
+        return userIdToUser.get(userId);
     }
 
-    public Collection<SpotifyUser> getAllUsers() {
-        return usernameToUser.values();
+    // Optional: get all users
+    public List<SpotifyUser> getAllUsers() {
+        return new ArrayList<>(userIdToUser.values());
+    }
+
+    // Optional: remove a user
+    public void removeUser(String userId) {
+        userIdToUser.remove(userId);
     }
 }
