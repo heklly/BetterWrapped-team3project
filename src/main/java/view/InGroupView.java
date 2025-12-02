@@ -168,6 +168,9 @@ public class InGroupView extends JPanel implements ActionListener, PropertyChang
     }
 
     public void setGroupPanel(UserGroupState state) {
+        // default logic to do nothing if group state is nothing
+        if (state.getGroupUsernames() == null  || state.getGroupUsernames().isEmpty()) { return; }
+
         groupPanel.removeAll();
         if (state.getGroupUsernames() != null) {
             groupPanel.setLayout(new BoxLayout(groupPanel, BoxLayout.Y_AXIS));

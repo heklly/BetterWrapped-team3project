@@ -3,6 +3,7 @@ package app;
 import data_access.LoyaltyScoreDataAccessObject;
 import data_access.SpotifyDataAccessObject;
 import data_access.TopItemDataAccessObject;
+import data_access.SpotifyDataAccessObject;
 import interface_adapter.ViewManagerModel;
 import interface_adapter.create_group.CreateGroupController;
 import interface_adapter.create_group.CreateGroupPresenter;
@@ -17,8 +18,6 @@ import interface_adapter.group_analytics.GroupAnalyticsViewModel;
 import interface_adapter.leave_group.LeaveGroupController;
 import interface_adapter.leave_group.LeaveGroupPresenter;
 import interface_adapter.logged_in.LoggedInViewModel;
-import interface_adapter.login.LoginPresenter;
-import interface_adapter.login.LoginViewModel;
 import interface_adapter.loyalty_score.LoyaltyController;
 import interface_adapter.loyalty_score.LoyaltyPresenter;
 import interface_adapter.loyalty_score.LoyaltyViewModel;
@@ -72,7 +71,6 @@ public class AppBuilder {
     final ViewManagerModel viewManagerModel = new ViewManagerModel();
     ViewManager viewManager = new ViewManager(cardPanel, cardLayout, viewManagerModel);
 
-    private LoginViewModel loginViewModel;
     private LoggedInViewModel loggedInViewModel;
     private LoggedInView loggedInView;
     private SpotifyAuthView spotifyAuthView;
@@ -214,13 +212,23 @@ public class AppBuilder {
     }
 
     public AppBuilder addGroupAnalyticsUseCase() {
+        final GroupAnalyticsViewModel vm = groupAnalyticsViewModel;
+
         // presenter
-        final GroupAnalyticsOutputBoundary outputBoundary = new GroupAnalyticsPresenter(groupAnalyticsViewModel);
+        final GroupAnalyticsOutputBoundary outputBoundary =
+                new GroupAnalyticsPresenter(vm);
+
         // interactor
-        final GroupAnalyticsInputBoundary interactor = new GroupAnalyticsInteractor(outputBoundary);
-        // controller
+        final GroupAnalyticsInputBoundary interactor =
+                new GroupAnalyticsInteractor(outputBoundary);
+
+        SpotifyDataAccessObject spotifyDAO = new SpotifyDataAccessObject();
+
+        //controller
+
         GroupAnalyticsController controller =
-                new GroupAnalyticsController(interactor);
+                new GroupAnalyticsController(interactor, spotifyDAO);
+
         // wire into view
         groupAnalyticsView.setGroupAnalyticsController(controller);
         return this;
