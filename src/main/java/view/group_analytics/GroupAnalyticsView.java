@@ -1,12 +1,15 @@
 package view.group_analytics;
 
 import entity.UserTasteProfile;
+import interface_adapter.ViewManagerModel;
 import interface_adapter.group_analytics.GroupAnalyticsController;
 import interface_adapter.group_analytics.GroupAnalyticsState;
 import interface_adapter.group_analytics.GroupAnalyticsViewModel;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.List;
@@ -17,24 +20,24 @@ import java.util.Set;
  * For now it uses a demo group; your teammate's group-forming use case
  * should call controller.analyzeGroup(...) with real UserTasteProfiles.
  */
-
-// got rid of implements View interface. You need to actually specify a view interface.
-public class GroupAnalyticsView extends JPanel implements PropertyChangeListener {
+public class GroupAnalyticsView extends JPanel implements ActionListener, PropertyChangeListener {
 
     private final GroupAnalyticsViewModel viewModel;
     private GroupAnalyticsController controller;
-
+    //Added these
+    private final ViewManagerModel viewManagerModel;
     private final JTextArea outputArea = new JTextArea(15, 40);
     private final JButton demoButton = new JButton("Run demo group");
+    private final JButton backButton = new JButton("Back to Group");
 
     public void setGroupAnalyticsController(GroupAnalyticsController controller) {
         this.controller = controller;
     }
 
     public GroupAnalyticsView(GroupAnalyticsViewModel viewModel,
-                              GroupAnalyticsController controller) {
+                              ViewManagerModel viewManagerModel) {
         this.viewModel = viewModel;
-        this.controller = controller;
+        this.viewManagerModel = viewManagerModel;
 
         this.viewModel.addPropertyChangeListener(this);
 
@@ -51,12 +54,17 @@ public class GroupAnalyticsView extends JPanel implements PropertyChangeListener
 
         JPanel bottom = new JPanel();
         bottom.add(demoButton);
+        // TODO: fix if you dont like it
+        bottom.add(backButton);
+        backButton.addActionListener(this);
 
         add(top, BorderLayout.NORTH);
         add(scrollPane, BorderLayout.CENTER);
         add(bottom, BorderLayout.SOUTH);
 
         wireActions();
+
+
     }
 
     private void wireActions() {
@@ -72,6 +80,12 @@ public class GroupAnalyticsView extends JPanel implements PropertyChangeListener
         );
 
         controller.analyzeGroup(demoGroup);
+    }
+
+    public void actionPerformed(ActionEvent evt) {
+        if (evt.getSource() == backButton) {
+            viewManagerModel.setState("in group");
+        }
     }
 
     @Override
@@ -108,8 +122,8 @@ public class GroupAnalyticsView extends JPanel implements PropertyChangeListener
         outputArea.setText(sb.toString());
     }
 
-    // commented out so code compiles. You need to specify an interface for @Override
     public String getViewName() {
         return viewModel.getViewName();
     }
+
 }
