@@ -26,8 +26,6 @@ public class SpotifyDataAccessObject {
     private final String redirectUri;
     private String codeVerifier;
     private final OkHttpClient httpClient;
-    private final Map<String, SpotifyUser> loggedInUsers = new HashMap<>(); // username -> SpotifyUser
-
 
     public SpotifyDataAccessObject() {
         this.clientId = ConfigManager.getProperty("spotify.client.id");
@@ -44,84 +42,6 @@ public class SpotifyDataAccessObject {
                 .setRedirectUri(URI.create(this.redirectUri))
                 .build();
     }
-
-    public SpotifyUser exchangeCodeForTokens(String authorizationCode, String username) {
-        try {
-            if (codeVerifier == null) {
-                throw new RuntimeException("Code verifier not generated. Call getAuthorizationUrl() first.");
-            }
-
-            System.out.println("Exchanging code for tokens with PKCE...");
-            System.out.println("Authorization code: " + authorizationCode);
-
-            // Exchange code for tokens using PKCE via HTTP request
-            RequestBody formBody = new FormBody.Builder()
-                    .add("grant_type", "authorization_code")
-                    .add("code", authorizationCode)
-                    .add("redirect_uri", redirectUri)
-                    .add("client_id", clientId)
-                    .add("code_verifier", codeVerifier)
-                    .build();
-
-            Request request = new Request.Builder()
-                    .url("https://accounts.spotify.com/api/token")
-                    .post(formBody)
-                    .addHeader("Content-Type", "application/x-www-form-urlencoded")
-                    .build();
-
-            try (Response response = httpClient.newCall(request).execute()) {
-                String responseBody = response.body().string();
-
-                if (!response.isSuccessful()) {
-                    System.err.println("Token exchange failed: " + responseBody);
-                    throw new RuntimeException("Token exchange failed: " + responseBody);
-                }
-
-                JSONObject json = new JSONObject(responseBody);
-                String accessToken = json.getString("access_token");
-                String refreshToken = json.optString("refresh_token", null);
-
-                System.out.println("Successfully obtained access token");
-
-                spotifyApi.setAccessToken(accessToken);
-                if (refreshToken != null) {
-                    spotifyApi.setRefreshToken(refreshToken);
-                }
-
-                // Get Spotify user profile
-                var userProfile = spotifyApi.getCurrentUsersProfile().build().execute();
-                System.out.println("Got user profile: " + userProfile.getDisplayName());
-
-                SpotifyUser spotifyUser = new SpotifyUser(
-                        username,
-                        accessToken,
-                        refreshToken,
-                        userProfile.getId()
-                );
-
-                // Store logged-in user
-                loggedInUsers.put(username, spotifyUser);
-
-                // Clear code verifier after use
-                this.codeVerifier = null;
-
-                return spotifyUser;
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException("Failed to exchange authorization code: " + e.getMessage(), e);
-        }
-    }
-
-    public SpotifyUser getUserByUsername(String username) {
-        return loggedInUsers.get(username);
-    }
-
-    public Collection<SpotifyUser> getAllLoggedInUsers() {
-        return loggedInUsers.values();
-    }
-}
 
     private String generateCodeVerifier() {
         SecureRandom secureRandom = new SecureRandom();

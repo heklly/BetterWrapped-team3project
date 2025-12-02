@@ -1,6 +1,7 @@
 package view;
 
 import data_access.SpotifyDataAccessObject;
+import data_access.SpotifyUserDataAccessObject;
 import entity.SpotifyUser;
 
 import interface_adapter.logged_in.LoggedInState;
@@ -27,6 +28,7 @@ import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -443,8 +445,8 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
         membersPanel.add(membersLabel);
         membersPanel.add(membersField);
 
-        // Create Button
         JButton createButton = new JButton("Create");
+        // Create Button
         createButton.addActionListener(e -> {
             String groupName = groupNameField.getText().trim();
             String membersText = membersField.getText().trim();
@@ -459,9 +461,24 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
             // Split usernames by comma
             String[] memberUsernames = membersText.isEmpty() ? new String[0] : membersText.split("\\s*,\\s*");
 
-            // Call your controller (implement groupController separately)
-            if (createGroupController != null && currentSpotifyUser != null) {
-                createGroupController.createGroup(currentSpotifyUser, groupName, List.of(memberUsernames));
+            // Convert usernames to SpotifyUser objects
+            List<SpotifyUser> members = new ArrayList<>();
+            SpotifyUserDataAccessObject spotifyUserDao = SpotifyUserDataAccessObject.getInstance();
+
+            for (String username : memberUsernames) {
+                SpotifyUser user = spotifyUserDao.getUserByUsername(username); // assuming you have a DAO to fetch users
+                if (user != null) {
+                    members.add(user);
+                }
+            }
+
+            // Include current user as part of the group if needed
+            if (currentSpotifyUser != null) {
+                members.add(currentSpotifyUser);
+            }
+
+            if (createGroupController != null) {
+                createGroupController.execute(groupName, members); // now matches method signature
                 JOptionPane.showMessageDialog(createGroupFrame,
                         "Group created successfully!",
                         "Success",
@@ -524,11 +541,21 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
     }
 
     private List<SpotifyUser> convertUsernamesToSpotifyUsers(String[] usernames) {
-        return Arrays.stream(usernames)
-                .map(username -> new SpotifyUser(username)) // assumes SpotifyUser has constructor
-                .toList();
-    }
+        SpotifyUserDataAccessObject spotifyUserDao = SpotifyUserDataAccessObject.getInstance(); // get the singleton
+        List<SpotifyUser> users = new ArrayList<>();
 
+        for (String username : usernames) {
+            SpotifyUser user = spotifyUserDao.getUserByUsername(username);
+            if (user != null) {
+                users.add(user);
+            } else {
+                // Optional: log or warn if the username does not exist
+                System.out.println("Warning: SpotifyUser \"" + username + "\" not found in DAO.");
+            }
+        }
+
+        return users;
+    }
     // --- Controllers and user setter ---
     public void setDailyMixController(DailyMixController dailyMixController) {
         this.dailyMixController = dailyMixController;

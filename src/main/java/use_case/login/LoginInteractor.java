@@ -1,5 +1,6 @@
 package use_case.login;
 
+import data_access.SpotifyUserDataAccessObject;
 import entity.SpotifyUser;
 
 /**
@@ -33,14 +34,16 @@ public class LoginInteractor implements LoginInputBoundary {
                 loginPresenter.prepareFailView("Incorrect password for \"" + username + "\".");
             }
             else {
-
                 final SpotifyUser user = userDataAccessObject.get(loginInputData.getUsername());
 
+                // Set the current username in your existing DAO
                 userDataAccessObject.setCurrentUsername(username);
+
+                //  Add the SpotifyUser to the global DAO
+                SpotifyUserDataAccessObject.getInstance().addUser(user);
 
                 final LoginOutputData loginOutputData = new LoginOutputData(user.getUsername());
                 loginPresenter.prepareSuccessView(loginOutputData);
-            }
         }
     }
-}
+}}
