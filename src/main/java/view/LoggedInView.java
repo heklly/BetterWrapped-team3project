@@ -313,7 +313,21 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
         loyaltyLookUpPanel.add(loyaltyLookUpLabel);
         loyaltyLookUpPanel.add(lookupField);
 
-
+        // Go to Group View Button
+        JPanel groupPanel = new JPanel();
+        groupPanel.setLayout(new BoxLayout(groupPanel, BoxLayout.Y_AXIS));
+        goToGroup = new JButton("Group");
+        goToGroup.addActionListener(e -> {
+            if (currentSpotifyUser.isInGroup()) {
+                viewManagerModel.setState("in group");
+                viewManagerModel.firePropertyChange();
+            } else {
+                viewManagerModel.setState("no group");
+                viewManagerModel.firePropertyChange();
+            }
+        });
+        goToGroup.setEnabled(false);
+        groupPanel.add(goToGroup);
 
         // --- Center panel (CENTER) ---
         JPanel centerPanel = new JPanel();
