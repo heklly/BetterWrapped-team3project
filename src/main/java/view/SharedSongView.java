@@ -5,6 +5,7 @@ import interface_adapter.create_group.InGroupViewModel;
 import interface_adapter.sharedsong.SharedSongViewModel;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
@@ -28,8 +29,11 @@ public class SharedSongView extends JPanel implements ActionListener, PropertyCh
         this.inGroupViewModel = inGroupViewModel;
         this.viewManagerModel = viewManagerModel;
         this.sharedSongViewModel = sharedSongViewModel;
+        this.addPropertyChangeListener(this);
 
         JLabel title = new JLabel("Who shares your currently playing song?");
+        title.setFont(new Font("Century Schoolbook", Font.PLAIN, 25));
+        title.setAlignmentX(RIGHT_ALIGNMENT);
 
         dataPanel = new JPanel();
         dataPanel.setLayout(new BoxLayout(dataPanel, BoxLayout.Y_AXIS));
@@ -41,10 +45,13 @@ public class SharedSongView extends JPanel implements ActionListener, PropertyCh
 
         backButton = new JButton("Back to Group");
         backButton.addActionListener(this);
-        this.add(backButton);
 
-        this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-        this.add(title, dataPanel);
+        this.setLayout(new BorderLayout());
+        this.add(title, BorderLayout.NORTH);
+//        this.add(dataPanel, BorderLayout.CENTER);
+        this.add(dataPanel, BorderLayout.CENTER);
+        this.add(backButton, BorderLayout.SOUTH);
+
     }
 
     public void actionPerformed(ActionEvent e) {
@@ -64,10 +71,15 @@ public class SharedSongView extends JPanel implements ActionListener, PropertyCh
 
     public void setDataPanel(Map<String, String> UsernameToShared) {
         dataPanel.removeAll();
+        dataPanel.add(Box.createVerticalStrut(7));
         if (UsernameToShared != null) {
             dataPanel.setLayout(new BoxLayout(dataPanel, BoxLayout.Y_AXIS));
             for (String username : UsernameToShared.keySet()) {
-                dataPanel.add(new JLabel(String.format("%s: %s", username, UsernameToShared.get(username))));
+                JLabel label = new JLabel(String.format("%s: %s", username, UsernameToShared.get(username)));
+                label.setFont(new Font("Century Schoolbook", Font.PLAIN, 30));
+                label.setAlignmentX(CENTER_ALIGNMENT);
+                dataPanel.add(label);
+                dataPanel.add(Box.createVerticalStrut(45));
             }
         }
     }

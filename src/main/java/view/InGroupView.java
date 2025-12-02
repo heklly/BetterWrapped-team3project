@@ -52,14 +52,17 @@ public class InGroupView extends JPanel implements ActionListener, PropertyChang
 
         groupName = new JLabel();
         setGroupName(currentState.getGroupName());
+        groupName.setFont(new Font("Century Schoolbook", Font.PLAIN, 18));
         groupName.setAlignmentX(JComponent.CENTER_ALIGNMENT);
 
         groupPanel = new JPanel();
         setGroupPanel(currentState);
         JPanel centerPanel = new JPanel();
         centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.Y_AXIS));
-        centerPanel.add(groupPanel);
+        centerPanel.add(Box.createVerticalStrut(20));
         centerPanel.add(groupName);
+        centerPanel.add(Box.createVerticalStrut(20));
+        centerPanel.add(groupPanel);
 
         JPanel buttons = new JPanel();
         buttons.setLayout(new FlowLayout());
@@ -99,11 +102,16 @@ public class InGroupView extends JPanel implements ActionListener, PropertyChang
                 new ActionListener() {
                     public void actionPerformed(ActionEvent evt) {
                         if (evt.getSource().equals(sharedSong)) {
-                            final SharedSongState currentState = sharedSongViewModel.getState();
-                            sharedSongController.execute(
-                                    currentState.getSpotifyUser(),
-                                    currentState.getGroupUsers()
-                            );
+                            if (sharedSongViewModel.getState() != null) {
+                                final SharedSongState currentState = sharedSongViewModel.getState();
+                                sharedSongController.execute(
+                                        currentState.getSpotifyUser(),
+                                        currentState.getGroupUsers()
+                                );
+                            } else {
+                                inGroupViewModel.firePropertyChange("shared song error");
+                            }
+
                         }
                     }
                 }
@@ -177,6 +185,7 @@ public class InGroupView extends JPanel implements ActionListener, PropertyChang
             for (String username : state.getGroupUsernames()) {
                 JLabel usernameLabel = new JLabel(username);
                 usernameLabel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+                usernameLabel.setFont(new Font("Century Schoolbook", Font.PLAIN, 18));
                 groupPanel.add(usernameLabel);
             }
         }
