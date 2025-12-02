@@ -24,18 +24,24 @@ public class Main {
         AppBuilder appBuilder = new AppBuilder();
         JFrame application = appBuilder
                 .addViewModels()         // ✅ Create ALL view models FIRST
-                // not needed .addLoginView()
                 .addLoyaltyView()
                 .addLoggedInView()
                 .addSpotifyAuthView()
-                .addSignupUseCase()
-                // not needed .addLoginUseCase()
-                .addChangePasswordUseCase()
-                // not needed .addLogoutUseCase()
+                .addGroupAnalyticsView()     // 🔹 add the new screen as a card
+                .addSpotifyAuthUseCase()
+                .addDailyMixUseCase()
+                .addGetTopItemsUseCase()
+                .addGroupAnalyticsUseCase()  // 🔹 wire controller + interactor + presenter
+                .addInGroupView()
+                .addNoGroupView()
+                .addSharedSongView()
+                .addGroupAnalyticsView()
                 .addSpotifyAuthUseCase()
                 .addDailyMixUseCase()
                 .addGetTopItemsUseCase()
                 .addLoyaltyUseCase()
+                .addSharedSongUseCase()
+                .addGroupAnalyticsUseCase()
                 .build();
         application.pack();
         application.setLocationRelativeTo(null);

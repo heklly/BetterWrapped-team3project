@@ -3,31 +3,54 @@ package app;
 import data_access.LoyaltyScoreDataAccessObject;
 import data_access.SpotifyDataAccessObject;
 import data_access.TopItemDataAccessObject;
+import data_access.SpotifyDataAccessObject;
 import interface_adapter.ViewManagerModel;
+import interface_adapter.create_group.CreateGroupController;
+import interface_adapter.create_group.CreateGroupPresenter;
+import interface_adapter.create_group.InGroupViewModel;
+import interface_adapter.create_group.NoGroupViewModel;
 import interface_adapter.get_topItems.GetTopItemsController;
 import interface_adapter.get_topItems.GetTopItemsPresenter;
 import interface_adapter.get_topItems.GetTopItemsViewModel;
+import interface_adapter.group_analytics.GroupAnalyticsController;
+import interface_adapter.group_analytics.GroupAnalyticsPresenter;
+import interface_adapter.group_analytics.GroupAnalyticsViewModel;
+import interface_adapter.leave_group.LeaveGroupController;
+import interface_adapter.leave_group.LeaveGroupPresenter;
 import interface_adapter.logged_in.LoggedInViewModel;
-import interface_adapter.login.LoginPresenter;
-import interface_adapter.login.LoginViewModel;
 import interface_adapter.loyalty_score.LoyaltyController;
 import interface_adapter.loyalty_score.LoyaltyPresenter;
 import interface_adapter.loyalty_score.LoyaltyViewModel;
+import interface_adapter.loyalty_score.LoyaltyViewModel;
+import interface_adapter.sharedsong.SharedSongController;
+import interface_adapter.sharedsong.SharedSongPresenter;
+import interface_adapter.sharedsong.SharedSongViewModel;
 import interface_adapter.spotify_auth.SpotifyAuthController;
 import interface_adapter.spotify_auth.SpotifyAuthPresenter;
 import interface_adapter.spotify_auth.SpotifyAuthViewModel;
 import interface_adapter.daily_mix.DailyMixViewModel;
 import interface_adapter.daily_mix.DailyMixController;
 import interface_adapter.daily_mix.DailyMixPresenter;
+import use_case.create_group.CreateGroupInputBoundary;
+import use_case.create_group.CreateGroupInteractor;
+import use_case.create_group.CreateGroupOutputBoundary;
+import use_case.create_group.GroupDataAccessInterface;
 import use_case.get_topItems.GetTopItemsInputBoundary;
 import use_case.get_topItems.GetTopItemsInteractor;
 import use_case.get_topItems.GetTopItemsOutputBoundary;
-import use_case.login.LoginInputBoundary;
-import use_case.login.LoginInteractor;
-import use_case.login.LoginOutputBoundary;
+import use_case.group_analytics.GroupAnalyticsInteractor;
+import use_case.group_analytics.GroupAnalyticsInputBoundary;
+import use_case.group_analytics.GroupAnalyticsOutputBoundary;
+import use_case.leave_group.LeaveGroupInputBoundary;
+import use_case.leave_group.LeaveGroupInteractor;
+import use_case.leave_group.LeaveGroupOutputBoundary;
 import use_case.loyalty_score.LoyaltyScoreInputBoundary;
+import use_case.loyalty_score.LoyaltyScoreInputData;
 import use_case.loyalty_score.LoyaltyScoreInteractor;
 import use_case.loyalty_score.LoyaltyScoreOutputBoundary;
+import use_case.sharedsong.SharedSongInputBoundary;
+import use_case.sharedsong.SharedSongInteractor;
+import use_case.sharedsong.SharedSongOutputBoundary;
 import use_case.spotify_auth.SpotifyAuthInputBoundary;
 import use_case.spotify_auth.SpotifyAuthInteractor;
 import use_case.spotify_auth.SpotifyAuthOutputBoundary;
@@ -37,6 +60,7 @@ import use_case.daily_mix.DailyMixInteractor;
 import use_case.daily_mix.DailyMixOutputBoundary;
 import use_case.daily_mix.DailyMixOutputData;
 import view.*;
+import view.group_analytics.GroupAnalyticsView;
 
 import javax.swing.*;
 import java.awt.*;
@@ -47,12 +71,20 @@ public class AppBuilder {
     final ViewManagerModel viewManagerModel = new ViewManagerModel();
     ViewManager viewManager = new ViewManager(cardPanel, cardLayout, viewManagerModel);
 
-    private LoginViewModel loginViewModel;
     private LoggedInViewModel loggedInViewModel;
     private LoggedInView loggedInView;
-    private LoginView loginView;
     private SpotifyAuthView spotifyAuthView;
     private SpotifyAuthViewModel spotifyAuthViewModel;
+
+    private InGroupView inGroupView;
+    private InGroupViewModel inGroupViewModel;
+    private NoGroupView noGroupView;
+    private NoGroupViewModel noGroupViewModel;
+    private SharedSongView sharedSongView;
+    private SharedSongViewModel sharedSongViewModel;
+    private GroupAnalyticsView groupAnalyticsView;
+    private GroupAnalyticsViewModel groupAnalyticsViewModel;
+
     private DailyMixViewModel dailyMixViewModel;
     private GetTopItemsViewModel getTopItemsViewModel;
     private LoyaltyViewModel loyaltyViewModel;
@@ -63,18 +95,15 @@ public class AppBuilder {
     }
 
     public AppBuilder addViewModels() {
-        loginViewModel = new LoginViewModel();
         loggedInViewModel = new LoggedInViewModel();
         spotifyAuthViewModel = new SpotifyAuthViewModel();
+        inGroupViewModel = new InGroupViewModel();
+        noGroupViewModel = new NoGroupViewModel();
+        sharedSongViewModel = new SharedSongViewModel();
+        groupAnalyticsViewModel = new GroupAnalyticsViewModel();
         dailyMixViewModel = new DailyMixViewModel();
         getTopItemsViewModel = new GetTopItemsViewModel();
         loyaltyViewModel = new LoyaltyViewModel();
-        return this;
-    }
-
-    public AppBuilder addLoginView() {
-        loginView = new LoginView(loginViewModel, viewManagerModel);
-        cardPanel.add(loginView, loginView.getViewName());
         return this;
     }
 
@@ -95,29 +124,34 @@ public class AppBuilder {
         return this;
     }
 
+    public AppBuilder addInGroupView() {
+        inGroupView = new InGroupView(viewManagerModel, inGroupViewModel, sharedSongViewModel, groupAnalyticsViewModel);
+        cardPanel.add(inGroupView, inGroupView.getViewName());
+        return this;
+    }
+
+    public AppBuilder addNoGroupView() {
+        noGroupView = new NoGroupView(noGroupViewModel, viewManagerModel);
+        cardPanel.add(noGroupView, noGroupView.getViewName());
+        return this;
+    }
+
+    public AppBuilder addSharedSongView() {
+        sharedSongView = new SharedSongView(inGroupViewModel, viewManagerModel, sharedSongViewModel);
+        cardPanel.add(sharedSongView, sharedSongView.getViewName());
+        return this;
+    }
+
+    public AppBuilder addGroupAnalyticsView() {
+        groupAnalyticsView = new GroupAnalyticsView(groupAnalyticsViewModel,
+                viewManagerModel);
+        cardPanel.add(groupAnalyticsView, groupAnalyticsView.getViewName());
+        return this;
+    }
+
     public AppBuilder addLoyaltyView() {
         loyaltyView = new LoyaltyScoreView(loyaltyViewModel, viewManagerModel);
         cardPanel.add(loyaltyView, loyaltyView.getViewName());
-        return this;
-    }
-
-    public AppBuilder addSignupUseCase() {
-        // emptied; do not need
-        return this;
-    }
-
-    public AppBuilder addLoginUseCase() {
-        // emptied, do not need
-        return this;
-    }
-
-    public AppBuilder addChangePasswordUseCase() {
-        // emptied, do not need.
-        return this;
-    }
-
-    public AppBuilder addLogoutUseCase() {
-        // emptied; not necessary.
         return this;
     }
 
@@ -138,6 +172,65 @@ public class AppBuilder {
         SpotifyAuthController controller = new SpotifyAuthController(spotifyAuthInteractor);
         spotifyAuthView.setSpotifyAuthController(controller);
 
+        return this;
+    }
+
+    public AppBuilder addLeaveGroupUseCase() {
+//        TODO uncomment once GroupDAO is done
+//        final LeaveGroupOutputBoundary leaveGroupPresenter =
+//                new LeaveGroupPresenter(viewManagerModel, inGroupViewModel, noGroupViewModel);
+//        final LeaveGroupInputBoundary leaveGroupInteractor =
+//                new LeaveGroupInteractor(new GroupDataAccessObject(), leaveGroupPresenter);
+//        LeaveGroupController leaveGroupController = new LeaveGroupController(leaveGroupInteractor);
+//        inGroupView.setLeaveGroupController(leaveGroupController);
+        return this;
+    }
+
+    public AppBuilder addCreateGroupUseCase() {
+        final CreateGroupOutputBoundary createGroupPresenter =
+                new CreateGroupPresenter(inGroupViewModel, noGroupViewModel, viewManagerModel);
+        final CreateGroupInputBoundary createGroupInteractor =
+                new CreateGroupInteractor(createGroupPresenter);
+        final CreateGroupController createGroupController =
+                new  CreateGroupController(createGroupInteractor);
+        noGroupView.setCreateGroupController(createGroupController);
+        return this;
+    }
+
+    public AppBuilder addJoinGroupUseCase() {
+        return this;
+    }
+
+    public AppBuilder addSharedSongUseCase() {
+        final SharedSongOutputBoundary sharedSongPresenter =
+                new SharedSongPresenter(sharedSongViewModel, viewManagerModel);
+        final SharedSongInputBoundary sharedSongInteractor =
+                new SharedSongInteractor(sharedSongPresenter, new SpotifyDataAccessObject());
+        final SharedSongController sharedSongController = new SharedSongController(sharedSongInteractor);
+        inGroupView.setSharedSongController(sharedSongController);
+        return this;
+    }
+
+    public AppBuilder addGroupAnalyticsUseCase() {
+        final GroupAnalyticsViewModel vm = groupAnalyticsViewModel;
+
+        // presenter
+        final GroupAnalyticsOutputBoundary outputBoundary =
+                new GroupAnalyticsPresenter(vm);
+
+        // interactor
+        final GroupAnalyticsInputBoundary interactor =
+                new GroupAnalyticsInteractor(outputBoundary);
+
+        SpotifyDataAccessObject spotifyDAO = new SpotifyDataAccessObject();
+
+        //controller
+
+        GroupAnalyticsController controller =
+                new GroupAnalyticsController(interactor, spotifyDAO);
+
+        // wire into view
+        groupAnalyticsView.setGroupAnalyticsController(controller);
         return this;
     }
 

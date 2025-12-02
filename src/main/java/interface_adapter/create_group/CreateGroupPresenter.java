@@ -20,6 +20,7 @@ public class CreateGroupPresenter implements CreateGroupOutputBoundary {
      * @param noGroupViewModel the NoGroupViewModel associated with the Create Group screen.
      * @param inGroupViewModel the InGroupViewModel to be updated
      * @param viewManagerModel changes create/join group view to in group view
+     *
      */
     public CreateGroupPresenter(InGroupViewModel inGroupViewModel,
                                 NoGroupViewModel noGroupViewModel,
@@ -40,9 +41,9 @@ public class CreateGroupPresenter implements CreateGroupOutputBoundary {
         if (outputData != null) {
             currentState.setGroupName(outputData.getGroup_name());
             currentState.setInGroup(true);
-//            currentState.setGroupUsernames(outputData.getUsers());
+            currentState.setGroupUsers(outputData.getUsers());
 //            currentState.setGroup(outputData.getGroup());
-//            currentState.setSpotifyUser(outputData.);
+            currentState.setSpotifyUser(outputData.getOwner());
             inGroupViewModel.firePropertyChange();
             noGroupViewModel.setState(new UserGroupState());
 

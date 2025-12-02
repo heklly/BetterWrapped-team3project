@@ -1,4 +1,4 @@
-package use_case.logged_in_view;
+package use_case.logged_in;
 
 import javax.swing.*;
 
