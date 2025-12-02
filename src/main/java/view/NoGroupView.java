@@ -42,11 +42,11 @@ public class NoGroupView extends JPanel implements ActionListener, PropertyChang
 
         loggedIn = new JButton("Main Page");
         final JPanel buttons = new JPanel();
-        buttons.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         createGroup = new JButton("Create Group");
         buttons.add(createGroup);
         joinGroup = new JButton("Join Group");
         buttons.add(joinGroup);
+        buttons.setLayout(new BoxLayout(buttons, BoxLayout.Y_AXIS));
 
         loggedIn.addActionListener(
                 new ActionListener() {

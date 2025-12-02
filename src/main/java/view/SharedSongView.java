@@ -30,7 +30,11 @@ public class SharedSongView extends JPanel implements ActionListener, PropertyCh
 
         dataPanel = new JPanel();
         dataPanel.setLayout(new BoxLayout(dataPanel, BoxLayout.Y_AXIS));
-        setDataPanel(sharedSongViewModel.getState().getUsernameToShared());
+
+        // defaulting to do only if state is not nothing
+        if ( sharedSongViewModel != null &&  sharedSongViewModel.getState() != null) {
+            setDataPanel(sharedSongViewModel.getState().getUsernameToShared());
+        }
 
         backButton = new JButton("Back to Group");
         backButton.addActionListener(this);
