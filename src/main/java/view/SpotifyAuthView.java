@@ -29,14 +29,16 @@ public class SpotifyAuthView extends JPanel implements ActionListener, PropertyC
         this.loggedInViewModel = loggedInViewModel;
         this.spotifyAuthViewModel.addPropertyChangeListener(this);
 
-        JLabel title = new JLabel("Connect Spotify Account");
+        JLabel title = new JLabel();
         title.setAlignmentX(Component.CENTER_ALIGNMENT);
         title.setFont(new Font("Arial", Font.BOLD, 18));
 
+        // Instructions Label with HTML for line breaks
         JLabel instructions = new JLabel("<html><center>" +
                 "Click the button below to connect your Spotify account.<br>" +
                 "Your browser will open and you'll be asked to authorize the app." +
                 "</center></html>");
+        instructions.setFont(new Font("Calibri", Font.BOLD, 30));
         instructions.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         statusLabel = new JLabel(" ");
@@ -45,10 +47,11 @@ public class SpotifyAuthView extends JPanel implements ActionListener, PropertyC
 
         JPanel buttonPanel = new JPanel();
         connectSpotifyButton = new JButton("Connect to Spotify");
-        connectSpotifyButton.setFont(new Font("Arial", Font.BOLD, 14));
-        connectSpotifyButton.setBackground(new Color(29, 185, 84));
+        connectSpotifyButton.setFont(new Font("Monospaced", Font.BOLD, 30));
+        connectSpotifyButton.setBackground(new Color(30, 215, 96));
         connectSpotifyButton.setForeground(Color.WHITE);
         connectSpotifyButton.setFocusPainted(false);
+        connectSpotifyButton.setPreferredSize(new Dimension(500, 200));
         buttonPanel.add(connectSpotifyButton);
 
         connectSpotifyButton.addActionListener(evt -> {
@@ -61,7 +64,11 @@ public class SpotifyAuthView extends JPanel implements ActionListener, PropertyC
         this.add(Box.createVerticalStrut(40));
         this.add(title);
         this.add(Box.createVerticalStrut(20));
-        this.add(instructions);
+
+        JPanel instructionsPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        instructionsPanel.add(instructions);                // Add instructions in the center
+        this.add(instructionsPanel);
+
         this.add(Box.createVerticalStrut(30));
         this.add(buttonPanel);
         this.add(Box.createVerticalStrut(20));
