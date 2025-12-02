@@ -59,6 +59,8 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
     private final JButton medium_termButton;
     private final JButton long_termButton;
     private final JTextArea TopItemsArea;
+    private final JButton goToGroup;
+    //    private GroupDataAccessObject groupDAO;
 
     public LoggedInView(LoggedInViewModel loggedInViewModel,
                         ViewManagerModel viewManagerModel,
