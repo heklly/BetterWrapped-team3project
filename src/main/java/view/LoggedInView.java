@@ -1,6 +1,7 @@
 package view;
 
 import data_access.SpotifyDataAccessObject;
+import data_access.SpotifyUserDataAccessObject;
 import entity.SpotifyUser;
 
 import interface_adapter.logged_in.LoggedInState;
@@ -27,6 +28,8 @@ import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class LoggedInView extends JPanel implements ActionListener, PropertyChangeListener {
@@ -446,6 +449,97 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
             TopItemsArea.setCaretPosition(0);
         }
 
+    }
+
+    // group helpers
+    private void openCreateGroupPopup() {
+        // Popup frame
+        JFrame createGroupFrame = new JFrame("Create Group");
+        createGroupFrame.setLayout(new BoxLayout(createGroupFrame.getContentPane(), BoxLayout.Y_AXIS));
+        createGroupFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+
+        // Group Name
+        JPanel groupNamePanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JLabel groupNameLabel = new JLabel("Group Name:");
+        JTextField groupNameField = new JTextField(20);
+        groupNamePanel.add(groupNameLabel);
+        groupNamePanel.add(groupNameField);
+
+        // Member Spotify User IDs
+        JPanel membersPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JLabel membersLabel = new JLabel("Member Spotify User IDs (comma-separated):");
+        JTextField membersField = new JTextField(30);
+        membersPanel.add(membersLabel);
+        membersPanel.add(membersField);
+
+        // Create button
+        JButton createButton = new JButton("Create");
+        createButton.addActionListener(e -> {
+            String groupName = groupNameField.getText().trim();
+            String membersText = membersField.getText().trim();
+
+            if (groupName.isEmpty()) {
+                JOptionPane.showMessageDialog(createGroupFrame,
+                        "Please enter a group name.",
+                        "Missing Name",
+                        JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            // Split IDs
+            String[] memberIds = membersText.isEmpty() ? new String[0] :
+                    Arrays.stream(membersText.split("\\s*,\\s*"))
+                            .map(String::trim)
+                            .toArray(String[]::new);
+
+            SpotifyUserDataAccessObject spotifyUserDao = SpotifyUserDataAccessObject.getInstance();
+            List<SpotifyUser> members = new ArrayList<>();
+            List<String> missingIds = new ArrayList<>();
+
+            for (String id : memberIds) {
+                SpotifyUser user = spotifyUserDao.getUserById(id);
+                if (user != null) {
+                    members.add(user);
+                } else {
+                    missingIds.add(id);
+                }
+            }
+
+            if (members.isEmpty()) {
+                JOptionPane.showMessageDialog(createGroupFrame,
+                        "No valid users found. Please enter at least one valid Spotify User ID.",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            if (!missingIds.isEmpty()) {
+                JOptionPane.showMessageDialog(createGroupFrame,
+                        "These user IDs were not found: " + String.join(", ", missingIds) + "\nThey will be skipped.",
+                        "Warning",
+                        JOptionPane.WARNING_MESSAGE);
+            }
+
+            if (createGroupController != null) {
+                createGroupController.execute(groupName, members);
+                JOptionPane.showMessageDialog(createGroupFrame,
+                        "Group created successfully!",
+                        "Success",
+                        JOptionPane.INFORMATION_MESSAGE);
+                createGroupFrame.dispose();
+            } else {
+                JOptionPane.showMessageDialog(createGroupFrame,
+                        "Error creating group. Make sure the controller is initialized.",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE);
+            }
+        });
+
+        createGroupFrame.add(groupNamePanel);
+        createGroupFrame.add(membersPanel);
+        createGroupFrame.add(createButton);
+        createGroupFrame.pack();
+        createGroupFrame.setVisible(true);
     }
 
     // --- Time and Item helpers ---
