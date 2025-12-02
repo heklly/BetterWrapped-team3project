@@ -350,6 +350,13 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
         centerPanel.add(TopItemsScroll, BorderLayout.CENTER);
 
         this.add(centerPanel, BorderLayout.CENTER);
+        JPanel groupButtonsPanel = new JPanel();
+        groupButtonsPanel.add(groupTabButton);
+        topWrapper.add(Box.createVerticalStrut(10)); // spacing
+        topWrapper.add(groupButtonsPanel);
+
+        topWrapper.add(Box.createVerticalStrut(10)); // spacing
+        topWrapper.add(groupButtonsPanel);
 
         // --- Bottom panel (SOUTH) ---
         JPanel bottomPanel = new JPanel();
