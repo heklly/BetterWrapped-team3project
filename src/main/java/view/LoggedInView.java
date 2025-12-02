@@ -196,7 +196,10 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
         // Generate getTopItems button listener
         getTopItemButton.addActionListener(evt -> {
             if (evt.getSource().equals(getTopItemButton)) {
+                System.out.println("=== BUTTON CLICKED ===");
+
                 if (getTopItemsController == null || currentSpotifyUser == null) {
+                    System.out.println("ERROR: Controller or user is null");
                     JOptionPane.showMessageDialog(this,
                             "Please select time range and top item first.",
                             "unselected item or time",
@@ -207,8 +210,9 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
                 final GetTopItemsState getTopItemsState = getTopItemsViewModel.getState();
                 TopItem topItem = getTopItemsState.getSelectedTopItem();
                 TimeRange timeRange = getTopItemsState.getSelectedTime();
-                getTopItemsController.execute(currentSpotifyUser, topItem, timeRange);
 
+                System.out.println("VIEW: Calling controller with topItem=" + topItem + ", timeRange=" + timeRange);
+                getTopItemsController.execute(currentSpotifyUser, topItem, timeRange);
             }
         });
 
@@ -430,6 +434,7 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
         state.setSelectedTopItem(TopItem.tracks);
         getTopItemsViewModel.setState(state);
         getTopItemsViewModel.firePropertyChange();
+        checkEnableGetTopItemButton();  // ADD THIS LINE
     }
 
     private void set_item_artist() {
@@ -437,6 +442,7 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
         state.setSelectedTopItem(TopItem.artists);
         getTopItemsViewModel.setState(state);
         getTopItemsViewModel.firePropertyChange();
+        checkEnableGetTopItemButton();  // ADD THIS LINE
     }
 
     // --- Controllers and user setter ---

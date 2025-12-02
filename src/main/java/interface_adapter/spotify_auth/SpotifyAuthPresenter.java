@@ -26,24 +26,49 @@ public class SpotifyAuthPresenter implements SpotifyAuthOutputBoundary {
     }
 
     @Override
-    public void prepareSuccessView(SpotifyAuthOutputData response) {
-        // Get current state (preserves existing username!)
-        LoggedInState loggedInState = loggedInViewModel.getState();
+    public void prepareAuthUrlView(String authUrl) {
+        SpotifyAuthState currentState = spotifyAuthViewModel.getState();
+        currentState.setAuthorizationUrl(authUrl);
+        currentState.setWaitingForCallback(true);
+        currentState.setStatusMessage("Opening browser...");
+        currentState.setAuthError("");
 
-        // If username is somehow empty, set it from response
+        spotifyAuthViewModel.setState(currentState);
+        spotifyAuthViewModel.firePropertyChange("authUrlReady");
+    }
+
+    @Override
+    public void updateStatus(String message) {
+        SpotifyAuthState currentState = spotifyAuthViewModel.getState();
+        currentState.setStatusMessage(message);
+
+        spotifyAuthViewModel.setState(currentState);
+        spotifyAuthViewModel.firePropertyChange("statusUpdate");
+    }
+
+    @Override
+    public void prepareSuccessView(SpotifyAuthOutputData response) {
+        // Update auth state
+        SpotifyAuthState authState = spotifyAuthViewModel.getState();
+        authState.setAuthenticated(true);
+        authState.setWaitingForCallback(false);
+        authState.setStatusMessage("Connected successfully!");
+        authState.setAuthError("");
+        spotifyAuthViewModel.setState(authState);
+        spotifyAuthViewModel.firePropertyChange("authSuccess");
+
+        // Update logged in state
+        LoggedInState loggedInState = loggedInViewModel.getState();
         if (loggedInState.getUsername() == null || loggedInState.getUsername().isEmpty()) {
             loggedInState.setUsername(response.getUsername());
         }
-
-        // Add Spotify authentication info
         loggedInState.setSpotifyAuthenticated(true);
         loggedInState.setSpotifyUserId(response.getSpotifyUserId());
 
-        // Update the view model
         loggedInViewModel.setState(loggedInState);
         loggedInViewModel.firePropertyChange();
 
-        // Pass the SpotifyUser to the LoggedInView
+        // Pass SpotifyUser to view
         if (loggedInView != null && response.getSpotifyUser() != null) {
             loggedInView.setCurrentSpotifyUser(response.getSpotifyUser());
         }
@@ -57,7 +82,10 @@ public class SpotifyAuthPresenter implements SpotifyAuthOutputBoundary {
     public void prepareFailView(String error) {
         SpotifyAuthState currentState = spotifyAuthViewModel.getState();
         currentState.setAuthError(error);
+        currentState.setWaitingForCallback(false);
+        currentState.setStatusMessage("");
+
         spotifyAuthViewModel.setState(currentState);
-        spotifyAuthViewModel.firePropertyChange();
+        spotifyAuthViewModel.firePropertyChange("authError");
     }
 }
