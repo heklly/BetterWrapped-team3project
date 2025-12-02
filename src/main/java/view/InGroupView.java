@@ -76,7 +76,11 @@ public class InGroupView extends JPanel implements ActionListener, PropertyChang
                 new ActionListener() {
                     public void actionPerformed(ActionEvent evt) {
                         if (evt.getSource().equals(leaveGroup)) {
-                            leaveGroupController.execute();
+                            leaveGroupController.execute(
+                                    currentState.getSpotifyUser(),
+                                    currentState.getGroup()
+
+                            );
                         }
                     }
                 }

@@ -16,6 +16,7 @@ public class UserGroupState {
     private SpotifyUser spotifyUser;
     private List<SpotifyUser> groupUsers;
 //    private List<UserTasteProfile> profiles;
+    private Group group;
 
     private String groupName = "";
     private List<String> groupUsernames = null;
@@ -25,6 +26,14 @@ public class UserGroupState {
     public SpotifyUser getSpotifyUser() { return spotifyUser; }
 
     public void setSpotifyUser(SpotifyUser spotifyUser) { this.spotifyUser = spotifyUser; }
+
+    public Group getGroup() {
+        return group;
+    }
+
+    public void setGroup(Group group) {
+        this.group = group;
+    }
 
     public List<SpotifyUser> getGroupUsers() { return this.groupUsers; }
 
