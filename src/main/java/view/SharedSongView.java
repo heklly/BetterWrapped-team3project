@@ -21,35 +21,46 @@ public class SharedSongView extends JPanel implements ActionListener, PropertyCh
     private final JButton backButton;
     private final JPanel dataPanel;
 
-
-    public SharedSongView(InGroupViewModel inGroupViewModel, ViewManagerModel viewManagerModel) {
+    // ONE CONSTRUCTOR - not nested!
+    public SharedSongView(SharedSongViewModel sharedSongViewModel,
+                          InGroupViewModel inGroupViewModel,
+                          ViewManagerModel viewManagerModel) {
+        this.sharedSongViewModel = sharedSongViewModel;
         this.inGroupViewModel = inGroupViewModel;
         this.viewManagerModel = viewManagerModel;
+
+        this.sharedSongViewModel.addPropertyChangeListener(this);
 
         JLabel title = new JLabel("Who shares your currently playing song?");
 
         dataPanel = new JPanel();
         dataPanel.setLayout(new BoxLayout(dataPanel, BoxLayout.Y_AXIS));
-        setDataPanel(sharedSongViewModel.getState().getUsernameToShared());
+
+        // ADD NULL CHECK:
+        if (sharedSongViewModel.getState().getUsernameToShared() != null) {
+            setDataPanel(sharedSongViewModel.getState().getUsernameToShared());
+        }
 
         backButton = new JButton("Back to Group");
         backButton.addActionListener(this);
         this.add(backButton);
 
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-        this.add(title, dataPanel);
+        this.add(title);
+        this.add(dataPanel);
     }
 
+    // METHODS ARE AT CLASS LEVEL - not inside constructor!
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == backButton) {
             viewManagerModel.firePropertyChange(inGroupViewModel.getViewName());
             sharedSongViewModel.firePropertyChange("back");
         }
     }
+
     public void propertyChange(PropertyChangeEvent evt) {
         if (evt.getPropertyName().equals("shared song")) {
             setDataPanel(sharedSongViewModel.getState().getUsernameToShared());
-
         } else if (evt.getPropertyName().equals("error")) {
             inGroupViewModel.firePropertyChange("shared song error");
         }
@@ -64,5 +75,7 @@ public class SharedSongView extends JPanel implements ActionListener, PropertyCh
         }
     }
 
-    public String getViewName() { return this.viewName; }
+    public String getViewName() {
+        return this.viewName;
+    }
 }

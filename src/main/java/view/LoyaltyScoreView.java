@@ -24,7 +24,6 @@ import java.util.Map;
  */
 public class LoyaltyScoreView extends JPanel implements ActionListener, PropertyChangeListener {
 
-    private final String viewName = "loyalty scores";
     private JTable loyaltyScoreTable;
     private JButton backButton;
     private final LoyaltyViewModel loyaltyViewModel;
@@ -179,8 +178,6 @@ public class LoyaltyScoreView extends JPanel implements ActionListener, Property
             artistPanel.revalidate();
             artistPanel.repaint();
     }
-
-    public String getViewName() { return viewName; }
 
     public void setLoyaltyController(LoyaltyController loyaltyController) {
         this.loyaltyController = loyaltyController;

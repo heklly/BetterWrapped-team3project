@@ -76,7 +76,11 @@ public class InGroupView extends JPanel implements ActionListener, PropertyChang
                 new ActionListener() {
                     public void actionPerformed(ActionEvent evt) {
                         if (evt.getSource().equals(leaveGroup)) {
-                            leaveGroupController.execute();
+                            final UserGroupState currentState = inGroupViewModel.getState();
+                            leaveGroupController.execute(
+                                    currentState.getSpotifyUser(),
+                                    currentState.getGroup()
+                            );
                         }
                     }
                 }
@@ -190,11 +194,23 @@ public class InGroupView extends JPanel implements ActionListener, PropertyChang
     public void setGroupPanel(UserGroupState state) {
         groupPanel.removeAll();
         groupPanel.setLayout(new BoxLayout(groupPanel, BoxLayout.Y_AXIS));
-        for (String username : state.getGroupUsernames()) {
-            JLabel usernameLabel = new JLabel(username);
-            usernameLabel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
-            groupPanel.add(usernameLabel);
+
+        // ADD NULL CHECK:
+        if (state.getGroupUsernames() != null) {
+            for (String username : state.getGroupUsernames()) {
+                JLabel usernameLabel = new JLabel(username);
+                usernameLabel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+                groupPanel.add(usernameLabel);
+            }
+        } else {
+            // Optionally add a placeholder label when no group exists
+            JLabel placeholderLabel = new JLabel("No group members");
+            placeholderLabel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+            groupPanel.add(placeholderLabel);
         }
+
+        groupPanel.revalidate();
+        groupPanel.repaint();
     }
     public String getViewName() { return viewName; }
 }

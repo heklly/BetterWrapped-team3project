@@ -5,10 +5,6 @@ import entity.SpotifyUser;
 
 import java.util.List;
 
-/**
- * Interactor for the Create Group use case.
- * Implements the input boundary.
- */
 public class CreateGroupInteractor implements CreateGroupInputBoundary {
 
     @Override
@@ -23,11 +19,12 @@ public class CreateGroupInteractor implements CreateGroupInputBoundary {
             }
         }
 
-        // Return output data
+        // Return output data WITH the group object
         return new CreateGroupOutputData(
                 group.getGroup_name(),
                 group.getOwner(),
-                group.getUsers()
+                group.getUsers(),
+                group  // ADD THIS PARAMETER
         );
     }
 }
