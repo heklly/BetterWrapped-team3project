@@ -579,6 +579,10 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
     }
 
     // --- Controllers and user setter ---
+    public void setCreateGroupController(interface_adapter.create_group.CreateGroupController controller) {
+        this.createGroupController = controller;
+    }
+
     public void setDailyMixController(DailyMixController dailyMixController) {
         this.dailyMixController = dailyMixController;
     }
