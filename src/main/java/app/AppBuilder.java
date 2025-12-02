@@ -197,26 +197,22 @@ public class AppBuilder {
 
     public AppBuilder addGroupAnalyticsUseCase() {
         final GroupAnalyticsViewModel vm = groupAnalyticsViewModel;
+
+        // presenter
         final GroupAnalyticsOutputBoundary outputBoundary =
                 new GroupAnalyticsPresenter(vm);
 
+        // interactor
         final GroupAnalyticsInputBoundary interactor =
                 new GroupAnalyticsInteractor(outputBoundary);
 
         SpotifyDataAccessObject spotifyDAO = new SpotifyDataAccessObject();
 
+        //controller
+
         GroupAnalyticsController controller =
                 new GroupAnalyticsController(interactor, spotifyDAO);
 
-        groupAnalyticsView.setGroupAnalyticsController(controller);
-
-        // presenter
-        final GroupAnalyticsOutputBoundary outputBoundary = new GroupAnalyticsPresenter(groupAnalyticsViewModel);
-        // interactor
-        final GroupAnalyticsInputBoundary interactor = new GroupAnalyticsInteractor(outputBoundary);
-        // controller
-        GroupAnalyticsController controller =
-                new GroupAnalyticsController(interactor);
         // wire into view
         groupAnalyticsView.setGroupAnalyticsController(controller);
         return this;

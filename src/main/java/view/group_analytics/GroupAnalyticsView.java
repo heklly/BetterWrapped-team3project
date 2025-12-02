@@ -20,7 +20,6 @@ import java.util.List;
  * View for showing group analytics verdict and scores.
  * This view only works with REAL data (real Group / SpotifyUser list).
  */
-public class GroupAnalyticsView extends JPanel implements PropertyChangeListener {
 public class GroupAnalyticsView extends JPanel implements ActionListener, PropertyChangeListener {
 
     private final GroupAnalyticsViewModel viewModel;
@@ -65,15 +64,10 @@ public class GroupAnalyticsView extends JPanel implements ActionListener, Proper
         add(scrollPane, BorderLayout.CENTER);
         add(bottom, BorderLayout.SOUTH);
 
-        wireActions();
-
+        // DEFINE THIS METHOD wireActions();
 
     }
 
-    // Called from AppBuilder
-    public void setGroupAnalyticsController(GroupAnalyticsController controller) {
-        this.controller = controller;
-    }
 
     // Called from group UI / presenter when a real Group is ready
     public void analyzeRealGroup(Group group) {
