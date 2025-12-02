@@ -1,5 +1,6 @@
 package interface_adapter.leave_group;
 
+import entity.Group;
 import entity.SpotifyUser;
 import use_case.leave_group.LeaveGroupInputBoundary;
 import use_case.leave_group.LeaveGroupInputData;
@@ -10,17 +11,17 @@ import use_case.leave_group.LeaveGroupInputData;
 
 public class LeaveGroupController {
 
-    private LeaveGroupInputBoundary leaveGroupUseCaseInteractor;
+    private final LeaveGroupInputBoundary leaveGroupUseCaseInteractor;
 
     public LeaveGroupController(LeaveGroupInputBoundary leaveGroupUseCaseInteractor) {
-        this.leaveGroupUseCaseInteractor = this.leaveGroupUseCaseInteractor;
+        this.leaveGroupUseCaseInteractor = leaveGroupUseCaseInteractor;
     }
 
     /**
      * Executes the Leave Group Use Case.
      */
-    public void execute() {
-        // COMMENTED OUT CURRENTLY SO CODE COMPILES:
-        // leaveGroupUseCaseInteractor.execute();
+    public void execute(SpotifyUser user, Group group) {
+        LeaveGroupInputData inputData = new LeaveGroupInputData(user, group);
+        leaveGroupUseCaseInteractor.execute(inputData);
     }
 }

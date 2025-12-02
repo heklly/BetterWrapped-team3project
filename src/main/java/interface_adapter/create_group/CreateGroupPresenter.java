@@ -41,9 +41,9 @@ public class CreateGroupPresenter implements CreateGroupOutputBoundary {
         if (outputData != null) {
             currentState.setGroupName(outputData.getGroup_name());
             currentState.setInGroup(true);
-//            currentState.setGroupUsernames(outputData.getUsers());
+            currentState.setGroupUsers(outputData.getUsers());
 //            currentState.setGroup(outputData.getGroup());
-//            currentState.setSpotifyUser(outputData.);
+            currentState.setSpotifyUser(outputData.getOwner());
             inGroupViewModel.firePropertyChange();
             noGroupViewModel.setState(new UserGroupState());
 

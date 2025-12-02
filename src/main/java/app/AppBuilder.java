@@ -31,6 +31,7 @@ import interface_adapter.spotify_auth.SpotifyAuthViewModel;
 import interface_adapter.daily_mix.DailyMixViewModel;
 import interface_adapter.daily_mix.DailyMixController;
 import interface_adapter.daily_mix.DailyMixPresenter;
+import use_case.create_group.CreateGroupInputBoundary;
 import use_case.create_group.CreateGroupInteractor;
 import use_case.create_group.CreateGroupOutputBoundary;
 import use_case.create_group.GroupDataAccessInterface;
@@ -136,7 +137,7 @@ public class AppBuilder {
     }
 
     public AppBuilder addSharedSongView() {
-        sharedSongView = new SharedSongView(inGroupViewModel, viewManagerModel);
+        sharedSongView = new SharedSongView(inGroupViewModel, viewManagerModel, sharedSongViewModel);
         cardPanel.add(sharedSongView, sharedSongView.getViewName());
         return this;
     }
@@ -182,6 +183,21 @@ public class AppBuilder {
 //                new LeaveGroupInteractor(new GroupDataAccessObject(), leaveGroupPresenter);
 //        LeaveGroupController leaveGroupController = new LeaveGroupController(leaveGroupInteractor);
 //        inGroupView.setLeaveGroupController(leaveGroupController);
+        return this;
+    }
+
+    public AppBuilder addCreateGroupUseCase() {
+        final CreateGroupOutputBoundary createGroupPresenter =
+                new CreateGroupPresenter(inGroupViewModel, noGroupViewModel, viewManagerModel);
+        final CreateGroupInputBoundary createGroupInteractor =
+                new CreateGroupInteractor(createGroupPresenter);
+        final CreateGroupController createGroupController =
+                new  CreateGroupController(createGroupInteractor);
+        noGroupView.setCreateGroupController(createGroupController);
+        return this;
+    }
+
+    public AppBuilder addJoinGroupUseCase() {
         return this;
     }
 

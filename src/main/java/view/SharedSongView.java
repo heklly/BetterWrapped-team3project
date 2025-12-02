@@ -22,9 +22,12 @@ public class SharedSongView extends JPanel implements ActionListener, PropertyCh
     private final JPanel dataPanel;
 
 
-    public SharedSongView(InGroupViewModel inGroupViewModel, ViewManagerModel viewManagerModel) {
+    public SharedSongView(InGroupViewModel inGroupViewModel,
+                          ViewManagerModel viewManagerModel,
+                          SharedSongViewModel sharedSongViewModel) {
         this.inGroupViewModel = inGroupViewModel;
         this.viewManagerModel = viewManagerModel;
+        this.sharedSongViewModel = sharedSongViewModel;
 
         JLabel title = new JLabel("Who shares your currently playing song?");
 
@@ -61,10 +64,11 @@ public class SharedSongView extends JPanel implements ActionListener, PropertyCh
 
     public void setDataPanel(Map<String, String> UsernameToShared) {
         dataPanel.removeAll();
-
-        dataPanel.setLayout(new BoxLayout(dataPanel, BoxLayout.Y_AXIS));
-        for (String username : UsernameToShared.keySet()) {
-            dataPanel.add(new JLabel(String.format("%s: %s", username, UsernameToShared.get(username))));
+        if (UsernameToShared != null) {
+            dataPanel.setLayout(new BoxLayout(dataPanel, BoxLayout.Y_AXIS));
+            for (String username : UsernameToShared.keySet()) {
+                dataPanel.add(new JLabel(String.format("%s: %s", username, UsernameToShared.get(username))));
+            }
         }
     }
 
