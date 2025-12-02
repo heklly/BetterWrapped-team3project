@@ -30,7 +30,7 @@ import java.beans.PropertyChangeListener;
 import java.util.List;
 
 public class LoggedInView extends JPanel implements ActionListener, PropertyChangeListener {
-
+    private final JButton groupTabButton;
     private final String viewName = "logged in";
     private final LoggedInViewModel loggedInViewModel;
     private final ViewManagerModel viewManagerModel;
@@ -104,6 +104,7 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
         connectSpotifyButton = new JButton("Connect Spotify");
         buttons.add(connectSpotifyButton);
 
+        groupTabButton = new JButton("Groups");
 
         // Daily Mix button
         generateDailyMixButton = new JButton("Generate Daily Mix");
