@@ -56,11 +56,21 @@ public class InGroupView extends JPanel implements ActionListener, PropertyChang
 
         groupPanel = new JPanel();
         setGroupPanel(currentState);
+        JPanel centerPanel = new JPanel();
+        centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.Y_AXIS));
+        centerPanel.add(groupPanel);
+        centerPanel.add(groupName);
 
+        JPanel buttons = new JPanel();
+        buttons.setLayout(new FlowLayout());
         loggedIn = new JButton("Main Page");
+        buttons.add(loggedIn);
         sharedSong = new JButton("Shared Song");
+        buttons.add(sharedSong);
         groupAnalytics = new JButton("Group Analytics");
+        buttons.add(groupAnalytics);
         leaveGroup = new JButton("Leave Group");
+        buttons.add(leaveGroup);
 
         loggedIn.addActionListener(
                 new ActionListener() {
@@ -115,43 +125,9 @@ public class InGroupView extends JPanel implements ActionListener, PropertyChang
                 }
         );
 
-        this.setLayout(new GridBagLayout());
-        GridBagConstraints c = new GridBagConstraints();
-        c.fill = GridBagConstraints.HORIZONTAL;
-        c.anchor = GridBagConstraints.PAGE_END;
-        c.gridwidth = 2;
-        c.gridx = 0;
-        c.gridy = 1;
-        this.add(groupName, c);
-
-        c.anchor = GridBagConstraints.CENTER;
-        c.fill = GridBagConstraints.BOTH;
-        c.gridheight = 2;
-        c.gridy = 2;
-        this.add(groupPanel, c);
-
-        c.gridheight = 1;
-        c.gridwidth = 1;
-        c.gridx = 2;
-        c.gridy = 1;
-        c.weighty = 0.5;
-        c.weightx = 0.3;
-        c.fill = GridBagConstraints.NONE;
-        this.add(leaveGroup, c);
-
-        c.weighty = 0.1;
-        c.gridy = 2;
-        this.add(sharedSong, c);
-
-        c.gridy = 3;
-        this.add(groupAnalytics, c);
-
-        c.weightx = 0;
-        c.fill = GridBagConstraints.BOTH;
-        c.gridx = 1;
-        c.gridy = 0;
-        this.add(loggedIn, c);
-
+        this.setLayout(new BorderLayout());
+        this.add(buttons, BorderLayout.NORTH);
+        this.add(centerPanel, BorderLayout.CENTER);
     }
 
     /**

@@ -39,28 +39,38 @@ public class NoGroupView extends JPanel implements ActionListener, PropertyChang
         this.noGroupViewModel.addPropertyChangeListener(this);
 
         JPanel topRow = new JPanel();
-        final JLabel title = new JLabel("You're not in a group");
+        final JLabel title = new JLabel("You're not in a group :( ");
+        title.setFont(new Font("Calibri", Font.PLAIN, 18));
+
         title.setAlignmentX(CENTER_ALIGNMENT);
-        topRow.add(title);
         loggedIn = new JButton("Main Page");
+        topRow.add(Box.createVerticalStrut(10));
         topRow.add(loggedIn);
 
         JPanel fields = new JPanel();
         fields.setLayout(new BoxLayout(fields, BoxLayout.Y_AXIS));
+        inputGroupUsersField.setColumns(40);
+        inputGroupUsersField.setFont(new Font("Calibri", Font.PLAIN, 15));
+        inputGroupNameField.setColumns(40);
+        inputGroupNameField.setFont(new Font("Calibri", Font.PLAIN, 15));
         final LabelTextPanel enterGroupName = new LabelTextPanel(
                 new JLabel("Enter Group Name"), inputGroupNameField);
-        fields.add(enterGroupName);
         final LabelTextPanel enterGroupUsers = new LabelTextPanel(
                 new JLabel("Enter Group Users"), inputGroupUsersField);
-        fields.add(enterGroupUsers);
+        fields.add(title);
+        fields.add(Box.createVerticalStrut(10));
         fields.add(nameErrorField);
-
+        fields.add(enterGroupName);
+        fields.add(enterGroupUsers);
 
         final JPanel buttons = new JPanel();
-        buttons.setLayout(new BoxLayout(buttons, BoxLayout.Y_AXIS));
+        buttons.setLayout(new BoxLayout(buttons, BoxLayout.X_AXIS));
         createGroup = new JButton("Create Group");
+        createGroup.setFont(new Font("Calibri", Font.PLAIN, 15));
         buttons.add(createGroup);
+        buttons.add(Box.createHorizontalStrut(10));
         joinGroup = new JButton("Join Group");
+        joinGroup.setFont(new Font("Calibri", Font.PLAIN, 15));
         buttons.add(joinGroup);
 
         loggedIn.addActionListener(
@@ -140,9 +150,9 @@ public class NoGroupView extends JPanel implements ActionListener, PropertyChang
             @Override
             public void changedUpdate(DocumentEvent e) { documentListenerHelper(); }
         });
-        this.setLayout(new BorderLayout(5, 5));
+        this.setLayout(new BorderLayout());
         this.add(topRow, BorderLayout.NORTH);
-        this.add(buttons, BorderLayout.EAST);
+        fields.add(buttons);
         this.add(fields, BorderLayout.CENTER);
 
     }
@@ -155,8 +165,10 @@ public class NoGroupView extends JPanel implements ActionListener, PropertyChang
     }
 
     public void propertyChange(PropertyChangeEvent evt) {
-//        if (evt.getPropertyName().equals("creatError")) {}
-        setNameError(noGroupViewModel.getState().getNameError());
+        if (evt.getPropertyName().equals("createError")) {
+            setNameError(noGroupViewModel.getState().getNameError());
+        }
+
     }
 
     public String getViewName() { return viewName; }
