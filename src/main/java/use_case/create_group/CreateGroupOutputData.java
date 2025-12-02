@@ -21,7 +21,7 @@ public class CreateGroupOutputData {
      * @param group_name name of newly created group
      */
 
-    public CreateGroupOutputData(String group_name, SpotifyUser owner, List<SpotifyUser> users) {
+    public CreateGroupOutputData(String group_name, List<SpotifyUser> users) {
         this.group_name = group_name;
         this.success = success;
         this.owner = owner;
