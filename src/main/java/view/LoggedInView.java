@@ -172,6 +172,38 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
             }
         });
 
+        //Group tab button listeners
+
+        groupTabButton.addActionListener(evt -> {
+            // Create a new popup frame
+            JFrame popup = new JFrame("Groups");
+            popup.setLayout(new FlowLayout());
+
+            JButton popupCreate = new JButton("Create Group");
+            JButton popupJoin = new JButton("Join Group");
+
+            // Add action listeners for the popup buttons
+            popupCreate.addActionListener(e -> {
+                openCreateGroupPopup();  // open the Create Group popup
+                popup.dispose();          // close the first Groups popup
+            });
+
+            popupJoin.addActionListener(e -> {
+                viewManagerModel.setState("joinGroupView");
+                viewManagerModel.firePropertyChange();
+                popup.dispose(); // close popup
+            });
+
+            // Add buttons to popup
+            popup.add(popupCreate);
+            popup.add(popupJoin);
+
+            popup.pack();
+            popup.setLocationRelativeTo(this); // center on main window
+            popup.setVisible(true);
+        });
+
+
         medium_termButton.addActionListener(evt -> {
             if (evt.getSource().equals(medium_termButton)) {
                 if (getTopItemsController == null || currentSpotifyUser == null) {
