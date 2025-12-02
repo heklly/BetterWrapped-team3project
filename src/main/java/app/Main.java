@@ -27,12 +27,21 @@ public class Main {
                 .addLoyaltyView()
                 .addLoggedInView()
                 .addSpotifyAuthView()
-                .addSignupUseCase()
-                .addChangePasswordUseCase()
+                .addGroupAnalyticsView()     // 🔹 add the new screen as a card
+                .addSpotifyAuthUseCase()
+                .addDailyMixUseCase()
+                .addGetTopItemsUseCase()
+                .addGroupAnalyticsUseCase()  // 🔹 wire controller + interactor + presenter
+                .addInGroupView()
+                .addNoGroupView()
+                .addSharedSongView()
+                .addGroupAnalyticsView()
                 .addSpotifyAuthUseCase()
                 .addDailyMixUseCase()
                 .addGetTopItemsUseCase()
                 .addLoyaltyUseCase()
+                .addSharedSongUseCase()
+                .addGroupAnalyticsUseCase()
                 .build();
         application.pack();
         application.setLocationRelativeTo(null);

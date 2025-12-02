@@ -9,14 +9,15 @@ import java.util.List;
  */
 public class SharedSongInputData {
 
-    private final Group group;
+    private final List<SpotifyUser> groupUsers;
     private final SpotifyUser user;
 
-    public SharedSongInputData(SpotifyUser user, Group group) {
-        this.group = group;
+    public SharedSongInputData(SpotifyUser user, List<SpotifyUser> groupUsers) {
+        this.groupUsers = groupUsers;
         this.user = user;
     }
-    public List<SpotifyUser> getListOfMembers() {return group.getUsers();}
+    public List<SpotifyUser> getListOfMembers() {return groupUsers;}
+
     public SpotifyUser getUser() {return user;}
 }
 
