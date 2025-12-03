@@ -1,52 +1,87 @@
 package view;
 
+import data_access.GroupDataAccessObject;
+import data_access.SpotifyUserDataAccessObject;
+import entity.SpotifyUser;
 import interface_adapter.ViewManagerModel;
+import interface_adapter.ViewModel;
 import interface_adapter.create_group.CreateGroupController;
+import interface_adapter.create_group.InGroupViewModel;
 import interface_adapter.create_group.NoGroupViewModel;
 import interface_adapter.create_group.UserGroupState;
 
 import javax.swing.*;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class NoGroupView extends JPanel implements ActionListener, PropertyChangeListener {
 
     private final String viewName = "no group";
     private final NoGroupViewModel noGroupViewModel;
+    private final InGroupViewModel inGroupViewModel;
     private final ViewManagerModel viewManagerModel;
+    private final LoggedInView loggedInView;
 
-    private final JTextField inputGroupNameField = new JTextField();
+    private final JTextField groupNameField = new JTextField();
     private final JLabel nameErrorField = new JLabel();
+    private final JTextField membersField = new JTextField();
 
     private final JButton loggedIn;
     private final JButton createGroup;
-    private final JButton joinGroup;
     private CreateGroupController createGroupController = null;
-//    private JoinGroupController joinGroupController = null;
 
-    public NoGroupView(NoGroupViewModel noGroupViewModel, ViewManagerModel viewManagerModel) {
+    public NoGroupView(NoGroupViewModel noGroupViewModel,
+                       InGroupViewModel inGroupViewModel,
+                       ViewManagerModel viewManagerModel,
+                       LoggedInView loggedInView) {
         this.noGroupViewModel = noGroupViewModel;
         this.viewManagerModel = viewManagerModel;
+        this.loggedInView = loggedInView;
+        this.inGroupViewModel = inGroupViewModel;
         this.noGroupViewModel.addPropertyChangeListener(this);
 
-        final JLabel title = new JLabel("You're not in a group");
-        title.setAlignmentX(CENTER_ALIGNMENT);
 
-        final LabelTextPanel enterGroupName = new LabelTextPanel(
-                new JLabel("Group Name"), inputGroupNameField);
-
+        JPanel topPanel = new JPanel();
         loggedIn = new JButton("Main Page");
-        final JPanel buttons = new JPanel();
-        buttons.setLayout(new BoxLayout(buttons, BoxLayout.Y_AXIS));
+        loggedIn.setAlignmentX(Component.LEFT_ALIGNMENT);
+        topPanel.add(loggedIn);
+
+        final JLabel title = new JLabel("You're not in a group :(");
+        title.setFont(new Font("Century Schoolbook", Font.PLAIN, 20));
+        title.setAlignmentX(CENTER_ALIGNMENT);
+        topPanel.add(title);
+
+        final JPanel fields = new JPanel();
+        fields.setLayout(new BoxLayout(fields, BoxLayout.Y_AXIS));
+
+        fields.add(Box.createVerticalStrut(10));
+        groupNameField.setColumns(30);
+        JLabel groupNameLabel = new JLabel("Group Name:");
+        groupNameLabel.setFont(new Font("Century Schoolbook", Font.PLAIN, 12));
+        final LabelTextPanel enterGroupName = new LabelTextPanel(groupNameLabel, groupNameField);
+        fields.add(enterGroupName);
+
+        membersField.setColumns(30);
+        JLabel membersLabel = new JLabel("Member Spotify User IDs");
+        membersLabel.setFont(new Font("Century Schoolbook", Font.PLAIN, 12));
+        final LabelTextPanel membersPanel = new LabelTextPanel(membersLabel, membersField);
+        fields.add(membersPanel);
+
+        JPanel buttons = new JPanel();
+        buttons.setLayout(new FlowLayout());
         createGroup = new JButton("Create Group");
+        createGroup.setAlignmentY(CENTER_ALIGNMENT);
+        createGroup.setFont(new Font("Century Schoolbook", Font.PLAIN, 12));
         buttons.add(createGroup);
-        joinGroup = new JButton("Join Group");
-        buttons.add(joinGroup);
+
+        fields.add(Box.createVerticalStrut(2));
+        fields.add(buttons);
 
         loggedIn.addActionListener(
                 new ActionListener() {
@@ -59,105 +94,75 @@ public class NoGroupView extends JPanel implements ActionListener, PropertyChang
                 }
         );
 
-        createGroup.addActionListener(
-                new ActionListener() {
-                    public void actionPerformed(ActionEvent evt) {
-                        if (evt.getSource().equals(createGroup)) {
-                            if (createGroupController == null) {
-                                JOptionPane.showMessageDialog(NoGroupView.this,
-                                        "Group creation is not wired up yet.",
-                                        "Error",
-                                        JOptionPane.ERROR_MESSAGE);
-                                return;
-                            }
+        createGroup.addActionListener(e -> {
+                    String groupName = groupNameField.getText().trim();
+                    String membersText = membersField.getText().trim();
 
-                            String name = inputGroupNameField.getText().trim();
-                            if (name.isEmpty()) {
-                                JOptionPane.showMessageDialog(NoGroupView.this,
-                                        "Please enter a group name.",
-                                        "Invalid Group Name",
-                                        JOptionPane.WARNING_MESSAGE);
-                                return;
-                            }
-
-                            // For now, we don't have members here; pass null/empty list
-                            final UserGroupState currentState = noGroupViewModel.getState();
-
-                            try {
-                                createGroupController.execute(
-                                        name,
-                                        currentState.getSpotifyUser(), // may be null; that's OK if controller handles it
-                                        currentState.getGroupUsers()   // may be null; controller will treat as empty
-                                );
-                            } catch (IllegalArgumentException e) {
-                                JOptionPane.showMessageDialog(NoGroupView.this,
-                                        e.getMessage(),
-                                        "Create Group Error",
-                                        JOptionPane.ERROR_MESSAGE);
-                            }
-                        }
+                    if (groupName.isEmpty()) {
+                        JOptionPane.showMessageDialog(this.getParent(),
+                                "Please enter a group name.",
+                                "Missing Name",
+                                JOptionPane.WARNING_MESSAGE);
+                        return;
                     }
+//                    Split IDs
+            String[] memberIds = membersText.isEmpty() ? new String[0] :
+                    Arrays.stream(membersText.split("\\s*,\\s*"))
+                            .map(String::trim)
+                            .toArray(String[]::new);
+
+            SpotifyUserDataAccessObject spotifyUserDao = SpotifyUserDataAccessObject.getInstance();
+            java.util.List<SpotifyUser> members = new ArrayList<>();
+            List<String> missingIds = new ArrayList<>();
+
+            for (String id : memberIds) {
+                SpotifyUser user = spotifyUserDao.getUserById(id);
+                if (user != null) {
+                    members.add(user);
+                } else {
+                    missingIds.add(id);
                 }
-        );
-
-        inputGroupNameField.getDocument().addDocumentListener(new DocumentListener() {
-
-            private void documentListenerHelper() {
-                final UserGroupState currentState = noGroupViewModel.getState();
-                currentState.setGroupName(inputGroupNameField.getText());
-                noGroupViewModel.setState(currentState);
-            }
-            @Override
-            public void insertUpdate(DocumentEvent e) {
-                documentListenerHelper();
             }
 
-            @Override
-            public void removeUpdate(DocumentEvent e) {
-                documentListenerHelper();
+            if (members.isEmpty()) {
+                JOptionPane.showMessageDialog(this.getParent(),
+                        "No valid users found. Please enter at least one valid Spotify User ID.",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE);
+                return;
             }
 
-            @Override
-            public void changedUpdate(DocumentEvent e) {
-                documentListenerHelper();
+            if (!missingIds.isEmpty()) {
+                JOptionPane.showMessageDialog(this.getParent(),
+                        "These user IDs were not found: " + String.join(", ", missingIds) + "\nThey will be skipped.",
+                        "Warning",
+                        JOptionPane.WARNING_MESSAGE);
+            }
+
+            if (createGroupController != null) {
+                createGroupController.execute(groupName, loggedInView.getCurrentSpotifyUser(), members);
+
+                // mark logged-in user as in a group
+                loggedInView.getCurrentSpotifyUser().setInGroup(true);
+
+                JOptionPane.showMessageDialog(this.getParent(),
+                        "Group created successfully!",
+                        "Success",
+                        JOptionPane.INFORMATION_MESSAGE);
+            }
+            else {
+                JOptionPane.showMessageDialog(this.getParent(),
+                        "Error creating group. Make sure the controller is initialized.",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE);
             }
         });
 
-        this.setLayout(new GridBagLayout());
-        GridBagConstraints gbcTitle = new GridBagConstraints();
-        gbcTitle.fill = GridBagConstraints.HORIZONTAL;
-        gbcTitle.anchor = GridBagConstraints.CENTER;
-        gbcTitle.gridx = 1;
-        gbcTitle.gridy = 1;
-        gbcTitle.weighty = 0.2;
-        this.add(title, gbcTitle);
-
-        GridBagConstraints gbcGroup = new GridBagConstraints();
-        gbcGroup.gridheight = 4;
-        gbcGroup.gridwidth = 3;
-        gbcGroup.anchor = GridBagConstraints.LINE_START;
-        gbcGroup.fill = GridBagConstraints.HORIZONTAL;
-        gbcGroup.gridx = 0;
-        gbcGroup.gridy = 2;
-        gbcGroup.gridwidth = 2;
-        gbcGroup.weighty = 0.3;
-        this.add(enterGroupName, gbcGroup);
-
-        GridBagConstraints gbcButtons = new GridBagConstraints();
-        gbcButtons.fill = GridBagConstraints.VERTICAL;
-        gbcButtons.anchor = GridBagConstraints.CENTER;
-        gbcButtons.gridx = 2;
-        gbcButtons.gridy = 2;
-        gbcButtons.weighty = 0.5;
-        this.add(buttons, gbcButtons);
-
-        GridBagConstraints c = new GridBagConstraints();
-        c.anchor = GridBagConstraints.CENTER;
-        c.fill = GridBagConstraints.BOTH;
-        c.gridx = 1;
-        c.gridy = 0;
-        this.add(loggedIn, c);
+        this.setLayout(new BorderLayout());
+        this.add(topPanel, BorderLayout.NORTH);
+        this.add(fields, BorderLayout.CENTER);
     }
+
     /**
      * React to a button click that results in evt.
      * @param evt the ActionEvent to react to
@@ -167,8 +172,9 @@ public class NoGroupView extends JPanel implements ActionListener, PropertyChang
     }
 
     public void propertyChange(PropertyChangeEvent evt) {
-//        if (evt.getPropertyName().equals("creatError")) {}
-        setNameError(noGroupViewModel.getState().getNameError());
+        if (evt.getPropertyName().equals("createError")) {
+            setNameError(noGroupViewModel.getState().getNameError());
+        }
     }
 
     public String getViewName() { return viewName; }
@@ -176,8 +182,6 @@ public class NoGroupView extends JPanel implements ActionListener, PropertyChang
     public void setCreateGroupController(CreateGroupController createGroupController) {
         this.createGroupController = createGroupController;
     }
-//    public void setJoinGroupController(JoinGorupController joinGroupController) {
-//        this.joinGroupController = joinGroupController
-//    }
-    public void setNameError(String nameError) { this.nameErrorField.setText("nameError"); }
+
+    public void setNameError(String nameError) { this.nameErrorField.setText(nameError); }
 }

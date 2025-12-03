@@ -23,11 +23,10 @@ public class SharedSongController {
      * Executes the Shared Song Use Case.
      * @param user the user checking if their song is shared
      * @param groupUsers the list of users in the group the user is in
-     * @param spotifyDAO the spotify DAO
      */
 
-    public void execute(SpotifyUser user, List<SpotifyUser> groupUsers, SpotifyDataAccessObject spotifyDAO) {
+    public void execute(SpotifyUser user, List<SpotifyUser> groupUsers) {
         final SharedSongInputData inputData = new SharedSongInputData(user, groupUsers);
-        sharedSongUseCaseInteractor.execute(inputData, spotifyDAO);
+        sharedSongUseCaseInteractor.execute(inputData);
     }
 }

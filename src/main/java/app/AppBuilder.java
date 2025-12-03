@@ -25,7 +25,6 @@ import interface_adapter.spotify_auth.SpotifyAuthViewModel;
 import interface_adapter.daily_mix.DailyMixViewModel;
 import interface_adapter.daily_mix.DailyMixController;
 import interface_adapter.daily_mix.DailyMixPresenter;
-import use_case.GroupDataAccessInterface;
 import use_case.get_topItems.GetTopItemsInputBoundary;
 import use_case.get_topItems.GetTopItemsInteractor;
 import use_case.get_topItems.GetTopItemsOutputBoundary;
@@ -116,7 +115,7 @@ public class AppBuilder {
     }
 
     public AppBuilder addNoGroupView() {
-        noGroupView = new NoGroupView(noGroupViewModel, viewManagerModel);
+        noGroupView = new NoGroupView(noGroupViewModel, inGroupViewModel, viewManagerModel, loggedInView);
         cardPanel.add(noGroupView, noGroupView.getViewName());
         return this;
     }
@@ -138,7 +137,7 @@ public class AppBuilder {
                 new interface_adapter.create_group.CreateGroupController(interactor, outputBoundary);
 
         // Give controller to the LoggedInView (popup)
-        loggedInView.setCreateGroupController(controller);
+//        loggedInView.setCreateGroupController(controller);
 
         // Also give controller to NoGroupView (create group screen)
         noGroupView.setCreateGroupController(controller);
