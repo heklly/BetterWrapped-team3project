@@ -24,7 +24,7 @@ import java.util.Map;
  */
 public class LoyaltyScoreView extends JPanel implements ActionListener, PropertyChangeListener {
 
-    private final String viewName = "loyalty scores";
+    private final String viewName = "loyalty";
     private JTable loyaltyScoreTable;
     private JButton backButton;
     private final LoyaltyViewModel loyaltyViewModel;
@@ -48,12 +48,23 @@ public class LoyaltyScoreView extends JPanel implements ActionListener, Property
 
     private void initializeComponents() {
         // Create a panel for the artist name at the top
-
         JPanel artistPanel = new JPanel(new BorderLayout());
         JLabel artistNameLabel = new JLabel(loyaltyViewModel.getState().getCurrentArtist() + " Loyalty Scores", JLabel.CENTER);
         artistNameLabel.setFont(new Font("Calibri", Font.BOLD, 30));
         artistPanel.setPreferredSize(new Dimension(400, 100));
         artistPanel.add(artistNameLabel, BorderLayout.CENTER);
+
+        // ADD INFO BUTTON
+        JButton infoButton = new JButton("ℹ How is the score calculated?");
+        infoButton.setFont(new Font("Calibri", Font.PLAIN, 14));
+        infoButton.setFocusPainted(false);
+        infoButton.addActionListener(e -> showFormulaExplanation());
+        System.out.println("Info button created");
+
+        JPanel infoPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        infoPanel.add(infoButton);
+        artistPanel.add(infoPanel, BorderLayout.EAST);
+
         add(artistPanel, BorderLayout.NORTH);
 
         // resizing
@@ -168,20 +179,64 @@ public class LoyaltyScoreView extends JPanel implements ActionListener, Property
     // PropertyChangeListener to update view when the state changes
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        // Update the table with the latest loyalty scores when the state changes
-            updateTableData();
-            JLabel artistNameLabel = new JLabel("Loyalty Scores for: " + loyaltyViewModel.getState().getCurrentArtist(), JLabel.CENTER);
-            artistNameLabel.setFont(new Font("Arial", Font.BOLD, 16));
-            JPanel artistPanel = (JPanel) getComponent(0);
-            artistPanel.removeAll();
-            artistPanel.add(artistNameLabel);
-            artistPanel.revalidate();
-            artistPanel.repaint();
-    }
+        // Update the table with the latest loyalty scores
+        updateTableData();
 
-    public String getViewName() { return viewName; }
+        // Update the artist name in the existing panel
+        JPanel artistPanel = (JPanel) getComponent(0);
+
+        // Find and update just the center component (the artist name label)
+        Component centerComponent = ((BorderLayout) artistPanel.getLayout()).getLayoutComponent(BorderLayout.CENTER);
+        if (centerComponent instanceof JLabel) {
+            JLabel artistNameLabel = (JLabel) centerComponent;
+            artistNameLabel.setText("Loyalty Scores for: " + loyaltyViewModel.getState().getCurrentArtist());
+            artistNameLabel.setFont(new Font("Calibri", Font.BOLD, 30));  // Keep consistent font
+        }
+
+        artistPanel.revalidate();
+        artistPanel.repaint();
+    }
 
     public void setLoyaltyController(LoyaltyController loyaltyController) {
         this.loyaltyController = loyaltyController;
+    }
+
+    public String getViewName() {
+        return viewName;
+    }
+    /**
+     * Shows a dialog explaining the loyalty score calculation formula
+     */
+    private void showFormulaExplanation() {
+        String explanation = "<html>" +
+                "<body style='width: 400px; padding: 10px;'>" +
+                "<h2 style='color: #1DB954;'>Loyalty Score Formula</h2>" +
+                "<p>Your loyalty score for an artist is calculated based on:</p>" +
+                "<ul>" +
+                "<li><b>Saved Tracks:</b> 10 points per track</li>" +
+                "<li><b>Saved Albums:</b> 50 points per album</li>" +
+                "<li><b>Recently Played:</b> 100 point bonus if you've listened recently</li>" +
+                "</ul>" +
+                "<h3>Example Calculation:</h3>" +
+                "<p style='background-color: #f0f0f0; padding: 10px; border-radius: 5px;'>" +
+                "If you have:<br>" +
+                "• 5 saved tracks (5 × 10 = 50 points)<br>" +
+                "• 2 saved albums (2 × 50 = 100 points)<br>" +
+                "• Listened recently (+100 points)<br>" +
+                "<br>" +
+                "<b>Total Score: 250 points</b>" +
+                "</p>" +
+                "<p style='margin-top: 15px;'>" +
+                "<i>Higher scores indicate stronger loyalty to the artist!</i>" +
+                "</p>" +
+                "</body>" +
+                "</html>";
+
+        JOptionPane.showMessageDialog(
+                this,
+                explanation,
+                "Loyalty Score Calculation",
+                JOptionPane.INFORMATION_MESSAGE
+        );
     }
 }

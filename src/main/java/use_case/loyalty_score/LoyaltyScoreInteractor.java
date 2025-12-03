@@ -34,13 +34,11 @@ public class LoyaltyScoreInteractor implements LoyaltyScoreInputBoundary {
 
         // user chooses a specific artist to view loyalty scores for; so
         final Map<String, Integer> loyalty_scores = loyaltyDataAccessObject.getLoyaltyArtist(userid, chosen_artist);
-
         final List<String> dates = loyaltyDataAccessObject.getDates(userid);
 
         // output data is loyalty scores
         final LoyaltyScoreOutputData outputData = new LoyaltyScoreOutputData(loyalty_scores, dates, chosen_artist);
 
-        //
         loyaltyPresenter.prepareView(outputData);
     }
 
@@ -49,7 +47,8 @@ public class LoyaltyScoreInteractor implements LoyaltyScoreInputBoundary {
         String userid = loyaltyScoreInputData.getSpotifyUser().getSpotifyUserId();
         List<String> dates =  loyaltyDataAccessObject.getDates(userid);
 
-        List<ArtistLoyaltyScore> loyaltyScores = spotifyDAO.getArtistLoyaltyScores(loyaltyScoreInputData.getSpotifyUser());
+        List<ArtistLoyaltyScore> loyaltyScores = spotifyDAO.getArtistLoyaltyScores(
+                                                loyaltyScoreInputData.getSpotifyUser());
 
         // return early if today's loyalty has already been calculated.
         if (dates.contains(currentDate)) {

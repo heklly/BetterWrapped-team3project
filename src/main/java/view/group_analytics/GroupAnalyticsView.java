@@ -1,5 +1,7 @@
 package view.group_analytics;
 
+import entity.Group;
+import entity.SpotifyUser;
 import entity.UserTasteProfile;
 import interface_adapter.ViewManagerModel;
 import interface_adapter.group_analytics.GroupAnalyticsController;
@@ -16,9 +18,8 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Simple view showing the verdict and scores.
- * For now it uses a demo group; your teammate's group-forming use case
- * should call controller.analyzeGroup(...) with real UserTasteProfiles.
+ * View for showing group analytics verdict and scores.
+ * This view only works with REAL data (real Group / SpotifyUser list).
  */
 public class GroupAnalyticsView extends JPanel implements ActionListener, PropertyChangeListener {
 
@@ -27,7 +28,6 @@ public class GroupAnalyticsView extends JPanel implements ActionListener, Proper
     //Added these
     private final ViewManagerModel viewManagerModel;
     private final JTextArea outputArea = new JTextArea(15, 40);
-    private final JButton demoButton = new JButton("Run demo group");
     private final JButton backButton = new JButton("Back to Group");
 
     public void setGroupAnalyticsController(GroupAnalyticsController controller) {
@@ -36,6 +36,7 @@ public class GroupAnalyticsView extends JPanel implements ActionListener, Proper
 
     public GroupAnalyticsView(GroupAnalyticsViewModel viewModel,
                               ViewManagerModel viewManagerModel) {
+
         this.viewModel = viewModel;
         this.viewManagerModel = viewManagerModel;
 
@@ -53,40 +54,25 @@ public class GroupAnalyticsView extends JPanel implements ActionListener, Proper
         top.add(title, BorderLayout.CENTER);
 
         JPanel bottom = new JPanel();
-        bottom.add(demoButton);
-        // TODO: fix if you dont like it
+
         bottom.add(backButton);
         backButton.addActionListener(this);
 
         add(top, BorderLayout.NORTH);
         add(scrollPane, BorderLayout.CENTER);
         add(bottom, BorderLayout.SOUTH);
-
-        wireActions();
-
-
     }
 
-    private void wireActions() {
-        demoButton.addActionListener(e -> runDemo());
-    }
 
-    private void runDemo() {
-        // TEMP: demo data. Replace with real group from your teammate later.
-        List<UserTasteProfile> demoGroup = List.of(
-                new UserTasteProfile("Nisarg", "me", Set.of("dance pop", "edm", "k-pop")),
-                new UserTasteProfile("Friend 1", "f1", Set.of("indie pop", "acoustic", "sad")),
-                new UserTasteProfile("Friend 2", "f2", Set.of("rock", "classic rock", "country"))
-        );
-
-        controller.analyzeGroup(demoGroup);
-    }
-
+    @Override
     public void actionPerformed(ActionEvent evt) {
         if (evt.getSource() == backButton) {
+            //Go back to InGroupView
             viewManagerModel.setState("in group");
+            viewManagerModel.firePropertyChange();
         }
     }
+
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
@@ -122,8 +108,8 @@ public class GroupAnalyticsView extends JPanel implements ActionListener, Proper
         outputArea.setText(sb.toString());
     }
 
+    // Used by AppBuilder to register the card name
     public String getViewName() {
         return viewModel.getViewName();
     }
-
 }

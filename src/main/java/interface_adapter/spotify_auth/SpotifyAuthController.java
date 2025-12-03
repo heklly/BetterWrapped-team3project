@@ -10,11 +10,20 @@ public class SpotifyAuthController {
         this.interactor = interactor;
     }
 
-    public String getAuthorizationUrl() {
-        return interactor.getAuthorizationUrl();
+    /**
+     * Initiates the authorization process
+     * @param username the username to associate with the Spotify account
+     */
+    public void startAuthorization(String username) {
+        interactor.startAuthorization(username);
     }
 
-    public void execute(String authorizationCode, String username) {
+    /**
+     * Completes authorization with the received code
+     * @param authorizationCode the code from Spotify
+     * @param username the username
+     */
+    public void completeAuthorization(String authorizationCode, String username) {
         SpotifyAuthInputData inputData = new SpotifyAuthInputData(authorizationCode, username);
         interactor.execute(inputData);
     }

@@ -22,28 +22,40 @@ public class SharedSongView extends JPanel implements ActionListener, PropertyCh
     private final JPanel dataPanel;
 
 
-    public SharedSongView(InGroupViewModel inGroupViewModel, ViewManagerModel viewManagerModel) {
+    public SharedSongView(InGroupViewModel inGroupViewModel,
+                          SharedSongViewModel sharedSongViewModel,
+                          ViewManagerModel viewManagerModel) {
+
         this.inGroupViewModel = inGroupViewModel;
+        this.sharedSongViewModel = sharedSongViewModel;
         this.viewManagerModel = viewManagerModel;
+
+        this.sharedSongViewModel.addPropertyChangeListener(this);
 
         JLabel title = new JLabel("Who shares your currently playing song?");
 
         dataPanel = new JPanel();
         dataPanel.setLayout(new BoxLayout(dataPanel, BoxLayout.Y_AXIS));
-        setDataPanel(sharedSongViewModel.getState().getUsernameToShared());
+
+        // ADD NULL CHECK:
+        if (sharedSongViewModel.getState().getUsernameToShared() != null) {
+            setDataPanel(sharedSongViewModel.getState().getUsernameToShared());
+        }
 
         backButton = new JButton("Back to Group");
         backButton.addActionListener(this);
-        this.add(backButton);
 
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-        this.add(title, dataPanel);
+        this.add(title);
+        this.add(dataPanel);
+        this.add(backButton);
     }
 
+    // METHODS ARE AT CLASS LEVEL - not inside constructor!
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == backButton) {
-            viewManagerModel.firePropertyChange(inGroupViewModel.getViewName());
-            sharedSongViewModel.firePropertyChange("back");
+            viewManagerModel.setState(inGroupViewModel.getViewName());
+            viewManagerModel.firePropertyChange();
         }
     }
     public void propertyChange(PropertyChangeEvent evt) {
@@ -58,11 +70,14 @@ public class SharedSongView extends JPanel implements ActionListener, PropertyCh
     public void setDataPanel(Map<String, String> UsernameToShared) {
         dataPanel.removeAll();
 
-        dataPanel.setLayout(new BoxLayout(dataPanel, BoxLayout.Y_AXIS));
         for (String username : UsernameToShared.keySet()) {
-            dataPanel.add(new JLabel(String.format("%s: %s", username, UsernameToShared.get(username))));
+            dataPanel.add(new JLabel(username + ": " + UsernameToShared.get(username)));
         }
+
+        dataPanel.revalidate();
+        dataPanel.repaint();
     }
+
 
     public String getViewName() { return this.viewName; }
 }

@@ -1,11 +1,11 @@
 package view;
 
 import data_access.SpotifyDataAccessObject;
+import data_access.SpotifyUserDataAccessObject;
 import entity.SpotifyUser;
 
 import interface_adapter.logged_in.LoggedInState;
 import interface_adapter.logged_in.LoggedInViewModel;
-import interface_adapter.logout.LogoutController;
 import interface_adapter.ViewManagerModel;
 import interface_adapter.loyalty_score.LoyaltyController;
 import interface_adapter.spotify_auth.SpotifyAuthViewModel;
@@ -27,16 +27,17 @@ import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class LoggedInView extends JPanel implements ActionListener, PropertyChangeListener {
-
+    private final JButton groupTabButton;
     private final String viewName = "logged in";
     private final LoggedInViewModel loggedInViewModel;
     private final ViewManagerModel viewManagerModel;
     private final SpotifyAuthViewModel spotifyAuthViewModel;
 
-    private LogoutController logoutController;
     private SpotifyDataAccessObject spotifyDAO;
     private SpotifyUser currentSpotifyUser;
 
@@ -48,7 +49,7 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
     private final DailyMixViewModel dailyMixViewModel;
     private DailyMixController dailyMixController;
     private final JButton generateDailyMixButton;
-
+    private interface_adapter.create_group.CreateGroupController createGroupController;
     private final GetTopItemsViewModel getTopItemsViewModel;
     private GetTopItemsController getTopItemsController;
     private LoyaltyController loyaltyController;
@@ -59,6 +60,8 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
     private final JButton medium_termButton;
     private final JButton long_termButton;
     private final JTextArea TopItemsArea;
+    private final JButton goToGroup;
+    //    private GroupDataAccessObject groupDAO;
 
     public LoggedInView(LoggedInViewModel loggedInViewModel,
                         ViewManagerModel viewManagerModel,
@@ -75,6 +78,7 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
         this.dailyMixViewModel.addPropertyChangeListener(this);
         this.getTopItemsViewModel.addPropertyChangeListener(this);
         this.spotifyDAO = new SpotifyDataAccessObject();
+
 
         final JLabel title = new JLabel("Better Wrapped - Dashboard");
         title.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -95,6 +99,7 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
         connectSpotifyButton = new JButton("Connect Spotify");
         buttons.add(connectSpotifyButton);
 
+        groupTabButton = new JButton("Create Group");
 
         // Daily Mix button
         generateDailyMixButton = new JButton("Generate Daily Mix");
@@ -120,14 +125,6 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
         medium_termButton.setEnabled(false);
         long_termButton = new JButton("1 year");
         long_termButton.setEnabled(false);
-
-
-        // Log out button listener
-        logOut.addActionListener(evt -> {
-            if (logoutController != null) {
-                logoutController.execute();
-            }
-        });
 
         // Connect Spotify listener
         connectSpotifyButton.addActionListener(evt -> {
@@ -161,6 +158,14 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
                 }
             }
         });
+
+        //Group tab button listeners
+
+        groupTabButton.addActionListener(evt -> {
+            // Go straight to the create group popup
+            openCreateGroupPopup();
+        });
+
 
         medium_termButton.addActionListener(evt -> {
             if (evt.getSource().equals(medium_termButton)) {
@@ -271,7 +276,22 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
         loyaltyLookUpPanel.add(loyaltyLookUpLabel);
         loyaltyLookUpPanel.add(lookupField);
 
+        // Go to Group View Button
+        JPanel groupPanel = new JPanel();
+        groupPanel.setLayout(new BoxLayout(groupPanel, BoxLayout.Y_AXIS));
+        goToGroup = new JButton("Group");
+        goToGroup.addActionListener(e -> {
+            if (currentSpotifyUser != null && currentSpotifyUser.isInGroup()) {
+                viewManagerModel.setState("in group");
+                viewManagerModel.firePropertyChange();
+            } else {
+                viewManagerModel.setState("no group");
+                viewManagerModel.firePropertyChange();
+            }
+        });
 
+        goToGroup.setEnabled(false);
+        groupPanel.add(goToGroup);
 
         // --- Center panel (CENTER) ---
         JPanel centerPanel = new JPanel();
@@ -281,6 +301,7 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
         topWrapper.setLayout(new BoxLayout(topWrapper, BoxLayout.Y_AXIS));
         topWrapper.add(title);
         topWrapper.add(spotifyPanel);
+        topWrapper.add(groupPanel);
         topWrapper.add(timePanel);
         loyaltyLookUpPanel.add(loyaltyLookUpLabel);
         loyaltyLookUpPanel.add(lookupField);
@@ -293,6 +314,13 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
         centerPanel.add(TopItemsScroll, BorderLayout.CENTER);
 
         this.add(centerPanel, BorderLayout.CENTER);
+        JPanel groupButtonsPanel = new JPanel();
+        groupButtonsPanel.add(groupTabButton);
+        topWrapper.add(Box.createVerticalStrut(10)); // spacing
+        topWrapper.add(groupButtonsPanel);
+
+        topWrapper.add(Box.createVerticalStrut(10)); // spacing
+        topWrapper.add(groupButtonsPanel);
 
         // --- Bottom panel (SOUTH) ---
         JPanel bottomPanel = new JPanel();
@@ -333,6 +361,7 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
                 short_termButton.setEnabled(connected);
                 medium_termButton.setEnabled(connected);
                 long_termButton.setEnabled(connected);
+                goToGroup.setEnabled(connected);
             }
         }
 
@@ -383,6 +412,102 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
 
     }
 
+    // group helpers
+    private void openCreateGroupPopup() {
+        // Popup frame
+        JFrame createGroupFrame = new JFrame("Create Group");
+        createGroupFrame.setLayout(new BoxLayout(createGroupFrame.getContentPane(), BoxLayout.Y_AXIS));
+        createGroupFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+
+        // Group Name
+        JPanel groupNamePanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JLabel groupNameLabel = new JLabel("Group Name:");
+        JTextField groupNameField = new JTextField(20);
+        groupNamePanel.add(groupNameLabel);
+        groupNamePanel.add(groupNameField);
+
+        // Member Spotify User IDs
+        JPanel membersPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JLabel membersLabel = new JLabel("Member Spotify User IDs (comma-separated):");
+        JTextField membersField = new JTextField(30);
+        membersPanel.add(membersLabel);
+        membersPanel.add(membersField);
+
+        // Create button
+        JButton createButton = new JButton("Create");
+        createButton.addActionListener(e -> {
+            String groupName = groupNameField.getText().trim();
+            String membersText = membersField.getText().trim();
+
+            if (groupName.isEmpty()) {
+                JOptionPane.showMessageDialog(createGroupFrame,
+                        "Please enter a group name.",
+                        "Missing Name",
+                        JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            // Split IDs
+            String[] memberIds = membersText.isEmpty() ? new String[0] :
+                    Arrays.stream(membersText.split("\\s*,\\s*"))
+                            .map(String::trim)
+                            .toArray(String[]::new);
+
+            SpotifyUserDataAccessObject spotifyUserDao = SpotifyUserDataAccessObject.getInstance();
+            List<SpotifyUser> members = new ArrayList<>();
+            List<String> missingIds = new ArrayList<>();
+
+            for (String id : memberIds) {
+                SpotifyUser user = spotifyUserDao.getUserById(id);
+                if (user != null) {
+                    members.add(user);
+                } else {
+                    missingIds.add(id);
+                }
+            }
+
+            if (members.isEmpty()) {
+                JOptionPane.showMessageDialog(createGroupFrame,
+                        "No valid users found. Please enter at least one valid Spotify User ID.",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            if (!missingIds.isEmpty()) {
+                JOptionPane.showMessageDialog(createGroupFrame,
+                        "These user IDs were not found: " + String.join(", ", missingIds) + "\nThey will be skipped.",
+                        "Warning",
+                        JOptionPane.WARNING_MESSAGE);
+            }
+
+            if (createGroupController != null) {
+                createGroupController.execute(groupName, currentSpotifyUser, members);
+
+                // mark logged-in user as in a group
+                currentSpotifyUser.setInGroup(true);
+
+                JOptionPane.showMessageDialog(createGroupFrame,
+                        "Group created successfully!",
+                        "Success",
+                        JOptionPane.INFORMATION_MESSAGE);
+                createGroupFrame.dispose();
+            }
+            else {
+                JOptionPane.showMessageDialog(createGroupFrame,
+                        "Error creating group. Make sure the controller is initialized.",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE);
+            }
+        });
+
+        createGroupFrame.add(groupNamePanel);
+        createGroupFrame.add(membersPanel);
+        createGroupFrame.add(createButton);
+        createGroupFrame.pack();
+        createGroupFrame.setVisible(true);
+    }
+
     // --- Time and Item helpers ---
     private void set_time_shortTerm() {
         final GetTopItemsState state = getTopItemsViewModel.getState();
@@ -410,6 +535,7 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
         state.setSelectedTopItem(TopItem.tracks);
         getTopItemsViewModel.setState(state);
         getTopItemsViewModel.firePropertyChange();
+        checkEnableGetTopItemButton();  // ADD THIS LINE
     }
 
     private void set_item_artist() {
@@ -417,19 +543,20 @@ public class LoggedInView extends JPanel implements ActionListener, PropertyChan
         state.setSelectedTopItem(TopItem.artists);
         getTopItemsViewModel.setState(state);
         getTopItemsViewModel.firePropertyChange();
+        checkEnableGetTopItemButton();  // ADD THIS LINE
     }
 
     // --- Controllers and user setter ---
+    public void setCreateGroupController(interface_adapter.create_group.CreateGroupController controller) {
+        this.createGroupController = controller;
+    }
+
     public void setDailyMixController(DailyMixController dailyMixController) {
         this.dailyMixController = dailyMixController;
     }
 
     public void setGetTopItemsController(GetTopItemsController getTopItemsController) {
         this.getTopItemsController = getTopItemsController;
-    }
-
-    public void setLogoutController(LogoutController logoutController) {
-        this.logoutController = logoutController;
     }
 
     public void setLoyaltyLookupController(LoyaltyController loyaltyController) {

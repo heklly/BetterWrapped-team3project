@@ -12,78 +12,96 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
-/**
- * The Use Case Interactor for the Check Shared Song Use Case.
- */
 public class SharedSongInteractor implements SharedSongInputBoundary {
-    private final SharedSongOutputBoundary sharedSongPresenter;
+
+    private final SharedSongOutputBoundary presenter;
     private final SpotifyDataAccessObject spotifyDAO;
 
-    public SharedSongInteractor(SharedSongOutputBoundary sharedSongPresenter,
+    public SharedSongInteractor(SharedSongOutputBoundary presenter,
                                 SpotifyDataAccessObject spotifyDAO) {
-        this.sharedSongPresenter = sharedSongPresenter;
+        this.presenter = presenter;
         this.spotifyDAO = spotifyDAO;
     }
 
-    public void execute(SharedSongInputData inputData,
-                        SpotifyDataAccessObject spotifyDataAccessObject) {
-        final SpotifyUser user = inputData.getUser();
+    @Override
+    public void execute(SharedSongInputData inputData) {
 
-        final GetUsersCurrentlyPlayingTrackRequest request = spotifyDataAccessObject
-                .getSpotifyApiForUser(user)
-                .getUsersCurrentlyPlayingTrack()
-                .build();
+        SpotifyUser mainUser = inputData.getUser();
+
+        // Filter real users
+        List<SpotifyUser> realUsers = inputData.getListOfMembers()
+                .stream()
+                .filter(u -> u != null && u.getAccessToken() != null)
+                .collect(Collectors.toList());
+
+        if (realUsers.isEmpty()) {
+            presenter.prepareFailureView("No valid group members.");
+            return;
+        }
+
         try {
+            // Use existing access token - do NOT refresh
+            GetUsersCurrentlyPlayingTrackRequest req =
+                    spotifyDAO.getSpotifyApiForUser(mainUser)
+                            .getUsersCurrentlyPlayingTrack()
+                            .build();
 
-            final CurrentlyPlaying response = request.execute();
+            CurrentlyPlaying response = req.execute();
 
-            // check to make sure something is playing, i.e. playing type and id are not null
-            if (!response.getIs_playing()) {
-                sharedSongPresenter.prepareFailureView("Try playing a song");
+            if (response == null) {
+                presenter.prepareFailureView("Spotify returned no playback — open Spotify and play a song.");
                 return;
             }
-            // check if a song is playing
-            String currentlyPlayingType = response.getCurrentlyPlayingType().getType();
-            if (!currentlyPlayingType.equals("track")) {
-                sharedSongPresenter.prepareFailureView("Try playing a song");
+
+            if (response.getIs_playing() == null || !response.getIs_playing()) {
+                presenter.prepareFailureView("You must be actively playing a song.");
                 return;
             }
-            // get song id for api call
+
+            if (response.getItem() == null) {
+                presenter.prepareFailureView("No track detected — try switching songs.");
+                return;
+            }
+
+            if (!"track".equals(response.getCurrentlyPlayingType().getType())) {
+                presenter.prepareFailureView("Only track playback is supported.");
+                return;
+            }
+
             String trackId = response.getItem().getId();
 
-            // go into group and check if song saved
-            final Map<String, String> usernameToShared = mapBuilder(inputData.getListOfMembers(), trackId);
+            // Compare with other group members
+            Map<String, String> results = new HashMap<>();
+            boolean anyoneShares = false;
 
-            // if no users in group have saved songs or none share your song then fail
-            final SharedSongOutputData sharedSongOutputData = new SharedSongOutputData(usernameToShared);
-            sharedSongPresenter.prepareSuccessView(sharedSongOutputData);
+            for (SpotifyUser member : realUsers) {
 
-        } catch (IOException | SpotifyWebApiException | ParseException e) {
-            System.out.println("Error: " + e.getMessage());
+                Boolean[] resp = spotifyDAO
+                        .getSpotifyApiForUser(member)
+                        .checkUsersSavedTracks(new String[]{trackId})
+                        .build()
+                        .execute();
+
+                if (resp[0]) {
+                    results.put(member.getUsername(), "Yes");
+                    anyoneShares = true;
+                } else {
+                    results.put(member.getUsername(), "No");
+                }
+            }
+
+            if (!anyoneShares) {
+                presenter.prepareFailureView("No one shares your song :(");
+            } else {
+                presenter.prepareSuccessView(new SharedSongOutputData(results));
+            }
+
+        } catch (SpotifyWebApiException e) {
+            presenter.prepareFailureView("Spotify permissions missing — reconnect Spotify.");
+        } catch (IOException | ParseException e) {
+            presenter.prepareFailureView("Error: " + e.getMessage());
         }
-    }
-
-    private boolean checkUserSavedTrack(SpotifyUser user, String trackId) throws IOException, SpotifyWebApiException, ParseException {
-        final CheckUsersSavedTracksRequest request = spotifyDAO
-                .getSpotifyApiForUser(user)
-                .checkUsersSavedTracks(new String[]{trackId})
-                .build();
-        final Boolean[] response = request.execute();
-        return response[0];
-    }
-
-    private Map<String, String> mapBuilder(List<SpotifyUser> group, String trackId)
-            throws IOException, SpotifyWebApiException, ParseException {
-        final Map<String, String> usernameToShared = new HashMap<>();
-
-        for (final SpotifyUser u : group) {
-            if (checkUserSavedTrack(u, trackId)) {
-                usernameToShared.put(u.getUsername(), "Yes");
-            }
-            else {
-                usernameToShared.put(u.getUsername(), "No");
-            }
-        } return usernameToShared;
     }
 }

@@ -1,7 +1,9 @@
 package data_access;
 
 import entity.ArtistLoyaltyScore;
+import entity.Group;
 import entity.SpotifyUser;
+import entity.UserTasteProfile;
 import okhttp3.*;
 import org.json.JSONObject;
 import se.michaelthelin.spotify.SpotifyApi;
@@ -43,6 +45,52 @@ public class SpotifyDataAccessObject {
                 .build();
     }
 
+    public UserTasteProfile buildTasteProfileForUser(SpotifyUser user) {
+        SpotifyUser freshUser = refreshAccessToken(user);
+        Set<String> genres = getUserTopGenres(freshUser);
+
+        return new UserTasteProfile(
+                user.getUsername(),
+                user.getSpotifyUserId(),
+                genres
+        );
+    }
+
+    public List<UserTasteProfile> buildTasteProfilesForGroup(Group group) {
+        List<UserTasteProfile> profiles = new ArrayList<>();
+
+        if (group == null || group.getUsers() == null) {
+            return profiles;
+        }
+
+        for (SpotifyUser user : group.getUsers()) {
+            if (user == null) {
+                continue;
+            }
+
+            // Reuse the method you just added
+            UserTasteProfile profile = buildTasteProfileForUser(user);
+            profiles.add(profile);
+        }
+
+        return profiles;
+    }
+
+    public List<UserTasteProfile> buildTasteProfilesForUsers(List<SpotifyUser> users) {
+        List<UserTasteProfile> profiles = new ArrayList<>();
+        if (users == null) {
+            return profiles;
+        }
+
+        for (SpotifyUser user : users) {
+            if (user == null) continue;
+            UserTasteProfile profile = buildTasteProfileForUser(user);
+            profiles.add(profile);
+        }
+
+        return profiles;
+    }
+
     private String generateCodeVerifier() {
         SecureRandom secureRandom = new SecureRandom();
         byte[] codeVerifierBytes = new byte[32];
@@ -71,7 +119,15 @@ public class SpotifyDataAccessObject {
             System.out.println("Generated code challenge: " + codeChallenge);
 
             // Build authorization URL manually with PKCE parameters
-            String scope = "user-library-read user-read-recently-played user-top-read";
+            String scope = String.join(" ",
+                    "user-library-read",
+                    "user-read-recently-played",
+                    "user-top-read",
+                    "playlist-read-private",
+                    "user-read-currently-playing",
+                    "user-read-playback-state"
+            );
+
             String authUrl = String.format(
                     "https://accounts.spotify.com/authorize?" +
                             "client_id=%s&" +
@@ -144,7 +200,7 @@ public class SpotifyDataAccessObject {
                 System.out.println("Got user profile: " + userProfile.getDisplayName());
 
                 SpotifyUser spotifyUser = new SpotifyUser(
-                        username,
+                        userProfile.getDisplayName(),
                         accessToken,
                         refreshToken,
                         userProfile.getId()

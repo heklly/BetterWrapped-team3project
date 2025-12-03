@@ -15,10 +15,10 @@ public class UserGroupState {
     // input data that need to be passed to use case controllers
     private SpotifyUser spotifyUser;
     private List<SpotifyUser> groupUsers;
-//    private List<UserTasteProfile> profiles;
+    private Group group;
 
     private String groupName = "";
-    private List<String> groupUsernames = null;
+    private List<String> groupUsernames = new ArrayList<>();
     private boolean inGroup =  false;
     private String nameError = "";
 
@@ -26,11 +26,26 @@ public class UserGroupState {
 
     public void setSpotifyUser(SpotifyUser spotifyUser) { this.spotifyUser = spotifyUser; }
 
+    public Group getGroup() {
+        return group;
+    }
+
+    public void setGroup(Group group) {
+        this.group = group;
+    }
+
     public List<SpotifyUser> getGroupUsers() { return this.groupUsers; }
 
     public void setGroupUsers(List<SpotifyUser> groupUsers) {
-        this.groupUsers = new ArrayList<SpotifyUser>(groupUsers);
+        this.groupUsers = new ArrayList<>(groupUsers);
+
+        // fills user id list list
+        this.groupUsernames = new ArrayList<>();
+        for (SpotifyUser u : groupUsers) {
+            this.groupUsernames.add(u.getUsername());
+        }
     }
+
     public String getGroupName() {
         return groupName;
     }

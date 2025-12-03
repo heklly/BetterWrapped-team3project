@@ -5,7 +5,7 @@ import interface_adapter.ViewModel;
 public class NoGroupViewModel extends ViewModel<UserGroupState> {
 
     public NoGroupViewModel() {
-        super("in group");
+        super("no group"); // <-- was "in group", that’s wrong
         setState(new UserGroupState());
     }
 }

@@ -71,9 +71,6 @@ public class LoyaltyScoreInteractorTest {
                 assertEquals(3, outputData.getScores().size());
                 assertEquals(ALS_current, outputData.getScores().get(LocalDate.now().toString()));
             }
-
-            @Override
-            public void returnPreviousView(){}
         };
 
         // Create the interactor with the mock Spotify DAO and the mock data access object
