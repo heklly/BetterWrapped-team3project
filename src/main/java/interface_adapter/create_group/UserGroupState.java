@@ -19,7 +19,6 @@ public class UserGroupState {
 
     private String groupName = "";
     private List<String> groupUsernames = new ArrayList<>();
-    private boolean inGroup =  false;
     private String nameError = "";
 
     public SpotifyUser getSpotifyUser() { return spotifyUser; }
@@ -60,14 +59,6 @@ public class UserGroupState {
 
     public void setGroupUsernames(List<String> groupUsernames) {
         this.groupUsernames = groupUsernames;
-    }
-
-    public boolean isInGroup() {
-        return inGroup;
-    }
-
-    public void setInGroup(boolean inGroup) {
-        this.inGroup = inGroup;
     }
 
     public String getNameError() { return nameError; }

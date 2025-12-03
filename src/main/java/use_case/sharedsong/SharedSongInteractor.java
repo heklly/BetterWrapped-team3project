@@ -25,7 +25,6 @@ public class SharedSongInteractor implements SharedSongInputBoundary {
         this.spotifyDAO = spotifyDAO;
     }
 
-    @Override
     public void execute(SharedSongInputData inputData) {
 
         SpotifyUser mainUser = inputData.getUser();
@@ -74,7 +73,6 @@ public class SharedSongInteractor implements SharedSongInputBoundary {
 
             // Compare with other group members
             Map<String, String> results = new HashMap<>();
-            boolean anyoneShares = false;
 
             for (SpotifyUser member : realUsers) {
 
@@ -86,17 +84,12 @@ public class SharedSongInteractor implements SharedSongInputBoundary {
 
                 if (resp[0]) {
                     results.put(member.getUsername(), "Yes");
-                    anyoneShares = true;
                 } else {
                     results.put(member.getUsername(), "No");
                 }
-            }
 
-            if (!anyoneShares) {
-                presenter.prepareFailureView("No one shares your song :(");
-            } else {
-                presenter.prepareSuccessView(new SharedSongOutputData(results));
-            }
+            } presenter.prepareSuccessView(new SharedSongOutputData(results));
+
 
         } catch (SpotifyWebApiException e) {
             presenter.prepareFailureView("Spotify permissions missing — reconnect Spotify.");

@@ -49,7 +49,7 @@ public class CreateGroupPresenter implements CreateGroupOutputBoundary {
         }
 
         // Update InGroupViewModel state
-        UserGroupState currentState = inGroupViewModel.getState();
+        UserGroupState currentState = new UserGroupState();
         currentState.setGroup(outputData.getGroup());               // full Group entity
         currentState.setGroupName(outputData.getGroup_name());
 
@@ -68,6 +68,7 @@ public class CreateGroupPresenter implements CreateGroupOutputBoundary {
         }
 
         // Notify the InGroupView to update UI
+        inGroupViewModel.setState(currentState);
         inGroupViewModel.firePropertyChange();
 
         // Reset NoGroupViewModel state

@@ -1,5 +1,6 @@
 package interface_adapter.sharedsong;
 
+import data_access.SpotifyDataAccessObject;
 import entity.SpotifyUser;
 import use_case.sharedsong.SharedSongInputBoundary;
 import use_case.sharedsong.SharedSongInputData;
@@ -20,8 +21,7 @@ public class SharedSongController {
 
     /**
      * Executes the Shared Song Use Case.
-     *
-     * @param user       the user checking if their song is shared
+     * @param user the user checking if their song is shared
      * @param groupUsers the list of users in the group the user is in
      */
 
