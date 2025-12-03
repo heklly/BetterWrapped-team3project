@@ -13,7 +13,6 @@ import interface_adapter.group_analytics.GroupAnalyticsController;
 import interface_adapter.group_analytics.GroupAnalyticsPresenter;
 import interface_adapter.group_analytics.GroupAnalyticsViewModel;
 import interface_adapter.logged_in.LoggedInViewModel;
-import interface_adapter.login.LoginViewModel;
 import interface_adapter.loyalty_score.LoyaltyController;
 import interface_adapter.loyalty_score.LoyaltyPresenter;
 import interface_adapter.loyalty_score.LoyaltyViewModel;
@@ -26,6 +25,7 @@ import interface_adapter.spotify_auth.SpotifyAuthViewModel;
 import interface_adapter.daily_mix.DailyMixViewModel;
 import interface_adapter.daily_mix.DailyMixController;
 import interface_adapter.daily_mix.DailyMixPresenter;
+import use_case.GroupDataAccessInterface;
 import use_case.get_topItems.GetTopItemsInputBoundary;
 import use_case.get_topItems.GetTopItemsInteractor;
 import use_case.get_topItems.GetTopItemsOutputBoundary;
@@ -56,7 +56,6 @@ public class AppBuilder {
     final ViewManagerModel viewManagerModel = new ViewManagerModel();
     ViewManager viewManager = new ViewManager(cardPanel, cardLayout, viewManagerModel);
 
-    private LoginViewModel loginViewModel;
     private LoggedInViewModel loggedInViewModel;
     private LoggedInView loggedInView;
     private SpotifyAuthView spotifyAuthView;
@@ -83,13 +82,13 @@ public class AppBuilder {
     public AppBuilder addViewModels() {
         loggedInViewModel = new LoggedInViewModel();
         spotifyAuthViewModel = new SpotifyAuthViewModel();
+        dailyMixViewModel = new DailyMixViewModel();
+        getTopItemsViewModel = new GetTopItemsViewModel();
+        loyaltyViewModel = new LoyaltyViewModel();
         inGroupViewModel = new InGroupViewModel();
         noGroupViewModel = new NoGroupViewModel();
         sharedSongViewModel = new SharedSongViewModel();
         groupAnalyticsViewModel = new GroupAnalyticsViewModel();
-        dailyMixViewModel = new DailyMixViewModel();
-        getTopItemsViewModel = new GetTopItemsViewModel();
-        loyaltyViewModel = new LoyaltyViewModel();
         return this;
     }
 
@@ -141,7 +140,7 @@ public class AppBuilder {
         // Give controller to the LoggedInView (popup)
         loggedInView.setCreateGroupController(controller);
 
-        // Also give controller to NoGroupView (join/create group screen)
+        // Also give controller to NoGroupView (create group screen)
         noGroupView.setCreateGroupController(controller);
 
         return this;
@@ -167,9 +166,12 @@ public class AppBuilder {
         return this;
     }
 
+
     public AppBuilder addSpotifyAuthUseCase() {
-        // PKCE doesn't need client secret!
         data_access.SpotifyDataAccessObject spotifyDAO = new data_access.SpotifyDataAccessObject();
+
+        // Create browser launcher
+        data_access.SystemBrowserLauncher browserLauncher = new data_access.SystemBrowserLauncher();
 
         final SpotifyAuthOutputBoundary spotifyAuthOutputBoundary =
                 new SpotifyAuthPresenter(viewManagerModel, spotifyAuthViewModel, loggedInViewModel);
@@ -179,22 +181,11 @@ public class AppBuilder {
         }
 
         final SpotifyAuthInputBoundary spotifyAuthInteractor =
-                new SpotifyAuthInteractor(spotifyDAO, spotifyAuthOutputBoundary);
+                new SpotifyAuthInteractor(spotifyDAO, spotifyAuthOutputBoundary, browserLauncher);
 
         SpotifyAuthController controller = new SpotifyAuthController(spotifyAuthInteractor);
         spotifyAuthView.setSpotifyAuthController(controller);
 
-        return this;
-    }
-
-    public AppBuilder addLeaveGroupUseCase() {
-//        TODO uncomment once GroupDAO is done
-//        final LeaveGroupOutputBoundary leaveGroupPresenter =
-//                new LeaveGroupPresenter(viewManagerModel, inGroupViewModel, noGroupViewModel);
-//        final LeaveGroupInputBoundary leaveGroupInteractor =
-//                new LeaveGroupInteractor(new GroupDataAccessObject(), leaveGroupPresenter);
-//        LeaveGroupController leaveGroupController = new LeaveGroupController(leaveGroupInteractor);
-//        inGroupView.setLeaveGroupController(leaveGroupController);
         return this;
     }
 
@@ -215,11 +206,13 @@ public class AppBuilder {
         final GroupAnalyticsInputBoundary interactor =
                 new GroupAnalyticsInteractor(outputBoundary);
 
-        GroupAnalyticsController controller =
-                new GroupAnalyticsController(interactor);
+        SpotifyDataAccessObject spotifyDAO = new SpotifyDataAccessObject();
 
-        // The button that triggers analytics lives inside InGroupView
-        inGroupView.setGroupAnalyticsController(controller);
+        GroupAnalyticsController groupAnalyticsController =
+                new GroupAnalyticsController(interactor, spotifyDAO);
+
+        // Give controller to InGroupView
+        inGroupView.setGroupAnalyticsController(groupAnalyticsController);
 
         return this;
     }

@@ -17,4 +17,4 @@ public class SharedSongViewModel extends ViewModel<SharedSongState> {
     public SharedSongState getState() {
         return super.getState();
     }
-}
+    }

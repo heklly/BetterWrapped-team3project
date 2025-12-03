@@ -1,5 +1,7 @@
 package view.group_analytics;
 
+import entity.Group;
+import entity.SpotifyUser;
 import entity.UserTasteProfile;
 import interface_adapter.ViewManagerModel;
 import interface_adapter.group_analytics.GroupAnalyticsController;
@@ -16,9 +18,8 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Simple view showing the verdict and scores.
- * For now it uses a demo group; your teammate's group-forming use case
- * should call controller.analyzeGroup(...) with real UserTasteProfiles.
+ * View for showing group analytics verdict and scores.
+ * This view only works with REAL data (real Group / SpotifyUser list).
  */
 public class GroupAnalyticsView extends JPanel implements ActionListener, PropertyChangeListener {
 
@@ -107,8 +108,8 @@ public class GroupAnalyticsView extends JPanel implements ActionListener, Proper
         outputArea.setText(sb.toString());
     }
 
+    // Used by AppBuilder to register the card name
     public String getViewName() {
         return viewModel.getViewName();
     }
-
 }

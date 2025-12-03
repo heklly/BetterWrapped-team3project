@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 
 /**
  * Presenter for the Create Group use case.
- * Converts output data into a form suitable for the UI and updates the InGroupViewModel.
+ * Converts output data into a form suitable for the UI and updates the ViewModel.
  */
 public class CreateGroupPresenter implements CreateGroupOutputBoundary {
 
@@ -18,6 +18,13 @@ public class CreateGroupPresenter implements CreateGroupOutputBoundary {
     private final NoGroupViewModel noGroupViewModel;
     private final ViewManagerModel viewManagerModel;
 
+    /**
+     * Constructs a CreateGroupPresenter.
+     *
+     * @param noGroupViewModel the NoGroupViewModel associated with the Create Group screen.
+     * @param inGroupViewModel the InGroupViewModel to be updated
+     * @param viewManagerModel changes create/join group view to in group view
+     */
     public CreateGroupPresenter(InGroupViewModel inGroupViewModel,
                                 NoGroupViewModel noGroupViewModel,
                                 ViewManagerModel viewManagerModel) {
@@ -26,6 +33,11 @@ public class CreateGroupPresenter implements CreateGroupOutputBoundary {
         this.viewManagerModel = viewManagerModel;
     }
 
+    /**
+     * Updates the ViewModel based on output data from the interactor.
+     *
+     * @param outputData the output data containing the created group info
+     */
     @Override
     public void present(CreateGroupOutputData outputData) {
         if (outputData == null) {

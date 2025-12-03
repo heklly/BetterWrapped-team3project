@@ -35,7 +35,6 @@ public class Main {
 
                 .addSpotifyAuthUseCase()
                 .addCreateGroupUseCase()
-                .addLeaveGroupUseCase()
                 .addDailyMixUseCase()
                 .addGetTopItemsUseCase()
                 .addLoyaltyUseCase()

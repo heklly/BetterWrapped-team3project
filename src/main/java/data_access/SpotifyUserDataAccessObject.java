@@ -28,6 +28,8 @@ public class SpotifyUserDataAccessObject {
     /** Load existing users on startup */
     private void loadFromJson() {
         try (FileReader reader = new FileReader(FILE_PATH)) {
+
+            // FIX #1 — USE CONSISTENT LIST TYPE
             Type listType = new TypeToken<List<SpotifyUser>>(){}.getType();
             List<SpotifyUser> users = gson.fromJson(reader, listType);
 
@@ -36,7 +38,9 @@ public class SpotifyUserDataAccessObject {
                     userIdToUser.put(u.getSpotifyUserId(), u);
                 }
             }
-            System.out.println("Loaded " + userIdToUser.size() + " Spotify users from disk.");
+
+            System.out.println("Loaded " + userIdToUser.size() + " Spotify users from disk:");
+            userIdToUser.values().forEach(u -> System.out.println(" ~ " + u.getUsername()));
 
         } catch (Exception e) {
             System.out.println("No existing Spotify user file found. Starting fresh.");
@@ -46,7 +50,15 @@ public class SpotifyUserDataAccessObject {
     /** Save all users to JSON */
     private void saveToJson() {
         try (FileWriter writer = new FileWriter(FILE_PATH)) {
-            writer.write(gson.toJson(userIdToUser.values()));
+
+            // FIX #2 — WRITE A REAL LIST, NOT A COLLECTION VIEW
+            List<SpotifyUser> list = new ArrayList<>(userIdToUser.values());
+            writer.write(gson.toJson(list));
+
+            // FIX #3 — DEBUG PRINT LIKE BEFORE
+            System.out.println("Saved " + list.size() + " Spotify users to disk:");
+            list.forEach(u -> System.out.println(" ~ " + u.getUsername()));
+
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -100,18 +100,6 @@ public class NoGroupView extends JPanel implements ActionListener, PropertyChang
                 }
         );
 
-//        joinGroup.addActionListener(
-//                new ActionListener() {
-//                    public void actionPerformed(ActionEvent evt) {
-//                        if (evt.getSource().equals(joinGroup)) {
-//                            final UserGroupState = noGroupViewModel.getState();
-//                            joinGroupController.execute();
-//                            TODO
-//                        }
-//                    }
-//                }
-//        );
-
         inputGroupNameField.getDocument().addDocumentListener(new DocumentListener() {
 
             private void documentListenerHelper() {

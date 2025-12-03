@@ -8,7 +8,6 @@ import interface_adapter.create_group.InGroupViewModel;
 import interface_adapter.create_group.UserGroupState;
 import interface_adapter.group_analytics.GroupAnalyticsController;
 import interface_adapter.group_analytics.GroupAnalyticsViewModel;
-import interface_adapter.leave_group.LeaveGroupController;
 import interface_adapter.sharedsong.SharedSongController;
 import interface_adapter.sharedsong.SharedSongState;
 import interface_adapter.sharedsong.SharedSongViewModel;
@@ -43,8 +42,6 @@ public class InGroupView extends JPanel implements ActionListener, PropertyChang
 
     private SharedSongController sharedSongController = null;
     private GroupAnalyticsController groupAnalyticsController = null;
-    private LeaveGroupController leaveGroupController = null;
-
 
     public InGroupView(ViewManagerModel viewManagerModel,
                        InGroupViewModel inGroupViewModel,
@@ -78,28 +75,6 @@ public class InGroupView extends JPanel implements ActionListener, PropertyChang
                         if (evt.getSource().equals(loggedIn)) {
                             viewManagerModel.setState("logged in");
                             viewManagerModel.firePropertyChange();
-                        }
-                    }
-                }
-        );
-
-        leaveGroup.addActionListener(
-                new ActionListener() {
-                    public void actionPerformed(ActionEvent evt) {
-                        if (evt.getSource().equals(leaveGroup)) {
-                            if (leaveGroupController == null) {
-                                JOptionPane.showMessageDialog(InGroupView.this,
-                                        "Leaving a group is not implemented yet.",
-                                        "Not Available",
-                                        JOptionPane.INFORMATION_MESSAGE);
-                                return;
-                            }
-
-                            UserGroupState state = inGroupViewModel.getState();
-                            leaveGroupController.execute(
-                                    state.getSpotifyUser(),
-                                    state.getGroup()
-                            );
                         }
                     }
                 }
@@ -204,7 +179,7 @@ public class InGroupView extends JPanel implements ActionListener, PropertyChang
                 }
 
                 //Call the use case
-                groupAnalyticsController.analyzeGroup(profiles);
+                groupAnalyticsController.analyzeProfiles(profiles);
 
                 // Switch to the group analytics view (the presenter updates the VM)
                 viewManagerModel.setState(groupAnalyticsViewModel.getViewName());
@@ -282,9 +257,6 @@ public class InGroupView extends JPanel implements ActionListener, PropertyChang
         }
     }
 
-    public void setLeaveGroupController(LeaveGroupController leaveGroupController) {
-        this.leaveGroupController = leaveGroupController;
-    }
     public void setSharedSongController(SharedSongController sharedSongController) {
         this.sharedSongController = sharedSongController;
     }

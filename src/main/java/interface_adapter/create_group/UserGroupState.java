@@ -15,7 +15,6 @@ public class UserGroupState {
     // input data that need to be passed to use case controllers
     private SpotifyUser spotifyUser;
     private List<SpotifyUser> groupUsers;
-//    private List<UserTasteProfile> profiles;
     private Group group;
 
     private String groupName = "";
@@ -62,7 +61,6 @@ public class UserGroupState {
     public void setGroupUsernames(List<String> groupUsernames) {
         this.groupUsernames = groupUsernames;
     }
-
 
     public boolean isInGroup() {
         return inGroup;

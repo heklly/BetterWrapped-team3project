@@ -828,5 +828,41 @@
             }
         ],
         "groupCode": "725434"
+    },
+    {
+        "groupName": "test",
+        "users": [
+            {
+                "spotifyUserId": "31wjijso7bwi7j4fqlf5urylztle",
+                "accessToken": "BQBVMyURI_hKjyFzoydxmoDAPJFgg8DxE1WVchpW-GqC2Wv71fUGT0fG-E3zSD-MtBjZ1aZUk4hVpUNDWEmadrYz2-MdWWMYzx6XHvLu1ZhZzaPEOcYK4WvMXUFGm_obn_kD8fXyDZ7WJ5C28G0IMwWs2FG2niNnCy5py98IGaY3O9Qjgvrp-XY97neHjWgs0cWS6vBZ7hpqRkSEsdyhxC-AGIrBVq14NgFQx699yvAGCnfvqhR4y8sn6XFzoao-8QcwCqbpssE7zY7hVHDPcIB5bVu3",
+                "username": "samridhi walia",
+                "refreshToken": "AQBKTgWZkemgoQc480SnsreDkkA67d9b0E09zO7yJrw2l6lROVGNMhJAZtBu1kQRiZVzUgGgJWNTB-A1rn6DoV1lQXCrCg6gAvByqYB-wqHBEoogWj4wuPz1b7KkCvlZeMg"
+            },
+            {
+                "spotifyUserId": "31wjijso7bwi7j4fqlf5urylztle",
+                "accessToken": "BQDyOTUU3EYljbXvaqVmQ1DLzJBlwZonoXy8A-JiFg146WR8APbo9AZTT7c69r90dYA9bYH8aU2XSz0Apzlm9G-eTxXByma-7u_-vChHNcfBQJtLfgIsi1cnpwVccXrenAJcZeiEx-WyqhDN14C-iwSC42nWbemRmFqdv1Vhnjoo8tKQOt5E4Na3jjjGdylYG8rdqwWOWIR9P8wBzjTNHZTN3_25pq_AD_v6pC2xzpesKWTHz0OsiZqhHPiwoki7_r6asmzfzjHA-Xs2wR0eiZX2SMMP",
+                "username": "samridhi walia",
+                "refreshToken": "AQB2usYG7qqVrSD0CDD73m3YAvSvufxyjIuE2ldpzjRAbI_8C4SN2AHZqd8kberY8YAs2tpUnwmSXCHT4TfGeV_1jfWU3STw5nSL85XojhG5iYTTcMnw7ZpOqxrGhOCvKd8"
+            }
+        ],
+        "groupCode": "885934"
+    },
+    {
+        "groupName": "test",
+        "users": [
+            {
+                "spotifyUserId": "pl4dd7dqzuajh6e2dn4fmrv8h",
+                "accessToken": "BQBwRxfDA-bOv2NtP0pf373RzIc5KmqYcOoHclA90I1N9tgSyo9OdPvvv6Saf1PLNPgeXojE1h-yWDwSUNnEfJ08gnOjxjSNQIBxq76UbDCffGLgKJ-USPUnKUqVeS1Vgb3p6LUSE-QO_PuwfNlca-7ZYL0pzb4dtVPbeibxQhmvHBfIzn2QQSy7nkWJGpvF82UPvnoJ2tMvnyCr-cqvl0V5x8jmfGaNenS0t32C0DM0gzg9hbXgLf76UWF-7e9ymhpLG8RvS8VA1GVF9Tm228Q1Y9aQ",
+                "username": "~sami~",
+                "refreshToken": "AQCQqgulTAI3ybIwe5PDmC_NCTUUwNUsJyM-XH5JSWAUk_l7bC0RkGhKE3tDI2KjLQuAGPNz5JBtEj27QXPPsIIAYXzvjaUXUb4cKbvmgnckLcG8iP6gQl9bUXsBRcGTpQI"
+            },
+            {
+                "spotifyUserId": "31wjijso7bwi7j4fqlf5urylztle",
+                "accessToken": "BQDyOTUU3EYljbXvaqVmQ1DLzJBlwZonoXy8A-JiFg146WR8APbo9AZTT7c69r90dYA9bYH8aU2XSz0Apzlm9G-eTxXByma-7u_-vChHNcfBQJtLfgIsi1cnpwVccXrenAJcZeiEx-WyqhDN14C-iwSC42nWbemRmFqdv1Vhnjoo8tKQOt5E4Na3jjjGdylYG8rdqwWOWIR9P8wBzjTNHZTN3_25pq_AD_v6pC2xzpesKWTHz0OsiZqhHPiwoki7_r6asmzfzjHA-Xs2wR0eiZX2SMMP",
+                "username": "samridhi walia",
+                "refreshToken": "AQB2usYG7qqVrSD0CDD73m3YAvSvufxyjIuE2ldpzjRAbI_8C4SN2AHZqd8kberY8YAs2tpUnwmSXCHT4TfGeV_1jfWU3STw5nSL85XojhG5iYTTcMnw7ZpOqxrGhOCvKd8"
+            }
+        ],
+        "groupCode": "218562"
     }
 ]
